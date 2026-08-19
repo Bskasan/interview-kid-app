@@ -1,5 +1,4 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
 import ExerciseScreen from '../../app/exercise/[id]';
 import { getQuestionSet, optionA11yLabel } from '../../src/data/questions';
 import i18n from '../../src/i18n';
@@ -11,11 +10,17 @@ const FEEDBACK_MS = 1400;
 // tests survive copy edits without hardcoding strings.
 const t = i18n.getFixedT(null, 'exercise');
 const tq = i18n.getFixedT(null, 'questions');
+const tCommon = i18n.getFixedT(null, 'common');
 
 const mockReplace = jest.fn();
 const mockDispatch = jest.fn();
 const mockUsePreventRemove = jest.fn();
-let mockVideoProps: { onEnded: () => void; onError: () => void } | undefined;
+type VideoProps = {
+  onReady: () => void;
+  onEnded: () => void;
+  onError: (cause: unknown) => void;
+};
+let mockVideoProps: VideoProps | undefined;
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: LESSON_ID }),
@@ -30,7 +35,7 @@ jest.mock('expo-router/react-navigation', () => ({
 
 // The video stage is native (expo-video); the screen only needs its callbacks.
 jest.mock('@/components/ExerciseVideo', () => ({
-  ExerciseVideo: (props: { onEnded: () => void; onError: () => void }) => {
+  ExerciseVideo: (props: VideoProps) => {
     mockVideoProps = props;
     return null;
   },
@@ -62,9 +67,9 @@ describe('Exercise screen — back guard lifecycle', () => {
     jest.restoreAllMocks();
   });
 
-  it('arms the guard only while a quiz is in progress', async () => {
+  it('arms the guard on both stages and drops it on finish', async () => {
     await render(<ExerciseScreen />);
-    expect(guardEnabled()).toBe(false); // video stage: nothing to lose yet
+    expect(guardEnabled()).toBe(true); // video stage: same confirm as the 🏠 button
 
     await startQuiz();
     expect(guardEnabled()).toBe(true);
@@ -89,34 +94,112 @@ describe('Exercise screen — back guard lifecycle', () => {
     });
   });
 
-  it('unlocks the quiz through the error path and confirms exit only on the leave button', async () => {
-    const alertSpy = jest.spyOn(Alert, 'alert');
+  it('lets the child continue without the video and confirms an intercepted back via the sheet', async () => {
     await render(<ExerciseScreen />);
 
-    // Video failure must never block the flow: the CTA unlocks anyway.
+    // Video failure: the card replaces the video area, the quiz CTA is gone,
+    // and the child decides — here, continue without the video.
     await act(() => {
-      mockVideoProps?.onError();
+      mockVideoProps?.onError(new Error('media'));
     });
-    await fireEvent.press(screen.getByLabelText(t('startQuiz')));
+    expect(screen.getByText(t('videoUnavailable'), { exact: false })).toBeTruthy();
+    expect(screen.queryByLabelText(t('startQuiz'))).toBeNull();
+    await fireEvent.press(screen.getByLabelText(t('videoSkip')));
     expect(guardEnabled()).toBe(true);
 
     const action = { type: 'GO_BACK' };
     await act(() => {
       guardCallback()({ data: { action } });
     });
+    expect(screen.getByText(t('exitPrompt'), { exact: false })).toBeTruthy();
 
-    expect(alertSpy).toHaveBeenCalledWith(t('exitTitle'), t('exitBody'), expect.any(Array));
+    // Staying closes the sheet, keeps the attempt and re-arms nothing.
+    await fireEvent.press(screen.getByLabelText(t('exitStay')));
+    expect(mockDispatch).not.toHaveBeenCalled();
+    expect(screen.queryByText(t('exitPrompt'), { exact: false })).toBeNull();
+    expect(guardEnabled()).toBe(true);
 
-    const buttons = alertSpy.mock.calls.at(-1)?.[2] ?? [];
-    const cancel = buttons.find((button) => button.text === t('exitCancel'));
-    const confirm = buttons.find((button) => button.text === t('exitConfirm'));
+    // Leaving dispatches the intercepted action (guard disarmed via `leaving`).
+    await act(() => {
+      guardCallback()({ data: { action } });
+    });
+    await fireEvent.press(screen.getByLabelText(t('exitLeave')));
+    expect(mockDispatch).toHaveBeenCalledWith(action);
+    expect(mockReplace).not.toHaveBeenCalled();
+  });
 
-    cancel?.onPress?.();
-    expect(mockDispatch).not.toHaveBeenCalled(); // staying keeps the attempt
+  it('opens the same sheet from the 🏠 button and replaces to Home on confirm', async () => {
+    await render(<ExerciseScreen />);
+
+    // Video stage: the exit button is already there.
+    await fireEvent.press(screen.getByLabelText(t('exitButton')));
+    expect(screen.getByText(t('exitPrompt'), { exact: false })).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText(t('exitLeave')));
+    expect(mockReplace).toHaveBeenCalledWith('/');
+    expect(mockDispatch).not.toHaveBeenCalled(); // no intercepted action to replay
+  });
+
+  it('fails a silent stall via the 12 s watchdog and recovers through retry', async () => {
+    await render(<ExerciseScreen />);
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+
+    // No ready/error event arrives: the watchdog turns the stall into the card.
+    await act(() => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(screen.getByText(t('videoUnavailable'), { exact: false })).toBeTruthy();
+
+    // Retry (online in tests): the player remounts and the happy path resumes.
+    await fireEvent.press(screen.getByLabelText(tCommon('retry')));
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+    expect(screen.getByText(t('watchFirst'), { exact: false })).toBeTruthy();
 
     await act(() => {
-      confirm?.onPress?.();
+      mockVideoProps?.onReady();
+      mockVideoProps?.onEnded();
     });
-    expect(mockDispatch).toHaveBeenCalledWith(action); // leaving discards it
+    await fireEvent.press(screen.getByLabelText(t('startQuiz')));
+    expect(screen.getAllByText(t('question', { current: 1, total: 3 })).length).toBeGreaterThan(0);
+  });
+
+  it('keeps a ready video failing the watchdog off the error card', async () => {
+    await render(<ExerciseScreen />);
+
+    // readyToPlay arrives in time: the watchdog is disarmed for good.
+    await act(() => {
+      mockVideoProps?.onReady();
+    });
+    await act(() => {
+      jest.advanceTimersByTime(30_000);
+    });
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+    // The CTA stays locked until the video actually ends (happy path intact).
+    expect(screen.getByLabelText(t('startQuiz'))).toBeTruthy();
+  });
+
+  it('freezes the feedback auto-advance while the sheet is open', async () => {
+    await render(<ExerciseScreen />);
+    await startQuiz();
+
+    const questions = getQuestionSet(LESSON_ID);
+    const first = questions[0]!;
+    await fireEvent.press(
+      screen.getByLabelText(optionA11yLabel(first.options[first.correctIndex], tq)),
+    );
+
+    // Open the sheet during the feedback window: the advance must wait.
+    await fireEvent.press(screen.getByLabelText(t('exitButton')));
+    await act(() => {
+      jest.advanceTimersByTime(FEEDBACK_MS * 2);
+    });
+    expect(screen.getAllByText(t('question', { current: 1, total: 3 })).length).toBeGreaterThan(0);
+
+    // Staying resumes: the advance fires after a fresh feedback window.
+    await fireEvent.press(screen.getByLabelText(t('exitStay')));
+    await act(() => {
+      jest.advanceTimersByTime(FEEDBACK_MS);
+    });
+    expect(screen.getAllByText(t('question', { current: 2, total: 3 })).length).toBeGreaterThan(0);
   });
 });

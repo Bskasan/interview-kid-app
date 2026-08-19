@@ -49,6 +49,12 @@ jest.mock('expo-localization', () => ({
   getLocales: () => [{ languageCode: 'tr' }],
 }));
 
+// NetInfo is native; its official mock reports "online", so offline paths are
+// driven explicitly in the tests that need them.
+jest.mock('@react-native-community/netinfo', () =>
+  require('@react-native-community/netinfo/jest/netinfo-mock.js'),
+);
+
 // Initialize i18next synchronously (bundled resources) so components can
 // translate during render without per-test setup.
 require('./src/i18n');

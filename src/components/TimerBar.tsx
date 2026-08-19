@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
+import { clamp } from '@/utils/clamp';
 
 type Props = {
   /** 1 → 0 as the time runs out. */
@@ -24,7 +25,7 @@ export function TimerBar({ progress, remainingSeconds }: Props) {
         <View
           style={[
             styles.fill,
-            { width: `${Math.max(0, Math.min(1, progress)) * 100}%`, backgroundColor: fillColor },
+            { width: `${clamp(progress, 0, 1) * 100}%`, backgroundColor: fillColor },
           ]}
         />
       </View>

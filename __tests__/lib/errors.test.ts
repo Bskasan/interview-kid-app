@@ -5,7 +5,7 @@ import { createAppError, isAppError } from '../../src/lib/errors/types';
 import { reportingStorage } from '../../src/lib/storage';
 import { useErrorStore } from '../../src/store/errorStore';
 
-// The logger prints via console.error in dev (= jest); silence and observe it.
+// The logger prints through the dev console in jest; silence and observe it.
 let consoleSpy: jest.SpyInstance;
 
 beforeEach(() => {

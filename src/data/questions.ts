@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 import type tr from '@/locales/tr.json';
 import { colors } from '@/theme';
+import { hashString } from '@/utils/hashString';
 
 /**
  * Local mock quiz content (the brief allows local data for the exercise).
@@ -274,12 +275,8 @@ const questionSets: readonly QuestionSet[] = [
  * involved, and the picsum ids are stable, so a lesson keeps its questions forever.
  */
 export function getQuestionSet(lessonId: string): QuestionSet {
-  let hash = 0;
-  for (const char of lessonId) {
-    hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  }
   // questionSets is a non-empty literal, so the index is always valid.
-  return questionSets[hash % questionSets.length]!;
+  return questionSets[hashString(lessonId) % questionSets.length]!;
 }
 
 /** Exposed for data-integrity tests only. */
