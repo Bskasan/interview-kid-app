@@ -24,6 +24,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0017 — Idempotent result recording](decisions/0017-idempotent-result-recording.md) — single writer + once-per-mount guard + idempotent best-merge.
 - [0018 — Interaction & display hardening](decisions/0018-interaction-hardening.md) — contrast fixes, font-scale caps, navigation double-tap locks, app-active default.
 - [0019 — Visual answer grid](decisions/0019-visual-answer-grid.md) — 2×2 visual tiles for pre-readers: emoji/SVG-shape/image option model, compile-time a11y labels, pure tile sizing with a 120dp floor.
+- [0020 — Test strategy](decisions/0020-test-strategy.md) — pure logic exhaustively, screens at decision points via mocked boundaries, components for locking/a11y; no snapshots, no library re-testing; jest infra for Reanimated 4 + RNTL 14.
 
 ## Features
 
