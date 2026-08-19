@@ -4,8 +4,8 @@ import { colors } from '@/theme';
  * Local mock quiz content (the brief allows local data for the exercise).
  * Turkish, ages 5–8: pre-readers first — every option is a big visual (emoji,
  * drawn shape or photo) with an optional short label. Five sets; a lesson picks
- * one deterministically from its id (ADR 0015), so the same lesson always asks
- * the same questions — retakes stay comparable.
+ * one deterministically from its id, so the same lesson always asks the same
+ * questions — retakes stay comparable.
  */
 export type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
 

@@ -6,7 +6,7 @@ const REQUEST_TIMEOUT_MS = 10_000;
 
 /**
  * Maps the raw picsum list response to Lesson[].
- * Defensive by policy (ADR 0009): unknown input never throws — a malformed item is
+ * Defensive by policy: unknown input never throws — a malformed item is
  * skipped, a malformed payload yields []. Lesson numbering stays contiguous over the
  * items that survived, so a skipped item never produces a gap like "Ders 7" missing.
  */

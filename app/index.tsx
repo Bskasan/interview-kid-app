@@ -23,7 +23,7 @@ export default function HomeScreen() {
   const { isOffline } = useNetworkStatus();
 
   // A fast double-tap on a card must not push two exercise screens; the lock
-  // re-opens whenever Home regains focus (ADR 0018).
+  // re-opens whenever Home regains focus.
   const navLockRef = useRef(false);
   useFocusEffect(
     useCallback(() => {

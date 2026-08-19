@@ -9,7 +9,7 @@ type Props = {
   uri: string;
   /** Fired when playback reaches the end (unlocks the quiz CTA). */
   onEnded: () => void;
-  /** Fired when the source fails to load/play (CTA unlocks anyway — ADR 0012). */
+  /** Fired when the source fails to load/play (the CTA unlocks anyway). */
   onError: () => void;
 };
 

@@ -27,8 +27,8 @@ type Props = {
 
 /**
  * Celebration badge: pops in with a spring (scale + settle from a tilt), emits a
- * one-shot glow ring and a few confetti pieces — all hand-rolled with Reanimated
- * (ADR 0016). Reduced motion renders everything static, no confetti.
+ * one-shot glow ring and a few confetti pieces — all hand-rolled with Reanimated.
+ * Reduced motion renders everything static, no confetti.
  */
 export function BadgeReveal({ badge }: Props) {
   const reduceMotion = useReducedMotion();

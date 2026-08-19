@@ -34,7 +34,7 @@ export function answerQuestion(state: QuizState, choice: number, correctIndex: n
   return { ...state, answer: { choice, isCorrect }, correct: state.correct + (isCorrect ? 1 : 0) };
 }
 
-/** Timer expiry counts as a wrong answer (assumption #2). Ignored if already answered. */
+/** Timer expiry counts as a wrong answer. Ignored if already answered. */
 export function timeoutQuestion(state: QuizState): QuizState {
   if (state.finished || state.answer !== null) {
     return state;

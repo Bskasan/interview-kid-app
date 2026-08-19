@@ -2,7 +2,7 @@ import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
-// navigation context). This is the supported compatibility entry (ADR 0014).
+// navigation context). This is the supported compatibility entry.
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
@@ -70,9 +70,9 @@ export default function ExerciseScreen() {
     return () => clearTimeout(timer);
   }, [quiz.answer, quiz.finished, questions.length]);
 
-  // Abandoning a running quiz needs a confirmation; the attempt is discarded
-  // (assumption #4). Must be declared before the finish effect below so the
-  // guard is already off when the replace to /result dispatches (ADR 0014).
+  // Abandoning a running quiz needs a confirmation; the attempt is discarded.
+  // Must be declared before the finish effect below so the guard is already
+  // off when the replace to /result dispatches.
   usePreventRemove(stage === 'quiz' && !quiz.finished, ({ data }) => {
     Alert.alert(strings.exercise.exitTitle, strings.exercise.exitBody, [
       { text: strings.exercise.exitCancel, style: 'cancel' },

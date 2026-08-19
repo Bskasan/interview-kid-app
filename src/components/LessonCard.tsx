@@ -17,7 +17,7 @@ const DEFAULT_TOTAL = 3;
 
 type Status = 'none' | 'attempted' | 'earned' | 'perfect';
 
-// Pills carry meaning via icon + text; the colored border is only an accent (ADR 0010).
+// Pills carry meaning via icon + text; the colored border is only an accent.
 const statusPill: Record<Exclude<Status, 'none'>, { label: string; borderColor: string }> = {
   attempted: { label: strings.home.keepGoing, borderColor: colors.coral },
   earned: { label: strings.home.badgeEarned, borderColor: colors.sun },
