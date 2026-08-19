@@ -66,7 +66,7 @@ export type AnswerFeedback = 'idle' | 'correct' | 'wrongChoice' | 'revealCorrect
 export function feedbackForOption(
   state: QuizState,
   index: number,
-  correctIndex: number
+  correctIndex: number,
 ): AnswerFeedback {
   if (state.answer === null) {
     return 'idle';

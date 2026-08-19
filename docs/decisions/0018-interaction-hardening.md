@@ -9,12 +9,12 @@ The a11y/edge-case sweep surfaced four small holes: (1) coral/gray text shades f
 contrast rule on the cream background; (2) huge system font scales could clip text inside
 fixed-height cards and buttons; (3) a fast double-tap on a Home card pushed two Exercise
 screens (and Result buttons could double-replace); (4) `AppState.currentState` can be `unknown`
-at cold start, which our "active only when 'active'" logic read as *backgrounded* — video
+at cold start, which our "active only when 'active'" logic read as _backgrounded_ — video
 autoplay and the timer could stick paused with no change event to unstick them.
 
 ## Decision
 
-- **Contrast**: `muted` darkened `#8C8C8C` → `#6E6E6E` (≥4.5:1 on cream *and* white; the token's
+- **Contrast**: `muted` darkened `#8C8C8C` → `#6E6E6E` (≥4.5:1 on cream _and_ white; the token's
   role is unchanged — amendment noted in ADR 0006). The timer's seconds stay `ink` at all
   urgency levels: urgency is already shown by the bar's color/width and the number's value, and
   coral text cannot pass 4.5:1 on cream.
@@ -29,12 +29,12 @@ autoplay and the timer could stick paused with no change event to unstick them.
 
 ## Alternatives considered
 
-- **allowFontScaling={false}** — kills clipping *and* accessibility; a capped multiplier keeps
+- **allowFontScaling={false}** — kills clipping _and_ accessibility; a capped multiplier keeps
   large-text users readable while protecting fixed layouts.
 - **Debounce/throttle timers for double-taps** — time-based guesses; a focus-scoped lock is
   deterministic and cannot eat a legitimate second visit.
 - **Coral urgent digits with a lighter track** — juggling shades to keep a failing color;
-  dropping color-coding from the *text* (bar keeps it) is simpler and honest to the
+  dropping color-coding from the _text_ (bar keeps it) is simpler and honest to the
   "never color alone" rule, which the countdown number already satisfies by being a number.
 - **Treating `unknown` app state as inactive (status quo)** — "safe" only in theory: nothing
   re-emits an event when the state was actually active all along, so the UI could stay frozen.

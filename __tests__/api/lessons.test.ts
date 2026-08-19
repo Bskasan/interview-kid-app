@@ -41,7 +41,7 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
     'returns an empty list instead of crashing for non-array payload %p',
     (payload) => {
       expect(mapLessons(payload)).toEqual([]);
-    }
+    },
   );
 });
 
@@ -74,7 +74,7 @@ describe('fetchLessons — network fetcher for the lesson list', () => {
 
     expect(fetchSpy).toHaveBeenCalledWith(
       'https://picsum.photos/v2/list?page=1&limit=20',
-      expect.objectContaining({ signal: expect.any(AbortSignal) })
+      expect.objectContaining({ signal: expect.any(AbortSignal) }),
     );
   });
 });

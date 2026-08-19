@@ -7,7 +7,7 @@ export function useAppActive() {
   // all); only an explicit background/inactive counts as "not active", otherwise
   // autoplay and the timer would stick paused with no change event to unstick them.
   const [isActive, setIsActive] = useState(
-    AppState.currentState !== 'background' && AppState.currentState !== 'inactive'
+    AppState.currentState !== 'background' && AppState.currentState !== 'inactive',
   );
 
   useEffect(() => {

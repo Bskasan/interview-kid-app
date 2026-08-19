@@ -48,7 +48,7 @@ throughout — an un-awaited `unmount()` demonstrably leaves effects alive.
   refactors noisy (two layers fail for one change) and trivial tests train reviewers to
   ignore red. Deleting filler is part of the deliverable.
 - **Snapshot tests for the screens** — fast to write, but they fail on every intentional
-  visual tweak and never say *what* broke; they protect nothing a reviewer cares about here.
+  visual tweak and never say _what_ broke; they protect nothing a reviewer cares about here.
 - **Full-flow tests rendering the router (Home → Exercise → Result)** — closest to reality,
   but needs expo-router's native stack, NetInfo, expo-video and query persistence all mocked
   together; brittle setup for little added signal over the decision-point tests. A real
@@ -62,7 +62,7 @@ throughout — an un-awaited `unmount()` demonstrably leaves effects alive.
   with zero console noise.
 - Component/screen tests are now possible at all (transform + Reanimated + mock setup), so
   future UI work can be tested at its decision points instead of by hand.
-- Screens are tested through mocked boundaries, so a breaking change *inside* expo-router or
+- Screens are tested through mocked boundaries, so a breaking change _inside_ expo-router or
   expo-video would not be caught — accepted: that is library territory and device-test
   territory.
 - The `.native`-stripping worklets resolver and the RNTL async API are version-coupled

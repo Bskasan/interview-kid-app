@@ -1,11 +1,10 @@
-/* eslint-env jest */
 // Reanimated ships an official jest mode: worklets run on the JS thread and the
 // native module is stubbed, so components using animations can render in tests.
 require('react-native-reanimated').setUpTests();
 
 // AsyncStorage is a native module; tests use its official in-memory mock.
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock')
+  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
 
 // react-native's auto-mock leaves AppState.currentState as a jest.fn(), but the
@@ -19,8 +18,9 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
 }));
 
 // Official mock: screens render without wrapping every test in a provider.
-jest.mock('react-native-safe-area-context', () =>
-  require('react-native-safe-area-context/jest/mock').default
+jest.mock(
+  'react-native-safe-area-context',
+  () => require('react-native-safe-area-context/jest/mock').default,
 );
 
 // Haptics calls chain .catch() on the returned promise, so the mocks must

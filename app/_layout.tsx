@@ -13,7 +13,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 // On native, React Query cannot see connectivity by itself; NetInfo drives its
 // online state so stale queries refetch automatically on reconnect.
 onlineManager.setEventListener((setOnline) =>
-  NetInfo.addEventListener((state) => setOnline(!!state.isConnected))
+  NetInfo.addEventListener((state) => setOnline(!!state.isConnected)),
 );
 
 const queryClient = new QueryClient({

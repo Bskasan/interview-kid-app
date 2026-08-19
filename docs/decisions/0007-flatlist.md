@@ -12,7 +12,7 @@ smooth scrolling on a mid-range Android phone in Expo Go.
 
 React Native's built-in **FlatList** with `keyExtractor` (lesson id — deduplicated by the mapper,
 ADR 0009), `getItemLayout` (cards have a fixed exported height, so layout is computed without
-measurement), a `RefreshControl` bound to React Query's `refetch`, and a fixed header *outside*
+measurement), a `RefreshControl` bound to React Query's `refetch`, and a fixed header _outside_
 the list so `getItemLayout` offsets stay exact.
 
 ## Alternatives considered

@@ -1,5 +1,10 @@
 import * as Haptics from 'expo-haptics';
-import { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from 'react-native-reanimated';
+import {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { motion } from '@/theme';
 
 /**

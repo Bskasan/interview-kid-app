@@ -20,7 +20,7 @@ Three independent layers, any one of which suffices:
 2. **Once-per-mount ref guard** — the recording effect flips `recordedRef` before writing, so
    re-renders and StrictMode's second effect invocation are blocked.
 3. **Idempotent merge** — `mergeResult` (unit-tested) only replaces a stored result when the new
-   attempt is *strictly better*; recording the same `{correct, total}` again is an identity
+   attempt is _strictly better_; recording the same `{correct, total}` again is an identity
    operation. Even a full remount with identical params cannot change stored state.
 
 Recording is skipped entirely for garbage params (`lessonId === ''` or `total <= 0`), and the
@@ -43,7 +43,7 @@ success haptic fires in the same guarded effect so it also runs at most once.
   is harmless.
 - Home reflects the new badge immediately on return: `LessonCard` subscribes to the store, and
   navigation is `replace`, so no stale screen instance survives.
-- If richer analytics ever need exactly-once *delivery* (not just idempotent state), a real
+- If richer analytics ever need exactly-once _delivery_ (not just idempotent state), a real
   attempt id would be introduced (noted for production).
 
 ## References

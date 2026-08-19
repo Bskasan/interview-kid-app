@@ -19,7 +19,7 @@ Three cooperating pieces:
    `lessons-v1`, query `gcTime` ≥ `maxAge`). A cold start offline rehydrates the last good list.
 2. **Connectivity awareness** — React Query's `onlineManager` is driven by NetInfo (per the
    official React Native guide), so a stale list refetches automatically on reconnect.
-3. **Honest banner** — `useNetworkStatus` reports offline only on a *definite* negative
+3. **Honest banner** — `useNetworkStatus` reports offline only on a _definite_ negative
    (`isConnected === false` or `isInternetReachable === false`). NetInfo's initial `null`
    ("don't know yet") is treated as online, so the banner never flashes during startup.
 
