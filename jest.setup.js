@@ -1,4 +1,8 @@
 /* eslint-env jest */
+// Reanimated ships an official jest mode: worklets run on the JS thread and the
+// native module is stubbed, so components using animations can render in tests.
+require('react-native-reanimated').setUpTests();
+
 // AsyncStorage is a native module; tests use its official in-memory mock.
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
