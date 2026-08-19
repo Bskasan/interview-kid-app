@@ -22,8 +22,8 @@ export default function ResultScreen() {
   const { passed, badge } = computeOutcome(correct, total);
   const recordResult = useProgressStore((state) => state.recordResult);
 
-  // Double-tapping a button must not replace twice (ADR 0018); the screen
-  // unmounts on navigation, so the lock never needs resetting.
+  // Double-tapping a button must not replace twice; the screen unmounts on
+  // navigation, so the lock never needs resetting.
   const navLockRef = useRef(false);
   const navigateOnce = (navigate: () => void) => {
     if (navLockRef.current) {
@@ -33,7 +33,7 @@ export default function ResultScreen() {
     navigate();
   };
 
-  // Record exactly once per visit (ADR 0017): the ref blocks re-renders and
+  // Record exactly once per visit: the ref blocks re-renders and
   // StrictMode's double effect; mergeResult in the store is idempotent anyway,
   // so even a remount with the same params cannot inflate progress.
   const recordedRef = useRef(false);

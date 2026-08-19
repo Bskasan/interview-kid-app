@@ -34,7 +34,7 @@ export function answerQuestion(state: QuizState, choice: number, correctIndex: n
   return { ...state, answer: { choice, isCorrect }, correct: state.correct + (isCorrect ? 1 : 0) };
 }
 
-/** Timer expiry counts as a wrong answer (assumption #2). Ignored if already answered. */
+/** Timer expiry counts as a wrong answer. Ignored if already answered. */
 export function timeoutQuestion(state: QuizState): QuizState {
   if (state.finished || state.answer !== null) {
     return state;
@@ -52,4 +52,30 @@ export function advanceQuiz(state: QuizState, totalQuestions: number): QuizState
     return { ...state, answer: null, finished: true };
   }
   return { ...state, index: nextIndex, answer: null };
+}
+
+/**
+ * idle: awaiting the child's tap. After an answer locks in:
+ * correct = the tapped right answer, wrongChoice = the tapped wrong answer,
+ * revealCorrect = the right answer shown after a wrong tap or timeout,
+ * lockedOut = the remaining options (dimmed, unpressable).
+ */
+export type AnswerFeedback = 'idle' | 'correct' | 'wrongChoice' | 'revealCorrect' | 'lockedOut';
+
+/** Projects the state onto one option's visual feedback. */
+export function feedbackForOption(
+  state: QuizState,
+  index: number,
+  correctIndex: number
+): AnswerFeedback {
+  if (state.answer === null) {
+    return 'idle';
+  }
+  if (state.answer.choice === index) {
+    return state.answer.isCorrect ? 'correct' : 'wrongChoice';
+  }
+  if (index === correctIndex) {
+    return 'revealCorrect';
+  }
+  return 'lockedOut';
 }

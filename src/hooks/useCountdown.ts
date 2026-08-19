@@ -11,7 +11,7 @@ type Options = {
 };
 
 /**
- * Question countdown (ADR 0013). Timestamp-based: while active, remaining time is
+ * Question countdown. Timestamp-based: while active, remaining time is
  * recomputed from Date.now() against a deadline, so JS-thread congestion cannot make
  * the timer run slow; ticks only refresh the display. Pausing (answer feedback,
  * app backgrounded via AppState) snapshots the remaining time; resuming sets a new

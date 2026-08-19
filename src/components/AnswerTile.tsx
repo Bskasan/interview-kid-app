@@ -1,0 +1,224 @@
+import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
+import Svg, { Circle, Polygon, Rect } from 'react-native-svg';
+import { optionA11yLabel, type AnswerOptionData, type OptionVisual } from '@/data/questions';
+import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { type AnswerFeedback } from '@/lib/quiz';
+import { colors, radius, spacing, typography } from '@/theme';
+
+// Feedback is never color-alone: the ✓/✗ badge + border shapes carry the meaning.
+const feedbackStyles = {
+  idle: { backgroundColor: colors.surface, borderColor: colors.border },
+  correct: { backgroundColor: colors.primary, borderColor: colors.primaryDark },
+  wrongChoice: { backgroundColor: colors.surface, borderColor: colors.coral },
+  revealCorrect: { backgroundColor: colors.surface, borderColor: colors.primary },
+  lockedOut: { backgroundColor: colors.surface, borderColor: colors.border, opacity: 0.55 },
+} as const;
+
+const a11yPrefixes: Record<AnswerFeedback, string> = {
+  idle: '',
+  correct: '✓ ',
+  wrongChoice: '✗ ',
+  revealCorrect: '✓ ',
+  lockedOut: '',
+};
+
+// Ink glyph on a surface disc: coral/primary appear only as the badge border,
+// so the mark keeps ≥4.5:1 contrast in every state.
+const badges: Partial<Record<AnswerFeedback, { glyph: string; borderColor: string }>> = {
+  correct: { glyph: '✓', borderColor: colors.primaryDark },
+  wrongChoice: { glyph: '✗', borderColor: colors.coral },
+  revealCorrect: { glyph: '✓', borderColor: colors.primary },
+};
+
+// 5-point star centered in the 0–100 viewBox (outer r 46, inner r 20).
+const STAR_POINTS =
+  '50,4 61.8,33.8 93.7,35.8 69,56.2 77,87.2 50,70 23,87.2 31,56.2 6.3,35.8 38.2,33.8';
+const TRIANGLE_POINTS = '50,8 92,88 8,88';
+
+type Props = {
+  option: AnswerOptionData;
+  feedback: AnswerFeedback;
+  onPress: () => void;
+  width: number;
+  height: number;
+};
+
+export function AnswerTile({ option, feedback, onPress, width, height }: Props) {
+  const locked = feedback !== 'idle';
+  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled: locked });
+  const reduceMotion = useReducedMotion();
+  const shakeX = useSharedValue(0);
+
+  useEffect(() => {
+    if (feedback === 'wrongChoice' && !reduceMotion) {
+      // Gentle shake — a wobble, not a punishment.
+      shakeX.value = withSequence(
+        withTiming(-6, { duration: 60 }),
+        withTiming(6, { duration: 60 }),
+        withTiming(-4, { duration: 50 }),
+        withTiming(4, { duration: 50 }),
+        withTiming(0, { duration: 40 })
+      );
+    }
+  }, [feedback, reduceMotion, shakeX]);
+
+  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
+
+  // The tile never shrinks below the touch floor; only the visual scales down,
+  // so cramped screens cost artwork size, not tap accuracy.
+  const visualSize = Math.round(Math.min(width, height) * 0.6);
+  const badge = badges[feedback];
+
+  return (
+    <Animated.View style={[animatedStyle, shakeStyle]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        disabled={locked}
+        accessibilityRole="button"
+        accessibilityLabel={a11yPrefixes[feedback] + optionA11yLabel(option)}
+        accessibilityState={{
+          disabled: locked,
+          selected: feedback === 'correct' || feedback === 'wrongChoice',
+        }}
+        style={({ pressed }) => [
+          styles.base,
+          { width, height },
+          feedbackStyles[feedback],
+          pressed && !locked && styles.pressed,
+        ]}
+      >
+        {option.visual ? (
+          <View style={styles.content} accessible={false}>
+            <TileVisual visual={option.visual} size={visualSize} />
+            {option.label !== undefined ? (
+              <Text
+                style={styles.caption}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                maxFontSizeMultiplier={1.2}
+              >
+                {option.label}
+              </Text>
+            ) : null}
+          </View>
+        ) : (
+          <Text
+            style={styles.textOnly}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            maxFontSizeMultiplier={1.4}
+            accessible={false}
+          >
+            {option.label}
+          </Text>
+        )}
+        {badge ? (
+          <View style={[styles.badge, { borderColor: badge.borderColor }]}>
+            <Text style={styles.badgeGlyph} maxFontSizeMultiplier={1}>
+              {badge.glyph}
+            </Text>
+          </View>
+        ) : null}
+      </Pressable>
+    </Animated.View>
+  );
+}
+
+function TileVisual({ visual, size }: { visual: OptionVisual; size: number }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  if (visual.kind === 'emoji' || (visual.kind === 'image' && imageFailed)) {
+    const emoji = visual.kind === 'emoji' ? visual.value : visual.fallbackEmoji;
+    return (
+      // Emoji must not scale with the system font or it bursts the fixed tile.
+      <Text style={{ fontSize: size * 0.8, lineHeight: size }} maxFontSizeMultiplier={1}>
+        {emoji}
+      </Text>
+    );
+  }
+
+  if (visual.kind === 'image') {
+    return (
+      <Image
+        source={{ uri: visual.uri }}
+        contentFit="cover"
+        transition={200}
+        onError={() => setImageFailed(true)}
+        style={{
+          width: size,
+          height: size,
+          borderRadius: radius.button - 6,
+          backgroundColor: colors.border,
+        }}
+      />
+    );
+  }
+
+  const fill = colors[visual.color];
+  return (
+    <Svg width={size} height={size} viewBox="0 0 100 100">
+      {visual.shape === 'circle' ? <Circle cx={50} cy={50} r={42} fill={fill} /> : null}
+      {visual.shape === 'square' ? (
+        <Rect x={10} y={10} width={80} height={80} rx={12} fill={fill} />
+      ) : null}
+      {visual.shape === 'triangle' ? <Polygon points={TRIANGLE_POINTS} fill={fill} /> : null}
+      {visual.shape === 'star' ? <Polygon points={STAR_POINTS} fill={fill} /> : null}
+    </Svg>
+  );
+}
+
+const styles = StyleSheet.create({
+  base: {
+    borderRadius: radius.button,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.sm,
+  },
+  pressed: {
+    backgroundColor: colors.background,
+  },
+  content: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  caption: {
+    ...typography.button,
+    color: colors.ink,
+    textAlign: 'center',
+  },
+  textOnly: {
+    ...typography.title,
+    color: colors.ink,
+    textAlign: 'center',
+  },
+  badge: {
+    position: 'absolute',
+    top: spacing.xs,
+    right: spacing.xs,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    backgroundColor: colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeGlyph: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.ink,
+  },
+});

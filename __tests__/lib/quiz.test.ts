@@ -1,18 +1,21 @@
-import { advanceQuiz, answerQuestion, createQuizState, timeoutQuestion } from '../../src/lib/quiz';
+import {
+  advanceQuiz,
+  answerQuestion,
+  createQuizState,
+  feedbackForOption,
+  timeoutQuestion,
+} from '../../src/lib/quiz';
 
 const TOTAL = 3;
 
 describe('quiz state machine — answering', () => {
-  it('locks in a correct answer and increments the score', () => {
-    const state = answerQuestion(createQuizState(), 2, 2);
-    expect(state.answer).toEqual({ choice: 2, isCorrect: true });
-    expect(state.correct).toBe(1);
-  });
-
-  it('locks in a wrong answer without changing the score', () => {
-    const state = answerQuestion(createQuizState(), 0, 2);
-    expect(state.answer).toEqual({ choice: 0, isCorrect: false });
-    expect(state.correct).toBe(0);
+  it.each([
+    ['correct', 2, 2, true, 1],
+    ['wrong', 0, 2, false, 0],
+  ])('locks in a %s answer and scores it', (_kind, choice, correctIndex, isCorrect, score) => {
+    const state = answerQuestion(createQuizState(), choice, correctIndex);
+    expect(state.answer).toEqual({ choice, isCorrect });
+    expect(state.correct).toBe(score);
   });
 
   it('ignores a second tap while feedback is showing (double-tap guard)', () => {
@@ -65,5 +68,40 @@ describe('quiz state machine — advancing', () => {
       state = advanceQuiz(answerQuestion(state, 0, 1), TOTAL);
     }
     expect(advanceQuiz(state, TOTAL)).toBe(state);
+  });
+});
+
+describe('feedbackForOption — per-option feedback projection', () => {
+  const CORRECT = 2;
+
+  it('shows every option as idle while no answer is locked in', () => {
+    const state = createQuizState();
+    for (const index of [0, 1, 2, 3]) {
+      expect(feedbackForOption(state, index, CORRECT)).toBe('idle');
+    }
+  });
+
+  it('marks a correct tap and dims the rest without revealing anything', () => {
+    const state = answerQuestion(createQuizState(), CORRECT, CORRECT);
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('correct');
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
+  });
+
+  it('marks a wrong tap and reveals the correct option', () => {
+    const state = answerQuestion(createQuizState(), 0, CORRECT);
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('wrongChoice');
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('revealCorrect');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
+  });
+
+  it('reveals the correct option after a timeout without marking any tap', () => {
+    const state = timeoutQuestion(createQuizState());
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('revealCorrect');
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
   });
 });

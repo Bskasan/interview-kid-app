@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { strings } from '@/lib/strings';
 import { colors, radius, spacing, typography } from '@/theme';
 
-// Original generic fox — deliberately not an owl or any existing app's character (ADR 0006).
+// Original generic fox — deliberately not an owl or any existing app's character.
 const FACE = '🦊';
 
 type Props = {

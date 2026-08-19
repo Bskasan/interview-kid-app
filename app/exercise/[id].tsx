@@ -2,12 +2,12 @@ import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
-// navigation context). This is the supported compatibility entry (ADR 0014).
+// navigation context). This is the supported compatibility entry.
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AnswerOption, type AnswerFeedback } from '@/components/AnswerOption';
+import { AnswerGrid } from '@/components/AnswerGrid';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { ExerciseVideo } from '@/components/ExerciseVideo';
 import { Mascot } from '@/components/Mascot';
@@ -20,6 +20,7 @@ import {
   advanceQuiz,
   answerQuestion,
   createQuizState,
+  feedbackForOption,
   timeoutQuestion,
   type QuizState,
 } from '@/lib/quiz';
@@ -69,9 +70,9 @@ export default function ExerciseScreen() {
     return () => clearTimeout(timer);
   }, [quiz.answer, quiz.finished, questions.length]);
 
-  // Abandoning a running quiz needs a confirmation; the attempt is discarded
-  // (assumption #4). Must be declared before the finish effect below so the
-  // guard is already off when the replace to /result dispatches (ADR 0014).
+  // Abandoning a running quiz needs a confirmation; the attempt is discarded.
+  // Must be declared before the finish effect below so the guard is already
+  // off when the replace to /result dispatches.
   usePreventRemove(stage === 'quiz' && !quiz.finished, ({ data }) => {
     Alert.alert(strings.exercise.exitTitle, strings.exercise.exitBody, [
       { text: strings.exercise.exitCancel, style: 'cancel' },
@@ -135,19 +136,6 @@ export default function ExerciseScreen() {
     return <SafeAreaView style={styles.screen} />;
   }
 
-  const feedbackFor = (index: number): AnswerFeedback => {
-    if (quiz.answer === null) {
-      return 'idle';
-    }
-    if (quiz.answer.choice === index) {
-      return quiz.answer.isCorrect ? 'correct' : 'wrongChoice';
-    }
-    if (index === question.correctIndex) {
-      return 'revealCorrect';
-    }
-    return 'lockedOut';
-  };
-
   const mascotSpeech =
     quiz.answer === null
       ? undefined
@@ -161,17 +149,15 @@ export default function ExerciseScreen() {
     <SafeAreaView style={styles.screen}>
       <SegmentedProgress current={quiz.index + 1} total={questions.length} />
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
-      <Text style={styles.prompt}>{question.prompt}</Text>
-      <View style={styles.options}>
-        {question.options.map((option, index) => (
-          <AnswerOption
-            key={`${quiz.index}-${index}`}
-            label={option}
-            feedback={feedbackFor(index)}
-            onPress={() => handleAnswer(index)}
-          />
-        ))}
-      </View>
+      <Text style={styles.prompt} numberOfLines={2}>
+        {question.prompt}
+      </Text>
+      <AnswerGrid
+        key={quiz.index}
+        options={question.options}
+        feedbackFor={(index) => feedbackForOption(quiz, index, question.correctIndex)}
+        onSelect={handleAnswer}
+      />
       <View style={styles.mascotRow}>
         <Mascot size={48} speech={mascotSpeech} />
       </View>
@@ -201,9 +187,6 @@ const styles = StyleSheet.create({
     color: colors.ink,
     textAlign: 'center',
     marginVertical: spacing.md,
-  },
-  options: {
-    gap: spacing.md,
   },
   mascotRow: {
     flex: 1,

@@ -6,8 +6,8 @@ export type Outcome = {
 };
 
 /**
- * Pass/badge rules (assumption #3 in CLAUDE.md):
- * pass = at least 2/3 correct, perfect badge = all correct, normal badge = passed.
+ * Pass/badge rules: pass = at least 2/3 correct, perfect badge = all correct,
+ * normal badge = passed.
  * Written as integer math (3*correct >= 2*total) to avoid float threshold bugs.
  * Inputs are clamped so garbage route params can never produce a bogus badge.
  */
@@ -22,7 +22,7 @@ export function computeOutcome(correct: number, total: number): Outcome {
 }
 
 /**
- * Best-result policy for retakes (assumption #3): a new completed attempt replaces
+ * Best-result policy for retakes: a new completed attempt replaces
  * the stored one only when it is strictly better (more correct answers). Ties keep
  * the existing record.
  */

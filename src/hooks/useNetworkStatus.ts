@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 /**
  * Reports offline only on a definite negative: NetInfo's initial state can be
- * `null` ("unknown"), which must not flash the offline banner on startup (ADR 0008).
+ * `null` ("unknown"), which must not flash the offline banner on startup.
  */
 export function useNetworkStatus() {
   const [isOffline, setIsOffline] = useState(false);

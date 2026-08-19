@@ -18,6 +18,7 @@ export function usePressFeedback({ disabled = false }: { disabled?: boolean } = 
       return;
     }
     if (!reduceMotion) {
+      // eslint-disable-next-line react-hooks/immutability -- writing .value is Reanimated's shared-value API
       scale.value = withSpring(motion.pressScale, motion.spring);
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
@@ -25,6 +26,7 @@ export function usePressFeedback({ disabled = false }: { disabled?: boolean } = 
 
   const onPressOut = () => {
     if (!reduceMotion) {
+      // eslint-disable-next-line react-hooks/immutability -- writing .value is Reanimated's shared-value API
       scale.value = withSpring(1, motion.spring);
     }
   };

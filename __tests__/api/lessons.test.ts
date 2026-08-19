@@ -10,13 +10,11 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
     expect(lessons).toEqual([
       {
         id: '10',
-        author: 'Paul Jarvis',
         title: 'Ders 1: Paul Jarvis',
         thumbnailUrl: 'https://picsum.photos/id/10/200/200',
       },
       {
         id: '25',
-        author: 'Alejandro Escamilla',
         title: 'Ders 2: Alejandro Escamilla',
         thumbnailUrl: 'https://picsum.photos/id/25/200/200',
       },
@@ -60,8 +58,8 @@ describe('fetchLessons — network fetcher for the lesson list', () => {
     await expect(fetchLessons()).rejects.toThrow('500');
   });
 
-  it('resolves the mapped lesson list on a successful response', async () => {
-    jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+  it('requests the picsum list with an abortable signal and maps the response', async () => {
+    const fetchSpy = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
       ok: true,
       json: async () => [{ id: '7', author: 'Ada' }],
     } as unknown as Response);
@@ -69,10 +67,14 @@ describe('fetchLessons — network fetcher for the lesson list', () => {
     await expect(fetchLessons()).resolves.toEqual([
       {
         id: '7',
-        author: 'Ada',
         title: 'Ders 1: Ada',
         thumbnailUrl: 'https://picsum.photos/id/7/200/200',
       },
     ]);
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://picsum.photos/v2/list?page=1&limit=20',
+      expect.objectContaining({ signal: expect.any(AbortSignal) })
+    );
   });
 });
