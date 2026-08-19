@@ -39,3 +39,6 @@ example
 # generated native folders
 /ios
 /android
+
+# local dev tooling
+.claude/launch.json
