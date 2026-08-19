@@ -10,6 +10,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0003 — expo-video](decisions/0003-expo-video.md) — current SDK video module; expo-av is deprecated/banned, react-native-video breaks Expo Go.
 - [0004 — TanStack Query + persistence](decisions/0004-tanstack-query-persist.md) — declarative server state with AsyncStorage cache for the offline Home list.
 - [0005 — zustand + persist](decisions/0005-zustand-persist.md) — tiny persisted progress/badge store; MMKV rejected (not Expo Go compatible).
+- [0006 — Design language implementation](decisions/0006-design-language.md) — hand-rolled tokens + ChunkyButton + emoji mascot; UI kits, Lottie and Nunito rejected; contrast policy.
 
 ## Features
 
