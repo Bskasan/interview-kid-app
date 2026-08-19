@@ -7,6 +7,7 @@ export const strings = {
   common: {
     loading: 'Yükleniyor…',
     retry: 'Tekrar dene',
+    back: 'Geri',
     errorTitle: 'Bir şeyler ters gitti',
   },
   home: {
@@ -16,8 +17,12 @@ export const strings = {
     offlineBanner: 'İnternet yok — kayıtlı dersler açık 📚',
     offlineNoCache: 'İnternete bağlanınca dersler gelecek',
     lessonTitle: (n: number, author: string) => `Ders ${n}: ${author}`,
+    keepGoing: 'Devam et 💪',
+    badgeEarned: 'Rozet 🏅',
+    badgePerfect: 'Süper 🌟',
   },
   exercise: {
+    comingSoon: 'Alıştırma çok yakında 🛠️',
     startQuiz: 'Alıştırmaya Geç',
     videoError: 'Video açılmadı, sorun değil!',
     videoErrorHint: 'Alıştırmaya geçebilirsin 👇',
@@ -42,5 +47,12 @@ export const strings = {
   a11y: {
     mascot: 'Sevimli tilki maskot',
     mascotSays: (text: string) => `Tilki diyor ki: ${text}`,
+    lessonCard: (title: string, status: string) => `${title}. ${status}`,
+    lessonStatus: {
+      none: 'Henüz denenmedi',
+      attempted: 'Denendi, henüz rozet yok',
+      earned: 'Rozet kazanıldı',
+      perfect: 'Mükemmel rozet kazanıldı',
+    },
   },
 } as const;
