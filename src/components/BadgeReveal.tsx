@@ -58,11 +58,7 @@ export function BadgeReveal({ badge }: Props) {
   const { emoji, ring } = badgeLook[badge];
 
   return (
-    <View
-      style={styles.stage}
-      accessible
-      accessibilityLabel={strings.a11y.lessonStatus[badge]}
-    >
+    <View style={styles.stage} accessible accessibilityLabel={strings.a11y.lessonStatus[badge]}>
       {reduceMotion
         ? null
         : Array.from({ length: CONFETTI_COUNT }, (_, index) => (

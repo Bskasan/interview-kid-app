@@ -13,7 +13,7 @@ export function useNetworkStatus() {
       NetInfo.addEventListener((state) => {
         setIsOffline(state.isConnected === false || state.isInternetReachable === false);
       }),
-    []
+    [],
   );
 
   return { isOffline };

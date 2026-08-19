@@ -29,7 +29,7 @@ export function computeOutcome(correct: number, total: number): Outcome {
 export function mergeResult(
   previous: LessonResult | undefined,
   correct: number,
-  total: number
+  total: number,
 ): LessonResult {
   if (!Number.isFinite(total) || total <= 0) {
     return previous ?? { best: 0, total: 0, badge: 'none' };

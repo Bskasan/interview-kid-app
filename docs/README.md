@@ -26,6 +26,11 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0019 — Visual answer grid](decisions/0019-visual-answer-grid.md) — 2×2 visual tiles for pre-readers: emoji/SVG-shape/image option model, compile-time a11y labels, pure tile sizing with a 120dp floor.
 - [0020 — Test strategy](decisions/0020-test-strategy.md) — pure logic exhaustively, screens at decision points via mocked boundaries, components for locking/a11y; no snapshots, no library re-testing; jest infra for Reanimated 4 + RNTL 14.
 - [0021 — Cleanup pass and lint setup](decisions/0021-cleanup-and-lint.md) — verified dead-code removals (assets, deps, tokens, props), depcheck cross-checked by hand, working ESLint flat config with targeted Reanimated rule disables.
+- [0022 — Prettier and ESLint hardening](decisions/0022-prettier-eslint-hardening.md) — Prettier as sole formatting owner + no-console/no-any/exhaustive-deps as errors; LF pinned via .gitattributes for Windows.
+- [0023 — Typed-routes generation for typecheck](decisions/0023-typed-routes-typegen.md) — `expo customize tsconfig.json` as a one-shot typegen so `tsc` works on fresh clones and CI without Metro.
+- [0024 — Husky + lint-staged + commitlint](decisions/0024-husky-lint-staged-commitlint.md) — POSIX-sh hooks: fast checks per commit, commitlint on messages, full `check` on push; lefthook/simple-git-hooks rejected.
+- [0025 — GitHub Actions CI pipeline](decisions/0025-github-actions-pipeline.md) — one fail-fast job (typecheck→lint→format→test→export) on PRs and main pushes; export artifact as post-merge proof; EAS deferred.
+- [0026 — Branch ruleset, enforcement deferred](decisions/0026-branch-ruleset-deferred.md) — import-ready `main.json` ruleset committed; GitHub Free private repos can't enforce, pre-push hook is the gate until then.
 
 ## Features
 

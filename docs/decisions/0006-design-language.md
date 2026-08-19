@@ -35,7 +35,7 @@ border next to text on `surface`.
   another dependency, and design time. An emoji in a circle communicates "friendly guide" at
   near-zero cost and is trivially original.
 - **Copying a familiar look (Duolingo greens, KA Kids characters)** — rejected outright: the repo
-  bans third-party IP; we keep only the *principles* (chunky targets, one action per screen,
+  bans third-party IP; we keep only the _principles_ (chunky targets, one action per screen,
   celebration moments) with our own tokens.
 
 **Amendment (2026-08-19, Phase 4):** `muted` darkened `#8C8C8C` → `#6E6E6E` — the original value

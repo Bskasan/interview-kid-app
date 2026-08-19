@@ -66,7 +66,7 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
         withTiming(6, { duration: 60 }),
         withTiming(-4, { duration: 50 }),
         withTiming(4, { duration: 50 }),
-        withTiming(0, { duration: 40 })
+        withTiming(0, { duration: 40 }),
       );
     }
   }, [feedback, reduceMotion, shakeX]);

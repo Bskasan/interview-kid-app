@@ -48,7 +48,12 @@ export default function ResultScreen() {
     }
   }, [lessonId, correct, total, passed, recordResult]);
 
-  const title = badge === 'perfect' ? strings.result.perfectTitle : passed ? strings.result.passTitle : strings.result.failTitle;
+  const title =
+    badge === 'perfect'
+      ? strings.result.perfectTitle
+      : passed
+        ? strings.result.passTitle
+        : strings.result.failTitle;
   const mascotSpeech =
     badge === 'perfect'
       ? strings.result.mascotPerfect

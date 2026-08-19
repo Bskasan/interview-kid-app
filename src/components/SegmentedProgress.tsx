@@ -11,11 +11,19 @@ type Props = {
 /** "Soru 2/3" + one segment per question: done = green, current = blue, ahead = beige. */
 export function SegmentedProgress({ current, total }: Props) {
   return (
-    <View style={styles.row} accessible accessibilityLabel={strings.exercise.question(current, total)}>
+    <View
+      style={styles.row}
+      accessible
+      accessibilityLabel={strings.exercise.question(current, total)}
+    >
       <View style={styles.segments}>
         {Array.from({ length: total }, (_, index) => {
           const state =
-            index < current - 1 ? colors.primary : index === current - 1 ? colors.sky : colors.border;
+            index < current - 1
+              ? colors.primary
+              : index === current - 1
+                ? colors.sky
+                : colors.border;
           return <View key={index} style={[styles.segment, { backgroundColor: state }]} />;
         })}
       </View>

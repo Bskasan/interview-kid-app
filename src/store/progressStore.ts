@@ -35,6 +35,6 @@ export const useProgressStore = create<ProgressState>()(
       onRehydrateStorage: () => () => {
         useProgressStore.setState({ hasHydrated: true });
       },
-    }
-  )
+    },
+  ),
 );

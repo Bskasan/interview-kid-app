@@ -41,7 +41,7 @@ lesson card's updated stars/badge immediately.
 - **Navigation** — both buttons use `router.replace` ("Tekrar Dene" →
   `/exercise/[id]`, "Ana Sayfa" → `/`), so the history never contains a finished quiz or a
   stale result. Home updates live because `LessonCard` subscribes to the zustand store.
-- Primary/secondary button variants swap with the outcome so the *likely* next action is the
+- Primary/secondary button variants swap with the outcome so the _likely_ next action is the
   big green one (design principle: one primary action).
 
 ## c) Edge cases handled

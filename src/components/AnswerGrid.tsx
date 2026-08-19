@@ -27,7 +27,7 @@ export function computeTileSize(window: { width: number; height: number }): {
   const gridBudget = window.height - RESERVED_VERTICAL;
   const tileHeight = Math.max(
     MIN_TILE_HEIGHT,
-    Math.min(tileWidth, Math.floor((gridBudget - spacing.md) / 2))
+    Math.min(tileWidth, Math.floor((gridBudget - spacing.md) / 2)),
   );
   return { width: tileWidth, height: tileHeight };
 }

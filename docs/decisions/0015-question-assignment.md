@@ -6,7 +6,7 @@ Date: 2026-08-19
 ## Context
 
 Quiz content is local mock data (per the brief), but 20 lessons share it. Retakes keep the
-*best* result (assumption #3), which is only fair if a retake answers the same questions.
+_best_ result (assumption #3), which is only fair if a retake answers the same questions.
 The quiz also needs rules for double-taps and for what happens right after an answer.
 
 ## Decision

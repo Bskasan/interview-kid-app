@@ -9,7 +9,7 @@ Assumption #4: leaving a quiz mid-attempt (Android back button/gesture, any navi
 asks for confirmation and discards the attempt. The guard must cover **every** removal path,
 must not fire when the quiz finishes and legitimately replaces to the Result screen, and must
 not record partial progress (only `recordResult` on Result writes progress — so discarding is
-simply *not navigating to Result*).
+simply _not navigating to Result_).
 
 ## Decision
 

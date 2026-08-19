@@ -28,7 +28,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       navLockRef.current = false;
-    }, [])
+    }, []),
   );
   const openLesson = useCallback(
     (lessonId: string) => {
@@ -38,12 +38,14 @@ export default function HomeScreen() {
       navLockRef.current = true;
       router.push(`/exercise/${lessonId}`);
     },
-    [router]
+    [router],
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: Lesson }) => <LessonCard lesson={item} onPress={() => openLesson(item.id)} />,
-    [openLesson]
+    ({ item }: { item: Lesson }) => (
+      <LessonCard lesson={item} onPress={() => openLesson(item.id)} />
+    ),
+    [openLesson],
   );
 
   const hasLessons = !!lessons && lessons.length > 0;

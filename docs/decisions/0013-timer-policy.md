@@ -16,7 +16,7 @@ backgrounded — a naive implementation would either cheat the child or punish a
 `useCountdown(totalSeconds, { running, onExpire })` in `src/hooks/useCountdown.ts`:
 
 - **Timestamp-based**: while active, a deadline (`Date.now() + remaining`) is fixed and every
-  100 ms tick *recomputes* remaining from the clock. Ticks only refresh the display — a delayed
+  100 ms tick _recomputes_ remaining from the clock. Ticks only refresh the display — a delayed
   tick cannot slow the timer down.
 - **Pause = gate, snapshot, re-arm**: the timer is active only while `running` (quiz logic:
   stops during answer feedback) **and** the app is foregrounded (`useAppActive`, AppState
@@ -33,7 +33,7 @@ backgrounded — a naive implementation would either cheat the child or punish a
 - **Fixed absolute deadline without pause** — accurate and stateless, but counts backgrounded
   time, violating assumption #2's pause requirement.
 - **Counting background elapsed time on return** (deadline + AppState timestamps) — that is the
-  *resume-and-penalize* behavior; explicitly not wanted for this age group.
+  _resume-and-penalize_ behavior; explicitly not wanted for this age group.
 
 ## Consequences
 

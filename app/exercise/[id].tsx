@@ -65,7 +65,7 @@ export default function ExerciseScreen() {
     }
     const timer = setTimeout(
       () => setQuiz((state) => advanceQuiz(state, questions.length)),
-      FEEDBACK_MS
+      FEEDBACK_MS,
     );
     return () => clearTimeout(timer);
   }, [quiz.answer, quiz.finished, questions.length]);
@@ -116,7 +116,11 @@ export default function ExerciseScreen() {
         : strings.exercise.watchFirst;
     return (
       <SafeAreaView style={styles.screen}>
-        <ExerciseVideo uri={LESSON_VIDEO_URL} onEnded={handleVideoEnded} onError={handleVideoError} />
+        <ExerciseVideo
+          uri={LESSON_VIDEO_URL}
+          onEnded={handleVideoEnded}
+          onError={handleVideoError}
+        />
         <View style={styles.videoMascot}>
           <Mascot size={64} speech={mascotSpeech} />
           {videoFailed ? <Text style={styles.hint}>{strings.exercise.videoErrorHint}</Text> : null}

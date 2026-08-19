@@ -47,7 +47,10 @@ export function LessonCard({ lesson, onPress }: Props) {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         accessibilityRole="button"
-        accessibilityLabel={strings.a11y.lessonCard(lesson.title, strings.a11y.lessonStatus[status])}
+        accessibilityLabel={strings.a11y.lessonCard(
+          lesson.title,
+          strings.a11y.lessonStatus[status],
+        )}
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       >
         <Image
