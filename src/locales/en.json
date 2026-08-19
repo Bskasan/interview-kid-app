@@ -41,10 +41,10 @@
     "timeUp": "Time's up ⏰",
     "timeLeft_one": "{{count}} second left",
     "timeLeft_other": "{{count}} seconds left",
-    "exitTitle": "Do you want to leave?",
-    "exitBody": "Your progress will be lost.",
-    "exitConfirm": "Leave",
-    "exitCancel": "Stay"
+    "exitButton": "Exit",
+    "exitPrompt": "Do you want to stop and go home?",
+    "exitStay": "Keep going",
+    "exitLeave": "Home"
   },
   "result": {
     "passTitle": "Bravo! 🎉",
