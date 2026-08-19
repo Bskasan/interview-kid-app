@@ -44,6 +44,9 @@ export const strings = {
     score: (correct: number, total: number) => `${correct}/${total} doğru`,
     retryLesson: 'Tekrar Dene',
     goHome: 'Ana Sayfa',
+    mascotPass: 'Seninle gurur duyuyorum!',
+    mascotPerfect: 'Vay! Hepsini bildin!',
+    mascotFail: 'Sorun değil, birlikte başarırız!',
   },
   a11y: {
     mascot: 'Sevimli tilki maskot',
