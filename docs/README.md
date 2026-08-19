@@ -15,6 +15,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0008 — Offline policy](decisions/0008-offline-policy.md) — persisted query cache + NetInfo-driven banner/refetch; honest offline detection.
 - [0009 — Defensive API parsing](decisions/0009-defensive-api-parsing.md) — hand-rolled unknown-narrowing mapper; skip bad items, never crash.
 - [0010 — Progress indicator semantics](decisions/0010-progress-indicator.md) — stars = best score, status pill with icon+text, derived "attempted".
+- [0011 — Web output "single"](decisions/0011-web-output-single.md) — no Node static rendering; fixes the window-is-not-defined SSR crash, web stays incidental.
 
 ## Features
 
