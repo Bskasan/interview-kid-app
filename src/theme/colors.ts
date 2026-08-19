@@ -8,7 +8,7 @@ export const colors = {
   background: '#FFF8EC', // cream app background
   surface: '#FFFFFF', // cards, bubbles
   ink: '#3A3A3A', // primary text — soft, not pure black
-  muted: '#8C8C8C', // secondary text
+  muted: '#6E6E6E', // secondary text — dark enough for 4.5:1 on cream AND white
   primary: '#3DC35B', // green — CTA / success
   primaryDark: '#2E9E47', // chunky button bottom edge
   sky: '#2FB5F0', // secondary accent

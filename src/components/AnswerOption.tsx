@@ -81,7 +81,7 @@ export function AnswerOption({ label, feedback, onPress }: Props) {
           pressed && !locked && styles.pressed,
         ]}
       >
-        <Text style={styles.label} numberOfLines={2}>
+        <Text style={styles.label} numberOfLines={2} maxFontSizeMultiplier={1.4}>
           {prefixes[feedback]}
           {label}
         </Text>

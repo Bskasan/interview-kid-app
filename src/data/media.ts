@@ -1,3 +1,10 @@
-/** Sample clip (~15 s) standing in for real lesson videos (per the brief). */
+/**
+ * Short sample clip (~10 s, H.264 mp4) standing in for real lesson videos.
+ * Google's classic gtv-videos-bucket samples (ForBiggerBlazes etc.) started
+ * returning 403 in 2026 and even current Expo docs still point at them —
+ * test-videos.co.uk exists specifically to host stable test media.
+ * If this ever dies, the exercise flow degrades gracefully by design:
+ * error message + unlocked quiz CTA (ADR 0012).
+ */
 export const LESSON_VIDEO_URL =
-  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+  'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4';

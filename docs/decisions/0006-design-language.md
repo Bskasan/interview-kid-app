@@ -38,6 +38,9 @@ border next to text on `surface`.
   bans third-party IP; we keep only the *principles* (chunky targets, one action per screen,
   celebration moments) with our own tokens.
 
+**Amendment (2026-08-19, Phase 4):** `muted` darkened `#8C8C8C` → `#6E6E6E` — the original value
+was 3.2:1 on cream, below the 4.5:1 floor. Role unchanged. See ADR 0018.
+
 ## Consequences
 
 - Every screen styles itself from `src/theme` — changing the palette or scale is a one-file edit.

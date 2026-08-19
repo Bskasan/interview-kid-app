@@ -57,7 +57,7 @@ export function ChunkyButton({
           pressed && !disabled && styles.pressed,
         ]}
       >
-        <Text style={styles.label} numberOfLines={1}>
+        <Text style={styles.label} numberOfLines={1} maxFontSizeMultiplier={1.4}>
           {icon ? `${icon} ` : ''}
           {label}
         </Text>

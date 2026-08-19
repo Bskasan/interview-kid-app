@@ -27,7 +27,9 @@ export function TimerBar({ progress, remainingSeconds }: Props) {
           ]}
         />
       </View>
-      <Text style={[styles.seconds, urgent && styles.secondsUrgent]}>{remainingSeconds}</Text>
+      <Text style={styles.seconds} maxFontSizeMultiplier={1.4}>
+        {remainingSeconds}
+      </Text>
     </View>
   );
 }
@@ -49,14 +51,13 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: radius.pill,
   },
+  // Seconds stay ink at all times: coral text fails 4.5:1 on cream, and urgency
+  // is already carried by the bar color + the shrinking width + the number itself.
   seconds: {
     ...typography.subtitle,
     color: colors.ink,
     minWidth: 36,
     textAlign: 'right',
     fontVariant: ['tabular-nums'],
-  },
-  secondsUrgent: {
-    color: colors.coral,
   },
 });
