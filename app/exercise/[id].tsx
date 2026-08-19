@@ -17,6 +17,7 @@ import { TimerBar } from '@/components/TimerBar';
 import { LESSON_VIDEO_URL } from '@/data/media';
 import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
+import { handleError } from '@/lib/errors/handleError';
 import {
   advanceQuiz,
   answerQuestion,
@@ -98,7 +99,11 @@ export default function ExerciseScreen() {
   }, [quiz.finished, quiz.correct, questions.length, lessonId, router]);
 
   const handleVideoEnded = useCallback(() => setVideoEnded(true), []);
-  const handleVideoError = useCallback(() => setVideoFailed(true), []);
+  // Silent: this screen renders its own failure UI (mascot line + open CTA).
+  const handleVideoError = useCallback((cause: unknown) => {
+    handleError(cause, { context: 'exercise.video', code: 'MEDIA', severity: 'silent' });
+    setVideoFailed(true);
+  }, []);
 
   const handleAnswer = (choiceIndex: number) => {
     if (!question || quiz.answer !== null || quiz.finished) {

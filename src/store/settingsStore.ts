@@ -1,7 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import i18n, { isAppLanguage, type AppLanguage } from '@/i18n';
+import { handleError } from '@/lib/errors/handleError';
+import { reportingStorage } from '@/lib/storage';
 
 type SettingsState = {
   /** Explicit user choice; null means "follow the device language". */
@@ -22,13 +23,23 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'settings-v1',
-      storage: createJSONStorage(() => AsyncStorage),
+      // reportingStorage: I/O failures are logged/surfaced instead of vanishing.
+      storage: createJSONStorage(() => reportingStorage),
       partialize: (state) => ({ language: state.language }),
       // i18n boots with the device language before hydration finishes; a stored
       // explicit choice wins as soon as it arrives (a sub-second flash of the
       // device language on cold start is accepted — no blank gate for everyone
       // to serve the rare mismatch case).
-      onRehydrateStorage: () => (state) => {
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          // Losing the language choice is harmless (device language applies) —
+          // log it, don't alarm anyone.
+          handleError(error, {
+            context: 'settings.rehydrate',
+            code: 'STORAGE',
+            severity: 'silent',
+          });
+        }
         useSettingsStore.setState({ hasHydrated: true });
         const persisted = state?.language;
         if (isAppLanguage(persisted) && persisted !== i18n.language) {

@@ -1,6 +1,7 @@
 import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { handleError } from '@/lib/errors/handleError';
 import en from '@/locales/en.json';
 import tr from '@/locales/tr.json';
 
@@ -29,17 +30,28 @@ export function resolveDeviceLanguage(): AppLanguage {
 // Resources are bundled, so with initAsync: false the init completes
 // synchronously — screens never see a missing-translation frame and tests need
 // no async setup. The persisted user choice (settingsStore) is applied on
-// rehydrate and overrides the device language.
-// eslint-disable-next-line import/no-named-as-default-member -- i18n.use() is the documented i18next API; the named `use` export is unrelated (React 19's hook re-export).
-void i18n.use(initReactI18next).init({
-  resources: { tr, en },
-  lng: resolveDeviceLanguage(),
-  fallbackLng: 'tr',
-  supportedLngs: SUPPORTED_LANGUAGES,
-  defaultNS: 'common',
-  interpolation: { escapeValue: false },
-  initAsync: false,
-  react: { useSuspense: false },
-});
+// rehydrate and overrides the device language. A failed init is close to
+// impossible (no backend, bundled JSON) but still reported: the banner falls
+// back to its hardcoded line when i18n is down.
+try {
+  // eslint-disable-next-line import/no-named-as-default-member -- i18n.use() is the documented i18next API; the named `use` export is unrelated (React 19's hook re-export).
+  void i18n
+    .use(initReactI18next)
+    .init({
+      resources: { tr, en },
+      lng: resolveDeviceLanguage(),
+      fallbackLng: 'tr',
+      supportedLngs: SUPPORTED_LANGUAGES,
+      defaultNS: 'common',
+      interpolation: { escapeValue: false },
+      initAsync: false,
+      react: { useSuspense: false },
+    })
+    .catch((cause: unknown) => {
+      handleError(cause, { context: 'i18n.init' });
+    });
+} catch (cause) {
+  handleError(cause, { context: 'i18n.init' });
+}
 
 export default i18n;

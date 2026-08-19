@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { handleError } from '@/lib/errors/handleError';
 import { useProgressStore } from '@/store/progressStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
@@ -62,6 +63,15 @@ export function LessonCard({ lesson, onPress }: Props) {
           contentFit="cover"
           transition={200}
           accessible={false}
+          // Silent: the bordered placeholder behind the image is the fallback
+          // UI; the log line keeps the failure observable.
+          onError={(event) =>
+            handleError(event?.error ?? event, {
+              context: `lesson-thumbnail.${lesson.id}`,
+              code: 'MEDIA',
+              severity: 'silent',
+            })
+          }
         />
         <View style={styles.content}>
           <Text style={styles.title} numberOfLines={2} maxFontSizeMultiplier={1.4}>
