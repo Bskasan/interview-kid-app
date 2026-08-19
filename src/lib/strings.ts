@@ -27,6 +27,7 @@ export const strings = {
     videoError: 'Video açılmadı, sorun değil!',
     videoErrorHint: 'Alıştırmaya geçebilirsin 👇',
     watchFirst: 'Önce videoyu izle 🎬',
+    videoDone: 'Süper! Şimdi alıştırma zamanı 🎯',
     question: (n: number, total: number) => `Soru ${n}/${total}`,
     correct: 'Harika! 🎉',
     wrong: 'Olsun, devam! 💪',
@@ -48,6 +49,7 @@ export const strings = {
     mascot: 'Sevimli tilki maskot',
     mascotSays: (text: string) => `Tilki diyor ki: ${text}`,
     lessonCard: (title: string, status: string) => `${title}. ${status}`,
+    timeLeft: (seconds: number) => `Kalan süre ${seconds} saniye`,
     lessonStatus: {
       none: 'Henüz denenmedi',
       attempted: 'Denendi, henüz rozet yok',

@@ -1,0 +1,62 @@
+import { StyleSheet, Text, View } from 'react-native';
+import { strings } from '@/lib/strings';
+import { colors, radius, spacing, typography } from '@/theme';
+
+type Props = {
+  /** 1 → 0 as the time runs out. */
+  progress: number;
+  remainingSeconds: number;
+};
+
+/** Shrinking time bar + seconds. Color shifts to sun then coral as time runs low. */
+export function TimerBar({ progress, remainingSeconds }: Props) {
+  const urgent = remainingSeconds <= 5;
+  const fillColor = remainingSeconds > 10 ? colors.primary : urgent ? colors.coral : colors.sun;
+
+  return (
+    <View
+      style={styles.row}
+      accessible
+      accessibilityLabel={strings.a11y.timeLeft(remainingSeconds)}
+    >
+      <View style={styles.track}>
+        <View
+          style={[
+            styles.fill,
+            { width: `${Math.max(0, Math.min(1, progress)) * 100}%`, backgroundColor: fillColor },
+          ]}
+        />
+      </View>
+      <Text style={[styles.seconds, urgent && styles.secondsUrgent]}>{remainingSeconds}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  track: {
+    flex: 1,
+    height: 12,
+    borderRadius: radius.pill,
+    backgroundColor: colors.border,
+    overflow: 'hidden',
+  },
+  fill: {
+    height: '100%',
+    borderRadius: radius.pill,
+  },
+  seconds: {
+    ...typography.subtitle,
+    color: colors.ink,
+    minWidth: 36,
+    textAlign: 'right',
+    fontVariant: ['tabular-nums'],
+  },
+  secondsUrgent: {
+    color: colors.coral,
+  },
+});
