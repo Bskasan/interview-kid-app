@@ -1,0 +1,4 @@
+# Keep LF in working copies on every platform so Prettier's endOfLine "lf"
+# check stays green on Windows (core.autocrlf would otherwise rewrite checkouts
+# to CRLF). Binary assets are exempt via text=auto detection.
+* text=auto eol=lf

@@ -1,0 +1,7 @@
+.expo/
+.expo-export/
+dist/
+web-build/
+coverage/
+package-lock.json
+assets/
