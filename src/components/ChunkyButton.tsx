@@ -1,12 +1,7 @@
-import * as Haptics from 'expo-haptics';
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import { colors, motion, radius, spacing, touchTarget, typography } from '@/theme';
+import Animated from 'react-native-reanimated';
+import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { colors, radius, spacing, touchTarget, typography } from '@/theme';
 
 /** Height of the darker "3D" bottom edge that collapses while pressed. */
 const EDGE_HEIGHT = 4;
@@ -42,32 +37,15 @@ export function ChunkyButton({
   accessibilityHint,
   style,
 }: Props) {
-  const reduceMotion = useReducedMotion();
-  const scale = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-
+  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled });
   const { fill, edge } = disabled ? { fill: colors.border, edge: colors.muted } : variants[variant];
-
-  const handlePressIn = () => {
-    if (!reduceMotion) {
-      scale.value = withSpring(motion.pressScale, motion.spring);
-    }
-    // Haptics are best-effort: unavailable on some devices/emulators.
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-  };
-
-  const handlePressOut = () => {
-    if (!reduceMotion) {
-      scale.value = withSpring(1, motion.spring);
-    }
-  };
 
   return (
     <Animated.View style={[animatedStyle, style]}>
       <Pressable
         onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? label}
