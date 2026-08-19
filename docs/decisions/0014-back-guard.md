@@ -13,9 +13,12 @@ simply *not navigating to Result*).
 
 ## Decision
 
-React Navigation's **`usePreventRemove`** hook (Expo Router is built on React Navigation, and
-`@react-navigation/native` v7 ships this as the supported successor of manual `beforeRemove`
-listeners), enabled while `stage === 'quiz' && !quiz.finished`. The callback shows a native
+React Navigation's **`usePreventRemove`** hook, imported from **`expo-router/react-navigation`**
+— since SDK 56 Expo Router vendors its navigation core and rejects standalone
+`@react-navigation/*` imports at bundle time (see the official SDK 55→56 migration guide).
+The vendored entry also shares Expo Router's `PreventRemoveContext`, which the standalone
+package would not — a plain `beforeRemove` listener without that context cannot reliably block
+the native back gesture on a native stack. Enabled while `stage === 'quiz' && !quiz.finished`. The callback shows a native
 `Alert.alert` — "Çıkmak istiyor musun? / İlerlemen kaybolur." with "Kal" (cancel) and "Çık"
 (destructive) — and dispatches the intercepted `data.action` only on "Çık".
 
@@ -46,5 +49,6 @@ dispatches, nothing intercepts it (replace also triggers removal events — guar
 
 ## References
 
-- usePreventRemove: https://reactnavigation.org/docs/use-prevent-remove/
+- Expo Router SDK 55→56 migration (vendored navigation, `expo-router/react-navigation` entry): https://docs.expo.dev/router/migrate/sdk-55-to-56/
+- usePreventRemove (concept/API, React Navigation docs): https://reactnavigation.org/docs/use-prevent-remove/
 - Alert: https://reactnative.dev/docs/alert

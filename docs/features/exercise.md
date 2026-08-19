@@ -48,7 +48,8 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
   the app is foregrounded (`useAppActive` on AppState); pausing snapshots remaining time.
   `onExpire` → `timeoutQuestion`, once per question (`reset()` on index change re-arms).
   `TimerBar` renders progress + seconds; `SegmentedProgress` renders "Soru n/3".
-- **Back guard** — `usePreventRemove` (React Navigation v7 under Expo Router) while
+- **Back guard** — `usePreventRemove` from `expo-router/react-navigation` (Expo Router vendors
+  React Navigation since SDK 56; standalone `@react-navigation/*` imports fail the bundle) while
   `stage === 'quiz' && !finished`; native `Alert` with Kal/Çık; confirmed exit dispatches the
   intercepted action (ADR 0014). The finish effect runs with the guard already off and calls
   `router.replace('/result', …)`.
@@ -91,6 +92,7 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 - `useEventListener` (expo package): https://docs.expo.dev/versions/v57.0.0/sdk/expo/
 - AppState: https://reactnative.dev/docs/appstate
 - usePreventRemove: https://reactnavigation.org/docs/use-prevent-remove/
+- Expo Router SDK 55→56 migration: https://docs.expo.dev/router/migrate/sdk-55-to-56/
 - Alert: https://reactnative.dev/docs/alert
 - expo-haptics (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/haptics/
 - Reanimated: https://docs.swmansion.com/react-native-reanimated/
