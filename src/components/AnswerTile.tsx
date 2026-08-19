@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -9,7 +10,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Polygon, Rect } from 'react-native-svg';
-import { optionA11yLabel, type AnswerOptionData, type OptionVisual } from '@/data/questions';
+import {
+  optionA11yLabel,
+  optionLabel,
+  type AnswerOptionData,
+  type OptionVisual,
+} from '@/data/questions';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { type AnswerFeedback } from '@/lib/quiz';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -53,6 +59,7 @@ type Props = {
 };
 
 export function AnswerTile({ option, feedback, onPress, width, height }: Props) {
+  const { t } = useTranslation('questions');
   const locked = feedback !== 'idle';
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled: locked });
   const reduceMotion = useReducedMotion();
@@ -77,6 +84,7 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
   // so cramped screens cost artwork size, not tap accuracy.
   const visualSize = Math.round(Math.min(width, height) * 0.6);
   const badge = badges[feedback];
+  const label = optionLabel(option, t);
 
   return (
     <Animated.View style={[animatedStyle, shakeStyle]}>
@@ -86,7 +94,7 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
         onPressOut={onPressOut}
         disabled={locked}
         accessibilityRole="button"
-        accessibilityLabel={a11yPrefixes[feedback] + optionA11yLabel(option)}
+        accessibilityLabel={a11yPrefixes[feedback] + optionA11yLabel(option, t)}
         accessibilityState={{
           disabled: locked,
           selected: feedback === 'correct' || feedback === 'wrongChoice',
@@ -101,14 +109,14 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
         {option.visual ? (
           <View style={styles.content} accessible={false}>
             <TileVisual visual={option.visual} size={visualSize} />
-            {option.label !== undefined ? (
+            {label !== undefined ? (
               <Text
                 style={styles.caption}
                 numberOfLines={1}
                 adjustsFontSizeToFit
                 maxFontSizeMultiplier={1.2}
               >
-                {option.label}
+                {label}
               </Text>
             ) : null}
           </View>
@@ -120,7 +128,7 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
             maxFontSizeMultiplier={1.4}
             accessible={false}
           >
-            {option.label}
+            {label}
           </Text>
         )}
         {badge ? (

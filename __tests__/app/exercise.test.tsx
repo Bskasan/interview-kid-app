@@ -2,10 +2,15 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Alert } from 'react-native';
 import ExerciseScreen from '../../app/exercise/[id]';
 import { getQuestionSet, optionA11yLabel } from '../../src/data/questions';
-import { strings } from '../../src/lib/strings';
+import i18n from '../../src/i18n';
 
 const LESSON_ID = 'lesson-1';
 const FEEDBACK_MS = 1400;
+
+// The setup file initializes i18n with Turkish; assertions go through t so the
+// tests survive copy edits without hardcoding strings.
+const t = i18n.getFixedT(null, 'exercise');
+const tq = i18n.getFixedT(null, 'questions');
 
 const mockReplace = jest.fn();
 const mockDispatch = jest.fn();
@@ -40,7 +45,7 @@ const startQuiz = async () => {
   await act(() => {
     mockVideoProps?.onEnded();
   });
-  await fireEvent.press(screen.getByLabelText(strings.exercise.startQuiz));
+  await fireEvent.press(screen.getByLabelText(t('startQuiz')));
 };
 
 describe('Exercise screen — back guard lifecycle', () => {
@@ -66,7 +71,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     const questions = getQuestionSet(LESSON_ID);
     for (const question of questions) {
       await fireEvent.press(
-        screen.getByLabelText(optionA11yLabel(question.options[question.correctIndex])),
+        screen.getByLabelText(optionA11yLabel(question.options[question.correctIndex], tq)),
       );
       await act(() => {
         jest.advanceTimersByTime(FEEDBACK_MS);
@@ -82,7 +87,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     });
   });
 
-  it('unlocks the quiz through the error path and confirms exit only on Çık', async () => {
+  it('unlocks the quiz through the error path and confirms exit only on the leave button', async () => {
     const alertSpy = jest.spyOn(Alert, 'alert');
     await render(<ExerciseScreen />);
 
@@ -90,7 +95,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     await act(() => {
       mockVideoProps?.onError();
     });
-    await fireEvent.press(screen.getByLabelText(strings.exercise.startQuiz));
+    await fireEvent.press(screen.getByLabelText(t('startQuiz')));
     expect(guardEnabled()).toBe(true);
 
     const action = { type: 'GO_BACK' };
@@ -98,15 +103,11 @@ describe('Exercise screen — back guard lifecycle', () => {
       guardCallback()({ data: { action } });
     });
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      strings.exercise.exitTitle,
-      strings.exercise.exitBody,
-      expect.any(Array),
-    );
+    expect(alertSpy).toHaveBeenCalledWith(t('exitTitle'), t('exitBody'), expect.any(Array));
 
     const buttons = alertSpy.mock.calls.at(-1)?.[2] ?? [];
-    const cancel = buttons.find((button) => button.text === strings.exercise.exitCancel);
-    const confirm = buttons.find((button) => button.text === strings.exercise.exitConfirm);
+    const cancel = buttons.find((button) => button.text === t('exitCancel'));
+    const confirm = buttons.find((button) => button.text === t('exitConfirm'));
 
     cancel?.onPress?.();
     expect(mockDispatch).not.toHaveBeenCalled(); // staying keeps the attempt

@@ -5,6 +5,7 @@ import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // navigation context). This is the supported compatibility entry.
 import { usePreventRemove } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AnswerGrid } from '@/components/AnswerGrid';
@@ -24,13 +25,14 @@ import {
   timeoutQuestion,
   type QuizState,
 } from '@/lib/quiz';
-import { strings } from '@/lib/strings';
 import { colors, spacing, typography } from '@/theme';
 
 /** How long the ✓/✗ feedback stays on screen before auto-advancing. */
 const FEEDBACK_MS = 1400;
 
 export default function ExerciseScreen() {
+  const { t } = useTranslation('exercise');
+  const { t: tq } = useTranslation('questions');
   const router = useRouter();
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -74,10 +76,10 @@ export default function ExerciseScreen() {
   // Must be declared before the finish effect below so the guard is already
   // off when the replace to /result dispatches.
   usePreventRemove(stage === 'quiz' && !quiz.finished, ({ data }) => {
-    Alert.alert(strings.exercise.exitTitle, strings.exercise.exitBody, [
-      { text: strings.exercise.exitCancel, style: 'cancel' },
+    Alert.alert(t('exitTitle'), t('exitBody'), [
+      { text: t('exitCancel'), style: 'cancel' },
       {
-        text: strings.exercise.exitConfirm,
+        text: t('exitConfirm'),
         style: 'destructive',
         onPress: () => navigation.dispatch(data.action),
       },
@@ -110,10 +112,10 @@ export default function ExerciseScreen() {
 
   if (stage === 'video') {
     const mascotSpeech = videoFailed
-      ? strings.exercise.videoError
+      ? t('videoError')
       : videoEnded
-        ? strings.exercise.videoDone
-        : strings.exercise.watchFirst;
+        ? t('videoDone')
+        : t('watchFirst');
     return (
       <SafeAreaView style={styles.screen}>
         <ExerciseVideo
@@ -123,10 +125,10 @@ export default function ExerciseScreen() {
         />
         <View style={styles.videoMascot}>
           <Mascot size={64} speech={mascotSpeech} />
-          {videoFailed ? <Text style={styles.hint}>{strings.exercise.videoErrorHint}</Text> : null}
+          {videoFailed ? <Text style={styles.hint}>{t('videoErrorHint')}</Text> : null}
         </View>
         <ChunkyButton
-          label={strings.exercise.startQuiz}
+          label={t('startQuiz')}
           icon="🎯"
           disabled={!videoEnded && !videoFailed}
           onPress={() => setStage('quiz')}
@@ -144,17 +146,17 @@ export default function ExerciseScreen() {
     quiz.answer === null
       ? undefined
       : quiz.answer.choice === 'timeout'
-        ? strings.exercise.timeUp
+        ? t('timeUp')
         : quiz.answer.isCorrect
-          ? strings.exercise.correct
-          : strings.exercise.wrong;
+          ? t('correct')
+          : t('wrong');
 
   return (
     <SafeAreaView style={styles.screen}>
       <SegmentedProgress current={quiz.index + 1} total={questions.length} />
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
       <Text style={styles.prompt} numberOfLines={2}>
-        {question.prompt}
+        {tq(question.promptKey)}
       </Text>
       <AnswerGrid
         key={quiz.index}
