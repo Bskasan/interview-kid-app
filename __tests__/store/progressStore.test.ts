@@ -1,11 +1,11 @@
 import { useProgressStore } from '../../src/store/progressStore';
 
-describe('progressStore', () => {
+describe('progressStore — persisted per-lesson results', () => {
   beforeEach(() => {
     useProgressStore.setState({ results: {} });
   });
 
-  it('records a first completed attempt', () => {
+  it('creates a result entry for a lesson completed the first time', () => {
     useProgressStore.getState().recordResult('42', 2, 3);
 
     expect(useProgressStore.getState().results['42']).toEqual({
@@ -15,7 +15,7 @@ describe('progressStore', () => {
     });
   });
 
-  it('keeps the best result across retakes', () => {
+  it('keeps the higher score when a retake performs worse', () => {
     const { recordResult } = useProgressStore.getState();
     recordResult('42', 3, 3);
     recordResult('42', 1, 3);
@@ -27,7 +27,7 @@ describe('progressStore', () => {
     });
   });
 
-  it('upgrades the badge when a retake is better', () => {
+  it('upgrades the badge when a retake performs better', () => {
     const { recordResult } = useProgressStore.getState();
     recordResult('42', 1, 3);
     recordResult('42', 2, 3);
@@ -35,7 +35,7 @@ describe('progressStore', () => {
     expect(useProgressStore.getState().results['42']?.badge).toBe('earned');
   });
 
-  it('tracks lessons independently', () => {
+  it('tracks results for different lessons independently', () => {
     const { recordResult } = useProgressStore.getState();
     recordResult('1', 3, 3);
     recordResult('2', 0, 3);

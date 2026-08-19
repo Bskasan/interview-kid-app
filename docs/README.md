@@ -15,7 +15,16 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0008 — Offline policy](decisions/0008-offline-policy.md) — persisted query cache + NetInfo-driven banner/refetch; honest offline detection.
 - [0009 — Defensive API parsing](decisions/0009-defensive-api-parsing.md) — hand-rolled unknown-narrowing mapper; skip bad items, never crash.
 - [0010 — Progress indicator semantics](decisions/0010-progress-indicator.md) — stars = best score, status pill with icon+text, derived "attempted".
+- [0011 — Web output "single"](decisions/0011-web-output-single.md) — no Node static rendering; fixes the window-is-not-defined SSR crash, web stays incidental.
+- [0012 — Event-driven video stage](decisions/0012-expo-video-events.md) — playToEnd/statusChange unlock the quiz CTA; no polling, error never blocks the flow.
+- [0013 — Timer policy](decisions/0013-timer-policy.md) — timestamp-based countdown, AppState pause/resume, single-fire expiry.
+- [0014 — Quiz back guard](decisions/0014-back-guard.md) — usePreventRemove + native Alert; finish disables the guard before replacing to Result.
+- [0015 — Question assignment](decisions/0015-question-assignment.md) — deterministic set per lesson id, pure quiz state machine, double-tap guard.
+- [0016 — Badge animation](decisions/0016-badge-animation.md) — hand-rolled Reanimated celebration over Lottie/confetti libs; reduced-motion fallback.
+- [0017 — Idempotent result recording](decisions/0017-idempotent-result-recording.md) — single writer + once-per-mount guard + idempotent best-merge.
 
 ## Features
 
 - [Home](features/home.md) — lesson list: data flow, offline behavior, progress indicators, edge cases, manual tests.
+- [Exercise](features/exercise.md) — video stage + timed quiz: events, timer, back guard, feedback states, edge cases, manual tests.
+- [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
