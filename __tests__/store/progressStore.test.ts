@@ -15,26 +15,8 @@ describe('progressStore — persisted per-lesson results', () => {
     });
   });
 
-  it('keeps the higher score when a retake performs worse', () => {
-    const { recordResult } = useProgressStore.getState();
-    recordResult('42', 3, 3);
-    recordResult('42', 1, 3);
-
-    expect(useProgressStore.getState().results['42']).toEqual({
-      best: 3,
-      total: 3,
-      badge: 'perfect',
-    });
-  });
-
-  it('upgrades the badge when a retake performs better', () => {
-    const { recordResult } = useProgressStore.getState();
-    recordResult('42', 1, 3);
-    recordResult('42', 2, 3);
-
-    expect(useProgressStore.getState().results['42']?.badge).toBe('earned');
-  });
-
+  // Best-result/badge policy itself is covered at the mergeResult layer; here we
+  // only test what the store adds on top: keying, isolation and persistence shape.
   it('tracks results for different lessons independently', () => {
     const { recordResult } = useProgressStore.getState();
     recordResult('1', 3, 3);

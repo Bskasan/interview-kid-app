@@ -9,16 +9,13 @@ import {
 const TOTAL = 3;
 
 describe('quiz state machine — answering', () => {
-  it('locks in a correct answer and increments the score', () => {
-    const state = answerQuestion(createQuizState(), 2, 2);
-    expect(state.answer).toEqual({ choice: 2, isCorrect: true });
-    expect(state.correct).toBe(1);
-  });
-
-  it('locks in a wrong answer without changing the score', () => {
-    const state = answerQuestion(createQuizState(), 0, 2);
-    expect(state.answer).toEqual({ choice: 0, isCorrect: false });
-    expect(state.correct).toBe(0);
+  it.each([
+    ['correct', 2, 2, true, 1],
+    ['wrong', 0, 2, false, 0],
+  ])('locks in a %s answer and scores it', (_kind, choice, correctIndex, isCorrect, score) => {
+    const state = answerQuestion(createQuizState(), choice, correctIndex);
+    expect(state.answer).toEqual({ choice, isCorrect });
+    expect(state.correct).toBe(score);
   });
 
   it('ignores a second tap while feedback is showing (double-tap guard)', () => {

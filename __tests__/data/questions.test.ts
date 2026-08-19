@@ -45,10 +45,10 @@ describe('getQuestionSet — deterministic set selection by lesson id', () => {
     }
   });
 
-  it('spreads different lesson ids across multiple sets', () => {
+  it('makes every question set reachable across realistic lesson ids', () => {
     const ids = Array.from({ length: 30 }, (_, i) => String(i));
     const distinctSets = new Set(ids.map((id) => getQuestionSet(id)));
-    expect(distinctSets.size).toBeGreaterThan(1);
+    expect(distinctSets.size).toBe(allQuestionSets.length);
   });
 
   it('returns a valid set even for unusual ids', () => {
