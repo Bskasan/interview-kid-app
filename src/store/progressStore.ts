@@ -1,7 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { handleError } from '@/lib/errors/handleError';
 import { mergeResult } from '@/lib/scoring';
+import { reportingStorage } from '@/lib/storage';
 import type { LessonResult } from '@/types/progress';
 
 type ProgressState = {
@@ -30,9 +31,16 @@ export const useProgressStore = create<ProgressState>()(
     }),
     {
       name: 'progress-v1',
-      storage: createJSONStorage(() => AsyncStorage),
+      // reportingStorage: I/O failures are logged/surfaced instead of vanishing.
+      storage: createJSONStorage(() => reportingStorage),
       partialize: (state) => ({ results: state.results }),
-      onRehydrateStorage: () => () => {
+      // The error argument covers what the storage wrapper can't see: corrupt
+      // JSON that fails to parse during rehydration. The child would silently
+      // see all badges gone — worth one calm banner.
+      onRehydrateStorage: () => (_state, error) => {
+        if (error) {
+          handleError(error, { context: 'progress.rehydrate', code: 'STORAGE' });
+        }
         useProgressStore.setState({ hasHydrated: true });
       },
     },

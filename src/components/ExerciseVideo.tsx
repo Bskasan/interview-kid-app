@@ -9,8 +9,8 @@ type Props = {
   uri: string;
   /** Fired when playback reaches the end (unlocks the quiz CTA). */
   onEnded: () => void;
-  /** Fired when the source fails to load/play (the CTA unlocks anyway). */
-  onError: () => void;
+  /** Fired when the source fails to load/play, with the player's error payload. */
+  onError: (cause: unknown) => void;
 };
 
 /**
@@ -27,9 +27,9 @@ export function ExerciseVideo({ uri, onEnded, onError }: Props) {
   const appActive = useAppActive();
 
   useEventListener(player, 'playToEnd', onEnded);
-  useEventListener(player, 'statusChange', ({ status }) => {
+  useEventListener(player, 'statusChange', ({ status, error }) => {
     if (status === 'error') {
-      onError();
+      onError(error);
     }
   });
 

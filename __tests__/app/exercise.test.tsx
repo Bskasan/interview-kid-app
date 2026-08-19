@@ -53,6 +53,8 @@ describe('Exercise screen — back guard lifecycle', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     mockVideoProps = undefined;
+    // The video-error path logs through the central handler; keep output clean.
+    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {

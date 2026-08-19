@@ -36,6 +36,8 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0029 — Locale-safe cached lessons](decisions/0029-locale-safe-cached-lessons.md) — Lesson model went language-neutral (lessonNumber/author), titles compose at render time, buster bumped to lessons-v2.
 - [0030 — Question content model](decisions/0030-question-content-model.md) — set/question ids + typed labelKey/a11yKey into the questions namespace; shape labels derived via per-language template (word order safe).
 - [0031 — Language detection & persisted override](decisions/0031-language-detection-persistence.md) — device locale → tr|en (fallback tr); explicit choice in persisted settingsStore wins on relaunch; header pill toggle with radio semantics.
+- [0032 — Central error handling](decisions/0032-central-error-handling.md) — AppError as plain discriminated object, normalizeError + handleError funnel with notify/silent severities, dev-only logger as the single console site, reportingStorage wrapper.
+- [0033 — Error surfacing](decisions/0033-error-surfacing.md) — single-slot replace-on-new banner (no queue, no blocking modal), silent policy where screens own their failure UI, root ErrorBoundary with kid-friendly fallback.
 
 ## Features
 
@@ -43,3 +45,4 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
 - [i18n](features/i18n.md) — Turkish + English: detection, persisted toggle, typed keys, translated question bank, plural handling, manual tests.
+- [Error handling](features/error-handling.md) — the central funnel, banner/boundary surfaces, silent policy, storage wrapper, edge cases, manual tests.

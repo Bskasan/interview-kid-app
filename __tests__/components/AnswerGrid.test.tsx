@@ -112,6 +112,15 @@ describe('AnswerGrid — selection locking', () => {
 });
 
 describe('AnswerGrid — image options', () => {
+  beforeEach(() => {
+    // The image-error path logs through the central handler; keep output clean.
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('swaps a failing image for its emoji fallback so the question stays answerable', async () => {
     await render(<AnswerGrid options={OPTIONS} feedbackFor={() => 'idle'} onSelect={jest.fn()} />);
 
