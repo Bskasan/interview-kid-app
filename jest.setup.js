@@ -17,3 +17,23 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
     addEventListener: jest.fn(() => ({ remove: jest.fn() })),
   },
 }));
+
+// Haptics calls chain .catch() on the returned promise, so the mocks must
+// resolve — jest's automock would return undefined and crash on press.
+jest.mock('expo-haptics', () => ({
+  impactAsync: jest.fn(async () => {}),
+  notificationAsync: jest.fn(async () => {}),
+  selectionAsync: jest.fn(async () => {}),
+  ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
+}));
+
+// expo-image is native; a View passthrough keeps props (onError etc.) reachable
+// so tests can drive load-failure paths directly.
+jest.mock('expo-image', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    Image: (props) => React.createElement(View, { testID: 'expo-image', ...props }),
+  };
+});
