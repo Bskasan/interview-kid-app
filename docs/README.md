@@ -22,6 +22,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0015 — Question assignment](decisions/0015-question-assignment.md) — deterministic set per lesson id, pure quiz state machine, double-tap guard.
 - [0016 — Badge animation](decisions/0016-badge-animation.md) — hand-rolled Reanimated celebration over Lottie/confetti libs; reduced-motion fallback.
 - [0017 — Idempotent result recording](decisions/0017-idempotent-result-recording.md) — single writer + once-per-mount guard + idempotent best-merge.
+- [0018 — Interaction & display hardening](decisions/0018-interaction-hardening.md) — contrast fixes, font-scale caps, navigation double-tap locks, app-active default.
 
 ## Features
 

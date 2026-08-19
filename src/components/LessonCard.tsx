@@ -58,16 +58,18 @@ export function LessonCard({ lesson, onPress }: Props) {
           accessible={false}
         />
         <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={styles.title} numberOfLines={2} maxFontSizeMultiplier={1.4}>
             {lesson.title}
           </Text>
           <View style={styles.statusRow}>
-            <Text style={styles.stars} accessible={false}>
+            <Text style={styles.stars} accessible={false} maxFontSizeMultiplier={1.4}>
               {stars}
             </Text>
             {pill ? (
               <View style={[styles.pill, { borderColor: pill.borderColor }]}>
-                <Text style={styles.pillLabel}>{pill.label}</Text>
+                <Text style={styles.pillLabel} maxFontSizeMultiplier={1.4}>
+                  {pill.label}
+                </Text>
               </View>
             ) : null}
           </View>

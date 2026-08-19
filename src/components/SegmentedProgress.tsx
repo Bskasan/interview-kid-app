@@ -19,7 +19,9 @@ export function SegmentedProgress({ current, total }: Props) {
           return <View key={index} style={[styles.segment, { backgroundColor: state }]} />;
         })}
       </View>
-      <Text style={styles.label}>{strings.exercise.question(current, total)}</Text>
+      <Text style={styles.label} maxFontSizeMultiplier={1.4}>
+        {strings.exercise.question(current, total)}
+      </Text>
     </View>
   );
 }
