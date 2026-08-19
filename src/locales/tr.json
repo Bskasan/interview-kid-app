@@ -1,0 +1,142 @@
+{
+  "common": {
+    "loading": "Yükleniyor…",
+    "retry": "Tekrar dene",
+    "errorTitle": "Bir şeyler ters gitti",
+    "mascotA11y": "Sevimli tilki maskot",
+    "mascotSays": "Tilki diyor ki: {{text}}",
+    "languagePickerA11y": "Dil seçimi",
+    "language": {
+      "tr": "Türkçe",
+      "en": "English"
+    }
+  },
+  "home": {
+    "title": "Dersler",
+    "greeting": "Merhaba! Hadi öğrenelim 🚀",
+    "emptyTitle": "Henüz ders yok",
+    "offlineBanner": "İnternet yok — kayıtlı dersler açık 📚",
+    "offlineNoCache": "İnternete bağlanınca dersler gelecek",
+    "lessonTitle": "Ders {{number}}: {{author}}",
+    "lessonCardA11y": "{{title}}. {{status}}",
+    "keepGoing": "Devam et 💪",
+    "badgeEarned": "Rozet 🏅",
+    "badgePerfect": "Süper 🌟",
+    "lessonStatus": {
+      "none": "Henüz denenmedi",
+      "attempted": "Denendi, henüz rozet yok",
+      "earned": "Rozet kazanıldı",
+      "perfect": "Mükemmel rozet kazanıldı"
+    }
+  },
+  "exercise": {
+    "startQuiz": "Alıştırmaya Geç",
+    "watchFirst": "Önce videoyu izle 🎬",
+    "videoDone": "Süper! Şimdi alıştırma zamanı 🎯",
+    "videoError": "Video açılmadı, sorun değil!",
+    "videoErrorHint": "Alıştırmaya geçebilirsin 👇",
+    "question": "Soru {{current}}/{{total}}",
+    "correct": "Harika! 🎉",
+    "wrong": "Olsun, devam! 💪",
+    "timeUp": "Süre doldu ⏰",
+    "timeLeft_one": "Kalan süre {{count}} saniye",
+    "timeLeft_other": "Kalan süre {{count}} saniye",
+    "exitTitle": "Çıkmak istiyor musun?",
+    "exitBody": "İlerlemen kaybolur.",
+    "exitConfirm": "Çık",
+    "exitCancel": "Kal"
+  },
+  "result": {
+    "passTitle": "Bravo! 🎉",
+    "perfectTitle": "Müthiş! Hepsi doğru 🌟",
+    "failTitle": "Az kaldı! Bir daha deneyelim 💪",
+    "score": "{{correct}}/{{total}} doğru",
+    "retryLesson": "Tekrar Dene",
+    "goHome": "Ana Sayfa",
+    "mascotPass": "Seninle gurur duyuyorum!",
+    "mascotPerfect": "Vay! Hepsini bildin!",
+    "mascotFail": "Sorun değil, birlikte başarırız!"
+  },
+  "errors": {
+    "network": "İnternet şu an çalışmıyor",
+    "media": "Video şu an açılmıyor",
+    "storage": "Kaydederken bir sorun oldu",
+    "unknown": "Bir şeyler ters gitti",
+    "ok": "Tamam"
+  },
+  "questions": {
+    "shapes": {
+      "q1": { "prompt": "Hangisi üçgen?" },
+      "q2": { "prompt": "Hangisi yıldız?" },
+      "q3": { "prompt": "Hangisi daire?" }
+    },
+    "colors": {
+      "q1": { "prompt": "Mavi olan hangisi?" },
+      "q2": { "prompt": "Sarı olan hangisi?" },
+      "q3": { "prompt": "Yeşil olan hangisi?" }
+    },
+    "counting": {
+      "q1": {
+        "prompt": "Kaç elma var? 🍎🍎🍎",
+        "options": { "o1": "2", "o2": "3", "o3": "4", "o4": "5" }
+      },
+      "q2": {
+        "prompt": "Kaç yıldız var? ⭐⭐",
+        "options": { "o1": "4", "o2": "3", "o3": "2", "o4": "1" }
+      },
+      "q3": {
+        "prompt": "Kaç top var? ⚽⚽⚽⚽",
+        "options": { "o1": "3", "o2": "5", "o3": "4", "o4": "6" }
+      }
+    },
+    "animals": {
+      "q1": {
+        "prompt": "Hangisi miyav der?",
+        "options": { "o1": "İnek", "o2": "Kedi", "o3": "Koyun", "o4": "Aslan" }
+      },
+      "q2": {
+        "prompt": "Hangisi uçar?",
+        "options": { "o1": "Balık", "o2": "Fil", "o3": "Kuş", "o4": "Kaplumbağa" }
+      },
+      "q3": {
+        "prompt": "Hangisi suda yaşar?",
+        "options": { "o1": "Yunus", "o2": "Kedi", "o3": "Köpek", "o4": "Tavuk" }
+      }
+    },
+    "objects": {
+      "q1": {
+        "prompt": "Hangisi yuvarlak?",
+        "options": { "o1": "Top", "o2": "Kutu", "o3": "Cetvel", "o4": "Gönye" }
+      },
+      "q2": {
+        "prompt": "Hangisi kare?",
+        "options": { "o1": "Zar", "o2": "Ay", "o3": "Yumurta", "o4": "Simit" }
+      },
+      "q3": {
+        "prompt": "Hangisi köpek?",
+        "options": { "o1": "Kedi", "o2": "Balık", "o3": "Köpek fotoğrafı", "o4": "Kuş" }
+      }
+    },
+    "color": {
+      "background": "Krem",
+      "surface": "Beyaz",
+      "ink": "Siyah",
+      "muted": "Gri",
+      "primary": "Yeşil",
+      "primaryDark": "Koyu yeşil",
+      "sky": "Mavi",
+      "skyDark": "Koyu mavi",
+      "sun": "Sarı",
+      "coral": "Kırmızı",
+      "grape": "Mor",
+      "border": "Bej"
+    },
+    "shape": {
+      "circle": "daire",
+      "square": "kare",
+      "triangle": "üçgen",
+      "star": "yıldız"
+    },
+    "shapeOption": "{{color}} {{shape}}"
+  }
+}
