@@ -8,7 +8,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { strings } from '@/lib/strings';
+import { useTranslation } from 'react-i18next';
 import { colors, motion, spacing } from '@/theme';
 import type { Badge } from '@/types/progress';
 
@@ -31,6 +31,7 @@ type Props = {
  * Reduced motion renders everything static, no confetti.
  */
 export function BadgeReveal({ badge }: Props) {
+  const { t } = useTranslation('home');
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(reduceMotion ? 1 : 0);
   const rotate = useSharedValue(reduceMotion ? 0 : -15);
@@ -58,7 +59,7 @@ export function BadgeReveal({ badge }: Props) {
   const { emoji, ring } = badgeLook[badge];
 
   return (
-    <View style={styles.stage} accessible accessibilityLabel={strings.a11y.lessonStatus[badge]}>
+    <View style={styles.stage} accessible accessibilityLabel={t(`lessonStatus.${badge}`)}>
       {reduceMotion
         ? null
         : Array.from({ length: CONFETTI_COUNT }, (_, index) => (

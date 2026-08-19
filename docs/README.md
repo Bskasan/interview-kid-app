@@ -31,9 +31,15 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0024 — Husky + lint-staged + commitlint](decisions/0024-husky-lint-staged-commitlint.md) — POSIX-sh hooks: fast checks per commit, commitlint on messages, full `check` on push; lefthook/simple-git-hooks rejected.
 - [0025 — GitHub Actions CI pipeline](decisions/0025-github-actions-pipeline.md) — one fail-fast job (typecheck→lint→format→test→export) on PRs and main pushes; export artifact as post-merge proof; EAS deferred.
 - [0026 — Branch ruleset, enforcement deferred](decisions/0026-branch-ruleset-deferred.md) — import-ready `main.json` ruleset committed; GitHub Free private repos can't enforce, pre-push hook is the gate until then.
+- [0027 — i18next with typed, synchronous init](decisions/0027-i18next-typed-sync-init.md) — tr/en JSON resources as namespaces, sync init (no Suspense), CustomTypeOptions key checking, parity test; custom context and react-intl rejected.
+- [0028 — Plural policy + Hermes polyfill](decisions/0028-plural-policy-hermes.md) — plural keys for timeLeft only; runtime-guarded intl-pluralrules (Hermes lacks Intl.PluralRules, i18next v24+ has no fallback).
+- [0029 — Locale-safe cached lessons](decisions/0029-locale-safe-cached-lessons.md) — Lesson model went language-neutral (lessonNumber/author), titles compose at render time, buster bumped to lessons-v2.
+- [0030 — Question content model](decisions/0030-question-content-model.md) — set/question ids + typed labelKey/a11yKey into the questions namespace; shape labels derived via per-language template (word order safe).
+- [0031 — Language detection & persisted override](decisions/0031-language-detection-persistence.md) — device locale → tr|en (fallback tr); explicit choice in persisted settingsStore wins on relaunch; header pill toggle with radio semantics.
 
 ## Features
 
 - [Home](features/home.md) — lesson list: data flow, offline behavior, progress indicators, edge cases, manual tests.
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
+- [i18n](features/i18n.md) — Turkish + English: detection, persisted toggle, typed keys, translated question bank, plural handling, manual tests.

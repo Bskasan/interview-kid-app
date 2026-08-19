@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { strings } from '@/lib/strings';
 import { colors, radius, spacing, typography } from '@/theme';
 
 // Original generic fox — deliberately not an owl or any existing app's character.
@@ -13,12 +13,13 @@ type Props = {
 };
 
 export function Mascot({ size = 64, speech }: Props) {
+  const { t } = useTranslation();
   return (
     <View
       style={styles.row}
       accessible
       accessibilityRole="image"
-      accessibilityLabel={speech ? strings.a11y.mascotSays(speech) : strings.a11y.mascot}
+      accessibilityLabel={speech ? t('mascotSays', { text: speech }) : t('mascotA11y')}
     >
       <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
         <Text style={{ fontSize: size * 0.55 }}>{FACE}</Text>

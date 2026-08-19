@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { strings } from '@/lib/strings';
 import { colors, radius, spacing, typography } from '@/theme';
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
 
 /** Shrinking time bar + seconds. Color shifts to sun then coral as time runs low. */
 export function TimerBar({ progress, remainingSeconds }: Props) {
+  const { t } = useTranslation('exercise');
   const urgent = remainingSeconds <= 5;
   const fillColor = remainingSeconds > 10 ? colors.primary : urgent ? colors.coral : colors.sun;
 
@@ -17,7 +18,7 @@ export function TimerBar({ progress, remainingSeconds }: Props) {
     <View
       style={styles.row}
       accessible
-      accessibilityLabel={strings.a11y.timeLeft(remainingSeconds)}
+      accessibilityLabel={t('timeLeft', { count: remainingSeconds })}
     >
       <View style={styles.track}>
         <View
