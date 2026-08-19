@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,32 +6,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BadgeReveal } from '@/components/BadgeReveal';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
+import { useNavigationLock } from '@/hooks/useNavigationLock';
+import { hapticSuccess } from '@/lib/haptics';
 import { computeOutcome } from '@/lib/scoring';
 import { useProgressStore } from '@/store/progressStore';
 import { colors, spacing, typography } from '@/theme';
+import { paramNumber, paramString } from '@/utils/routeParams';
 
 export default function ResultScreen() {
   const { t } = useTranslation('result');
   const router = useRouter();
   const params = useLocalSearchParams<{ lessonId: string; correct: string; total: string }>();
-  const lessonId = typeof params.lessonId === 'string' ? params.lessonId : '';
+  const lessonId = paramString(params.lessonId);
   // Params arrive as strings (or garbage on a bad deep link); scoring clamps further.
-  const correct = Number.isFinite(Number(params.correct)) ? Number(params.correct) : 0;
-  const total = Number.isFinite(Number(params.total)) ? Number(params.total) : 0;
+  const correct = paramNumber(params.correct);
+  const total = paramNumber(params.total);
 
   const { passed, badge } = computeOutcome(correct, total);
   const recordResult = useProgressStore((state) => state.recordResult);
 
   // Double-tapping a button must not replace twice; the screen unmounts on
   // navigation, so the lock never needs resetting.
-  const navLockRef = useRef(false);
-  const navigateOnce = (navigate: () => void) => {
-    if (navLockRef.current) {
-      return;
-    }
-    navLockRef.current = true;
-    navigate();
-  };
+  const navigateOnce = useNavigationLock();
 
   // Record exactly once per visit: the ref blocks re-renders and
   // StrictMode's double effect; mergeResult in the store is idempotent anyway,
@@ -45,7 +40,7 @@ export default function ResultScreen() {
     recordedRef.current = true;
     recordResult(lessonId, correct, total);
     if (passed) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      hapticSuccess();
     }
   }, [lessonId, correct, total, passed, recordResult]);
 

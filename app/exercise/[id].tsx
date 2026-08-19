@@ -1,4 +1,3 @@
-import * as Haptics from 'expo-haptics';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
@@ -23,6 +22,7 @@ import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { handleError } from '@/lib/errors/handleError';
+import { hapticSuccess } from '@/lib/haptics';
 import {
   advanceQuiz,
   answerQuestion,
@@ -32,6 +32,7 @@ import {
   type QuizState,
 } from '@/lib/quiz';
 import { colors, spacing, typography } from '@/theme';
+import { paramString } from '@/utils/routeParams';
 
 /** How long the ✓/✗ feedback stays on screen before auto-advancing. */
 const FEEDBACK_MS = 1400;
@@ -62,7 +63,7 @@ export default function ExerciseScreen() {
   const router = useRouter();
   const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const lessonId = typeof id === 'string' ? id : '';
+  const lessonId = paramString(id);
 
   const questions = useMemo(() => getQuestionSet(lessonId), [lessonId]);
   const { isOffline } = useNetworkStatus();
@@ -213,7 +214,7 @@ export default function ExerciseScreen() {
       return;
     }
     if (choiceIndex === question.correctIndex) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      hapticSuccess();
     }
     setQuiz((state) => answerQuestion(state, choiceIndex, question.correctIndex));
   };

@@ -1,5 +1,5 @@
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useRef } from 'react';
+import { useRouter } from 'expo-router';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,7 @@ import { LessonCardSkeleton } from '@/components/LessonCardSkeleton';
 import { Mascot } from '@/components/Mascot';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { useLessons } from '@/hooks/useLessons';
+import { useNavigationLock } from '@/hooks/useNavigationLock';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { colors, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
@@ -26,21 +27,10 @@ export default function HomeScreen() {
 
   // A fast double-tap on a card must not push two exercise screens; the lock
   // re-opens whenever Home regains focus.
-  const navLockRef = useRef(false);
-  useFocusEffect(
-    useCallback(() => {
-      navLockRef.current = false;
-    }, []),
-  );
+  const navigateOnce = useNavigationLock({ resetOnFocus: true });
   const openLesson = useCallback(
-    (lessonId: string) => {
-      if (navLockRef.current) {
-        return;
-      }
-      navLockRef.current = true;
-      router.push(`/exercise/${lessonId}`);
-    },
-    [router],
+    (lessonId: string) => navigateOnce(() => router.push(`/exercise/${lessonId}`)),
+    [navigateOnce, router],
   );
 
   const renderItem = useCallback(

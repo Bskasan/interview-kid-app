@@ -11,6 +11,8 @@ let mockParams: Record<string, string> = {};
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => mockParams,
   useRouter: () => ({ replace: mockReplace }),
+  // useNavigationLock subscribes via useFocusEffect; run it once like a mount.
+  useFocusEffect: (callback: () => void) => callback(),
 }));
 
 const originalRecordResult = useProgressStore.getState().recordResult;

@@ -6,6 +6,7 @@ import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { handleError } from '@/lib/errors/handleError';
 import { useProgressStore } from '@/store/progressStore';
 import { colors, radius, spacing, typography } from '@/theme';
+import { clamp } from '@/utils/clamp';
 import type { Lesson } from '@/types/lesson';
 
 /** Fixed dimensions exported for FlatList's getItemLayout. */
@@ -42,7 +43,7 @@ export function LessonCard({ lesson, onPress }: Props) {
 
   const status: Status = !result ? 'none' : result.badge === 'none' ? 'attempted' : result.badge;
   const total = result?.total ?? DEFAULT_TOTAL;
-  const best = Math.max(0, Math.min(result?.best ?? 0, total));
+  const best = clamp(result?.best ?? 0, 0, total);
   const stars = '⭐'.repeat(best) + '☆'.repeat(total - best);
   const pill = status === 'none' ? null : statusPill[status];
   const title = t('lessonTitle', { number: lesson.lessonNumber, author: lesson.author });

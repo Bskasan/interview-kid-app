@@ -1,10 +1,10 @@
-import * as Haptics from 'expo-haptics';
 import {
   useAnimatedStyle,
   useReducedMotion,
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { hapticImpactLight } from '@/lib/haptics';
 import { motion } from '@/theme';
 
 /**
@@ -26,7 +26,7 @@ export function usePressFeedback({ disabled = false }: { disabled?: boolean } = 
       // eslint-disable-next-line react-hooks/immutability -- writing .value is Reanimated's shared-value API
       scale.value = withSpring(motion.pressScale, motion.spring);
     }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    hapticImpactLight();
   };
 
   const onPressOut = () => {

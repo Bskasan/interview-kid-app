@@ -1,3 +1,4 @@
+import { clamp } from '@/utils/clamp';
 import type { Badge, LessonResult } from '@/types/progress';
 
 export type Outcome = {
@@ -15,7 +16,7 @@ export function computeOutcome(correct: number, total: number): Outcome {
   if (!Number.isFinite(total) || total <= 0) {
     return { passed: false, badge: 'none' };
   }
-  const safeCorrect = clamp(correct, 0, total);
+  const safeCorrect = clamp(Math.trunc(correct), 0, total);
   const passed = 3 * safeCorrect >= 2 * total;
   const badge: Badge = safeCorrect === total ? 'perfect' : passed ? 'earned' : 'none';
   return { passed, badge };
@@ -34,16 +35,9 @@ export function mergeResult(
   if (!Number.isFinite(total) || total <= 0) {
     return previous ?? { best: 0, total: 0, badge: 'none' };
   }
-  const safeCorrect = clamp(correct, 0, total);
+  const safeCorrect = clamp(Math.trunc(correct), 0, total);
   if (previous && previous.best >= safeCorrect) {
     return previous;
   }
   return { best: safeCorrect, total, badge: computeOutcome(safeCorrect, total).badge };
-}
-
-function clamp(value: number, min: number, max: number): number {
-  if (!Number.isFinite(value)) {
-    return min;
-  }
-  return Math.min(Math.max(Math.trunc(value), min), max);
 }

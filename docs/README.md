@@ -40,6 +40,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0033 — Error surfacing](decisions/0033-error-surfacing.md) — single-slot replace-on-new banner (no queue, no blocking modal), silent policy where screens own their failure UI, root ErrorBoundary with kid-friendly fallback.
 - [0034 — Exit confirm sheet](decisions/0034-exit-confirm-sheet.md) — 🏠 button + one Modal sheet for every exit path on both stages (supersedes 0014's quiz-only Alert); pause-while-open semantics; stay is the safe default.
 - [0035 — Video failure: the child decides](decisions/0035-video-failure-child-decides.md) — explicit loading/ready/ended/error machine, 12 s watchdog + offline-on-entry, retry-by-remount, continue-without-video (supersedes 0012's unlock-on-error).
+- [0036 — Shared utils layout](decisions/0036-shared-utils-layout.md) — React-free helpers in src/utils (clamp, hashString, routeParams), useNavigationLock hook, haptics wrapper; no barrel exports; what was deliberately not extracted.
 
 ## Features
 
