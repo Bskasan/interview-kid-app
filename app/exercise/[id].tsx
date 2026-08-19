@@ -7,14 +7,14 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AnswerOption } from '@/components/AnswerOption';
+import { AnswerGrid } from '@/components/AnswerGrid';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { ExerciseVideo } from '@/components/ExerciseVideo';
 import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
 import { TimerBar } from '@/components/TimerBar';
 import { LESSON_VIDEO_URL } from '@/data/media';
-import { getQuestionSet, optionA11yLabel, SECONDS_PER_QUESTION } from '@/data/questions';
+import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
 import {
   advanceQuiz,
@@ -149,17 +149,15 @@ export default function ExerciseScreen() {
     <SafeAreaView style={styles.screen}>
       <SegmentedProgress current={quiz.index + 1} total={questions.length} />
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
-      <Text style={styles.prompt}>{question.prompt}</Text>
-      <View style={styles.options}>
-        {question.options.map((option, index) => (
-          <AnswerOption
-            key={`${quiz.index}-${index}`}
-            label={optionA11yLabel(option)}
-            feedback={feedbackForOption(quiz, index, question.correctIndex)}
-            onPress={() => handleAnswer(index)}
-          />
-        ))}
-      </View>
+      <Text style={styles.prompt} numberOfLines={2}>
+        {question.prompt}
+      </Text>
+      <AnswerGrid
+        key={quiz.index}
+        options={question.options}
+        feedbackFor={(index) => feedbackForOption(quiz, index, question.correctIndex)}
+        onSelect={handleAnswer}
+      />
       <View style={styles.mascotRow}>
         <Mascot size={48} speech={mascotSpeech} />
       </View>
@@ -189,9 +187,6 @@ const styles = StyleSheet.create({
     color: colors.ink,
     textAlign: 'center',
     marginVertical: spacing.md,
-  },
-  options: {
-    gap: spacing.md,
   },
   mascotRow: {
     flex: 1,
