@@ -41,10 +41,10 @@
     "timeUp": "Süre doldu ⏰",
     "timeLeft_one": "Kalan süre {{count}} saniye",
     "timeLeft_other": "Kalan süre {{count}} saniye",
-    "exitTitle": "Çıkmak istiyor musun?",
-    "exitBody": "İlerlemen kaybolur.",
-    "exitConfirm": "Çık",
-    "exitCancel": "Kal"
+    "exitButton": "Çıkış",
+    "exitPrompt": "Bırakıp ana sayfaya dönmek istiyor musun?",
+    "exitStay": "Devam et",
+    "exitLeave": "Ana sayfa"
   },
   "result": {
     "passTitle": "Bravo! 🎉",

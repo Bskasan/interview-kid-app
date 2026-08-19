@@ -48,8 +48,16 @@ function mapLesson(item: unknown, lessonNumber: number): Lesson | null {
     id: idText,
     lessonNumber,
     author: authorText,
-    thumbnailUrl: `https://picsum.photos/id/${idText}/200/200`,
+    thumbnailUrl: lessonThumbnailUrl(idText),
   };
+}
+
+/**
+ * Thumbnail for a lesson (picsum) — derivable from the id alone, so screens
+ * that only have the route param (e.g. the exit sheet) need no query access.
+ */
+export function lessonThumbnailUrl(lessonId: string): string {
+  return `https://picsum.photos/id/${lessonId}/200/200`;
 }
 
 export async function fetchLessons(): Promise<Lesson[]> {
