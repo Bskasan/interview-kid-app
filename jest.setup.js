@@ -42,3 +42,13 @@ jest.mock('expo-image', () => {
     Image: (props) => React.createElement(View, { testID: 'expo-image', ...props }),
   };
 });
+
+// expo-localization is native; a fixed Turkish device locale keeps every suite
+// deterministic and matches the copy the tests assert against.
+jest.mock('expo-localization', () => ({
+  getLocales: () => [{ languageCode: 'tr' }],
+}));
+
+// Initialize i18next synchronously (bundled resources) so components can
+// translate during render without per-test setup.
+require('./src/i18n');

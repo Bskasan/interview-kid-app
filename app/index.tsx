@@ -1,15 +1,16 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FullScreenMessage } from '@/components/FullScreenMessage';
+import { LanguageToggle } from '@/components/LanguageToggle';
 import { LESSON_CARD_GAP, LESSON_CARD_HEIGHT, LessonCard } from '@/components/LessonCard';
 import { LessonCardSkeleton } from '@/components/LessonCardSkeleton';
 import { Mascot } from '@/components/Mascot';
 import { OfflineBanner } from '@/components/OfflineBanner';
 import { useLessons } from '@/hooks/useLessons';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { strings } from '@/lib/strings';
 import { colors, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
 
@@ -18,6 +19,7 @@ const SKELETON_COUNT = 5;
 const ListGap = () => <View style={{ height: LESSON_CARD_GAP }} />;
 
 export default function HomeScreen() {
+  const { t } = useTranslation(['home', 'common']);
   const router = useRouter();
   const { data: lessons, isPending, isError, refetch, isRefetching } = useLessons();
   const { isOffline } = useNetworkStatus();
@@ -53,7 +55,7 @@ export default function HomeScreen() {
   let content;
   if (isPending) {
     content = (
-      <View style={styles.skeletons} accessibilityLabel={strings.common.loading}>
+      <View style={styles.skeletons} accessibilityLabel={t('common:loading')}>
         {Array.from({ length: SKELETON_COUNT }, (_, i) => (
           <LessonCardSkeleton key={i} />
         ))}
@@ -91,13 +93,9 @@ export default function HomeScreen() {
     content = (
       <FullScreenMessage
         speech={
-          isError
-            ? isOffline
-              ? strings.home.offlineNoCache
-              : strings.common.errorTitle
-            : strings.home.emptyTitle
+          isError ? (isOffline ? t('offlineNoCache') : t('common:errorTitle')) : t('emptyTitle')
         }
-        actionLabel={strings.common.retry}
+        actionLabel={t('common:retry')}
         onAction={() => refetch()}
       />
     );
@@ -106,8 +104,11 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>{strings.home.title}</Text>
-        <Mascot size={48} speech={strings.home.greeting} />
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{t('title')}</Text>
+          <LanguageToggle />
+        </View>
+        <Mascot size={48} speech={t('greeting')} />
       </View>
       {isOffline ? <OfflineBanner /> : null}
       {content}
@@ -124,9 +125,16 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.md,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
   title: {
     ...typography.title,
     color: colors.ink,
+    flexShrink: 1,
   },
   listContent: {
     paddingHorizontal: spacing.lg,

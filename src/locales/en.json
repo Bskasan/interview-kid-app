@@ -1,0 +1,142 @@
+{
+  "common": {
+    "loading": "Loading…",
+    "retry": "Try again",
+    "errorTitle": "Something went wrong",
+    "mascotA11y": "Friendly fox mascot",
+    "mascotSays": "The fox says: {{text}}",
+    "languagePickerA11y": "Language choice",
+    "language": {
+      "tr": "Türkçe",
+      "en": "English"
+    }
+  },
+  "home": {
+    "title": "Lessons",
+    "greeting": "Hi! Let's learn 🚀",
+    "emptyTitle": "No lessons yet",
+    "offlineBanner": "No internet — saved lessons ready 📚",
+    "offlineNoCache": "Lessons will load when you're online",
+    "lessonTitle": "Lesson {{number}}: {{author}}",
+    "lessonCardA11y": "{{title}}. {{status}}",
+    "keepGoing": "Keep going 💪",
+    "badgeEarned": "Badge 🏅",
+    "badgePerfect": "Super 🌟",
+    "lessonStatus": {
+      "none": "Not tried yet",
+      "attempted": "Tried, no badge yet",
+      "earned": "Badge earned",
+      "perfect": "Perfect badge earned"
+    }
+  },
+  "exercise": {
+    "startQuiz": "Start the Quiz",
+    "watchFirst": "Watch the video first 🎬",
+    "videoDone": "Great! Quiz time 🎯",
+    "videoError": "Video didn't load, no worries!",
+    "videoErrorHint": "You can start the quiz 👇",
+    "question": "Question {{current}}/{{total}}",
+    "correct": "Great job! 🎉",
+    "wrong": "That's okay, keep going! 💪",
+    "timeUp": "Time's up ⏰",
+    "timeLeft_one": "{{count}} second left",
+    "timeLeft_other": "{{count}} seconds left",
+    "exitTitle": "Do you want to leave?",
+    "exitBody": "Your progress will be lost.",
+    "exitConfirm": "Leave",
+    "exitCancel": "Stay"
+  },
+  "result": {
+    "passTitle": "Bravo! 🎉",
+    "perfectTitle": "Amazing! All correct 🌟",
+    "failTitle": "So close! Let's try again 💪",
+    "score": "{{correct}}/{{total}} correct",
+    "retryLesson": "Try Again",
+    "goHome": "Home",
+    "mascotPass": "I'm proud of you!",
+    "mascotPerfect": "Wow! You got them all!",
+    "mascotFail": "It's okay, we'll do it together!"
+  },
+  "errors": {
+    "network": "The internet isn't working right now",
+    "media": "The video won't play right now",
+    "storage": "Something went wrong while saving",
+    "unknown": "Something went wrong",
+    "ok": "OK"
+  },
+  "questions": {
+    "shapes": {
+      "q1": { "prompt": "Which one is a triangle?" },
+      "q2": { "prompt": "Which one is a star?" },
+      "q3": { "prompt": "Which one is a circle?" }
+    },
+    "colors": {
+      "q1": { "prompt": "Which one is blue?" },
+      "q2": { "prompt": "Which one is yellow?" },
+      "q3": { "prompt": "Which one is green?" }
+    },
+    "counting": {
+      "q1": {
+        "prompt": "How many apples? 🍎🍎🍎",
+        "options": { "o1": "2", "o2": "3", "o3": "4", "o4": "5" }
+      },
+      "q2": {
+        "prompt": "How many stars? ⭐⭐",
+        "options": { "o1": "4", "o2": "3", "o3": "2", "o4": "1" }
+      },
+      "q3": {
+        "prompt": "How many balls? ⚽⚽⚽⚽",
+        "options": { "o1": "3", "o2": "5", "o3": "4", "o4": "6" }
+      }
+    },
+    "animals": {
+      "q1": {
+        "prompt": "Which one says meow?",
+        "options": { "o1": "Cow", "o2": "Cat", "o3": "Sheep", "o4": "Lion" }
+      },
+      "q2": {
+        "prompt": "Which one can fly?",
+        "options": { "o1": "Fish", "o2": "Elephant", "o3": "Bird", "o4": "Turtle" }
+      },
+      "q3": {
+        "prompt": "Which one lives in water?",
+        "options": { "o1": "Dolphin", "o2": "Cat", "o3": "Dog", "o4": "Chicken" }
+      }
+    },
+    "objects": {
+      "q1": {
+        "prompt": "Which one is round?",
+        "options": { "o1": "Ball", "o2": "Box", "o3": "Ruler", "o4": "Set square" }
+      },
+      "q2": {
+        "prompt": "Which one is square?",
+        "options": { "o1": "Dice", "o2": "Moon", "o3": "Egg", "o4": "Bagel" }
+      },
+      "q3": {
+        "prompt": "Which one is a dog?",
+        "options": { "o1": "Cat", "o2": "Fish", "o3": "Dog photo", "o4": "Bird" }
+      }
+    },
+    "color": {
+      "background": "Cream",
+      "surface": "White",
+      "ink": "Black",
+      "muted": "Gray",
+      "primary": "Green",
+      "primaryDark": "Dark green",
+      "sky": "Blue",
+      "skyDark": "Dark blue",
+      "sun": "Yellow",
+      "coral": "Red",
+      "grape": "Purple",
+      "border": "Beige"
+    },
+    "shape": {
+      "circle": "circle",
+      "square": "square",
+      "triangle": "triangle",
+      "star": "star"
+    },
+    "shapeOption": "{{color}} {{shape}}"
+  }
+}

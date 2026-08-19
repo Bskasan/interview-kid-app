@@ -1,11 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { strings } from '@/lib/strings';
 import { colors, radius, spacing, typography } from '@/theme';
 
 export function OfflineBanner() {
+  const { t } = useTranslation('home');
   return (
     <View style={styles.banner} accessibilityLiveRegion="polite">
-      <Text style={styles.text}>{strings.home.offlineBanner}</Text>
+      <Text style={styles.text}>{t('offlineBanner')}</Text>
     </View>
   );
 }

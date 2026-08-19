@@ -5,25 +5,38 @@ import {
   QUESTIONS_PER_ATTEMPT,
   type OptionVisual,
 } from '../../src/data/questions';
+import i18n from '../../src/i18n';
+
+// Language-neutral data + per-language text: integrity must hold in BOTH
+// languages, so every check runs against a fixed t per locale.
+const LOCALES = ['tr', 'en'] as const;
 
 describe('question bank — data integrity', () => {
-  it('gives every option a non-empty, unique spoken label and a valid answer index', () => {
-    expect(allQuestionSets.length).toBeGreaterThanOrEqual(5);
-    for (const set of allQuestionSets) {
-      expect(set).toHaveLength(QUESTIONS_PER_ATTEMPT);
-      for (const question of set) {
-        expect(question.prompt.trim().length).toBeGreaterThan(0);
-        const labels = question.options.map((option) => optionA11yLabel(option));
-        for (const label of labels) {
-          expect(label.trim().length).toBeGreaterThan(0);
+  it.each(LOCALES)(
+    'resolves every prompt and gives options unique spoken labels in %s',
+    (locale) => {
+      const t = i18n.getFixedT(locale, 'questions');
+      expect(allQuestionSets.length).toBeGreaterThanOrEqual(5);
+      for (const set of allQuestionSets) {
+        expect(set).toHaveLength(QUESTIONS_PER_ATTEMPT);
+        for (const question of set) {
+          const prompt = t(question.promptKey);
+          expect(prompt.trim().length).toBeGreaterThan(0);
+          // A missing key would echo the key itself back — catch that too.
+          expect(prompt).not.toBe(question.promptKey);
+
+          const labels = question.options.map((option) => optionA11yLabel(option, t));
+          for (const label of labels) {
+            expect(label.trim().length).toBeGreaterThan(0);
+          }
+          // A screen reader must never announce two indistinguishable answers.
+          expect(new Set(labels).size).toBe(4);
+          expect(question.correctIndex).toBeGreaterThanOrEqual(0);
+          expect(question.correctIndex).toBeLessThan(4);
         }
-        // A screen reader must never announce two indistinguishable answers.
-        expect(new Set(labels).size).toBe(4);
-        expect(question.correctIndex).toBeGreaterThanOrEqual(0);
-        expect(question.correctIndex).toBeLessThan(4);
       }
-    }
-  });
+    },
+  );
 
   it('uses at most one network image in the whole bank, with an offline emoji fallback', () => {
     const imageVisuals = allQuestionSets

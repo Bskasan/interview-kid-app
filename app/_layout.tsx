@@ -1,3 +1,6 @@
+// Side-effect import: initializes i18next synchronously before any screen
+// (or the module-scope wiring below) can render user-facing text.
+import '@/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
@@ -35,7 +38,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PersistQueryClientProvider
         client={queryClient}
-        persistOptions={{ persister, maxAge: DAY_MS, buster: 'lessons-v1' }}
+        // v2: Lesson dropped the baked title for lessonNumber/author (i18n) —
+        // the buster invalidates persisted v1 entries with the old shape.
+        persistOptions={{ persister, maxAge: DAY_MS, buster: 'lessons-v2' }}
       >
         <StatusBar style="dark" />
         <Stack

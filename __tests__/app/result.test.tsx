@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import ResultScreen from '../../app/result';
-import { strings } from '../../src/lib/strings';
+import i18n from '../../src/i18n';
 import { useProgressStore } from '../../src/store/progressStore';
+
+const t = i18n.getFixedT(null, 'result');
 
 const mockReplace = jest.fn();
 let mockParams: Record<string, string> = {};
@@ -46,8 +48,8 @@ describe('Result screen — recording and navigation guards', () => {
     await render(<ResultScreen />);
 
     expect(recordSpy).not.toHaveBeenCalled();
-    expect(screen.queryByLabelText(strings.result.retryLesson)).toBeNull();
-    expect(screen.getByLabelText(strings.result.goHome)).toBeTruthy();
+    expect(screen.queryByLabelText(t('retryLesson'))).toBeNull();
+    expect(screen.getByLabelText(t('goHome'))).toBeTruthy();
   });
 
   it('records nothing when the total param is garbage', async () => {
@@ -63,8 +65,8 @@ describe('Result screen — recording and navigation guards', () => {
   it('navigates once even when both buttons are tapped in quick succession', async () => {
     await render(<ResultScreen />);
 
-    await fireEvent.press(screen.getByLabelText(strings.result.retryLesson));
-    await fireEvent.press(screen.getByLabelText(strings.result.goHome));
+    await fireEvent.press(screen.getByLabelText(t('retryLesson')));
+    await fireEvent.press(screen.getByLabelText(t('goHome')));
 
     expect(mockReplace).toHaveBeenCalledTimes(1);
     expect(mockReplace).toHaveBeenCalledWith('/exercise/42');

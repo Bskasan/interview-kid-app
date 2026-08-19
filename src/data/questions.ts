@@ -1,13 +1,31 @@
+import type { TFunction } from 'i18next';
+import type tr from '@/locales/tr.json';
 import { colors } from '@/theme';
 
 /**
  * Local mock quiz content (the brief allows local data for the exercise).
- * Turkish, ages 5–8: pre-readers first — every option is a big visual (emoji,
- * drawn shape or photo) with an optional short label. Five sets; a lesson picks
- * one deterministically from its id, so the same lesson always asks the same
- * questions — retakes stay comparable.
+ * Ages 5–8, pre-readers first: every option is a big visual (emoji, drawn shape
+ * or photo) with an optional short label. The data here is language-neutral —
+ * structure, visuals and answers — while every displayed or spoken text lives in
+ * the `questions` i18n namespace and is resolved at render time. Five sets; a
+ * lesson picks one deterministically from its id, so the same lesson always
+ * asks the same questions — retakes stay comparable.
  */
 export type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
+
+type QuestionsResource = (typeof tr)['questions'];
+
+type DotPaths<T> = T extends string
+  ? never
+  : {
+      [K in keyof T & string]: T[K] extends string ? K : `${K}.${DotPaths<T[K]>}`;
+    }[keyof T & string];
+
+/** A key inside the `questions` namespace, checked against tr.json by tsc. */
+export type QuestionTextKey = DotPaths<QuestionsResource>;
+
+/** The t function bound to the `questions` namespace. */
+export type QuestionsT = TFunction<'questions'>;
 
 export type OptionVisual =
   | { kind: 'emoji'; value: string }
@@ -16,15 +34,21 @@ export type OptionVisual =
   | { kind: 'image'; uri: string; fallbackEmoji: string };
 
 /**
- * Either a visible label exists (it doubles as the spoken label), or an explicit
- * a11yLabel is required — a non-empty description is a compile-time guarantee.
+ * Every option resolves to a non-empty spoken label by construction: either a
+ * labelKey/a11yKey points into the questions namespace, or the option is a drawn
+ * shape whose label is derived from its color + shape tokens.
  */
 export type AnswerOptionData =
-  | { label: string; a11yLabel?: string; visual?: OptionVisual }
-  | { label?: undefined; a11yLabel: string; visual: OptionVisual };
+  | { labelKey: QuestionTextKey; a11yKey?: QuestionTextKey; visual?: OptionVisual }
+  | { labelKey?: undefined; a11yKey: QuestionTextKey; visual: OptionVisual }
+  | {
+      labelKey?: undefined;
+      a11yKey?: undefined;
+      visual: Extract<OptionVisual, { kind: 'shape' }>;
+    };
 
 export type Question = {
-  prompt: string;
+  promptKey: QuestionTextKey;
   /** Exactly four answer options. */
   options: readonly [AnswerOptionData, AnswerOptionData, AnswerOptionData, AnswerOptionData];
   correctIndex: 0 | 1 | 2 | 3;
@@ -35,54 +59,46 @@ export type QuestionSet = readonly Question[];
 export const QUESTIONS_PER_ATTEMPT = 3;
 export const SECONDS_PER_QUESTION = 15;
 
-/** What a screen reader announces for an option. Total by construction. */
-export function optionA11yLabel(option: AnswerOptionData): string {
-  if (option.label !== undefined) {
-    return option.a11yLabel ?? option.label;
-  }
-  return option.a11yLabel;
+/** Visible caption under a visual, when the option has one. */
+export function optionLabel(option: AnswerOptionData, t: QuestionsT): string | undefined {
+  return option.labelKey !== undefined ? t(option.labelKey) : undefined;
 }
 
-// Exhaustive over the palette so a new color token forces a Turkish name.
-const TURKISH_COLOR: Record<keyof typeof colors, string> = {
-  background: 'Krem',
-  surface: 'Beyaz',
-  ink: 'Siyah',
-  muted: 'Gri',
-  primary: 'Yeşil',
-  primaryDark: 'Koyu yeşil',
-  sky: 'Mavi',
-  skyDark: 'Koyu mavi',
-  sun: 'Sarı',
-  coral: 'Kırmızı',
-  grape: 'Mor',
-  border: 'Bej',
-};
-
-const TURKISH_SHAPE: Record<ShapeName, string> = {
-  circle: 'daire',
-  square: 'kare',
-  triangle: 'üçgen',
-  star: 'yıldız',
-};
+/**
+ * What a screen reader announces for an option. Total by construction; shape
+ * options compose "{{color}} {{shape}}" through the namespace template so word
+ * order follows the language, not the code.
+ */
+export function optionA11yLabel(option: AnswerOptionData, t: QuestionsT): string {
+  if (option.labelKey !== undefined) {
+    return t(option.a11yKey ?? option.labelKey);
+  }
+  if (option.a11yKey !== undefined) {
+    return t(option.a11yKey);
+  }
+  const { color, shape } = option.visual;
+  return t('shapeOption', {
+    color: t(`color.${color}`),
+    shape: t(`shape.${shape}`),
+  });
+}
 
 const shapeOpt = (shape: ShapeName, color: keyof typeof colors): AnswerOptionData => ({
   visual: { kind: 'shape', shape, color },
-  a11yLabel: `${TURKISH_COLOR[color]} ${TURKISH_SHAPE[shape]}`,
 });
 
-const emojiOpt = (value: string, label: string): AnswerOptionData => ({
+const emojiOpt = (value: string, labelKey: QuestionTextKey): AnswerOptionData => ({
   visual: { kind: 'emoji', value },
-  label,
+  labelKey,
 });
 
-const textOpt = (label: string): AnswerOptionData => ({ label });
+const textOpt = (labelKey: QuestionTextKey): AnswerOptionData => ({ labelKey });
 
 const questionSets: readonly QuestionSet[] = [
   // Shapes — find the named shape among drawn shapes
   [
     {
-      prompt: 'Hangisi üçgen?',
+      promptKey: 'shapes.q1.prompt',
       options: [
         shapeOpt('square', 'sky'),
         shapeOpt('triangle', 'coral'),
@@ -92,7 +108,7 @@ const questionSets: readonly QuestionSet[] = [
       correctIndex: 1,
     },
     {
-      prompt: 'Hangisi yıldız?',
+      promptKey: 'shapes.q2.prompt',
       options: [
         shapeOpt('star', 'sun'),
         shapeOpt('circle', 'sky'),
@@ -102,7 +118,7 @@ const questionSets: readonly QuestionSet[] = [
       correctIndex: 0,
     },
     {
-      prompt: 'Hangisi daire?',
+      promptKey: 'shapes.q3.prompt',
       options: [
         shapeOpt('square', 'coral'),
         shapeOpt('star', 'primary'),
@@ -115,7 +131,7 @@ const questionSets: readonly QuestionSet[] = [
   // Colors — same shape everywhere so only the color differs
   [
     {
-      prompt: 'Mavi olan hangisi?',
+      promptKey: 'colors.q1.prompt',
       options: [
         shapeOpt('circle', 'primary'),
         shapeOpt('circle', 'sun'),
@@ -125,7 +141,7 @@ const questionSets: readonly QuestionSet[] = [
       correctIndex: 2,
     },
     {
-      prompt: 'Sarı olan hangisi?',
+      promptKey: 'colors.q2.prompt',
       options: [
         shapeOpt('square', 'sun'),
         shapeOpt('square', 'grape'),
@@ -135,7 +151,7 @@ const questionSets: readonly QuestionSet[] = [
       correctIndex: 0,
     },
     {
-      prompt: 'Yeşil olan hangisi?',
+      promptKey: 'colors.q3.prompt',
       options: [
         shapeOpt('star', 'grape'),
         shapeOpt('star', 'primary'),
@@ -148,50 +164,65 @@ const questionSets: readonly QuestionSet[] = [
   // Counting — the prompt carries the emoji, options are big digits
   [
     {
-      prompt: 'Kaç elma var? 🍎🍎🍎',
-      options: [textOpt('2'), textOpt('3'), textOpt('4'), textOpt('5')],
+      promptKey: 'counting.q1.prompt',
+      options: [
+        textOpt('counting.q1.options.o1'),
+        textOpt('counting.q1.options.o2'),
+        textOpt('counting.q1.options.o3'),
+        textOpt('counting.q1.options.o4'),
+      ],
       correctIndex: 1,
     },
     {
-      prompt: 'Kaç yıldız var? ⭐⭐',
-      options: [textOpt('4'), textOpt('3'), textOpt('2'), textOpt('1')],
+      promptKey: 'counting.q2.prompt',
+      options: [
+        textOpt('counting.q2.options.o1'),
+        textOpt('counting.q2.options.o2'),
+        textOpt('counting.q2.options.o3'),
+        textOpt('counting.q2.options.o4'),
+      ],
       correctIndex: 2,
     },
     {
-      prompt: 'Kaç top var? ⚽⚽⚽⚽',
-      options: [textOpt('3'), textOpt('5'), textOpt('4'), textOpt('6')],
+      promptKey: 'counting.q3.prompt',
+      options: [
+        textOpt('counting.q3.options.o1'),
+        textOpt('counting.q3.options.o2'),
+        textOpt('counting.q3.options.o3'),
+        textOpt('counting.q3.options.o4'),
+      ],
       correctIndex: 2,
     },
   ],
   // Animals — emoji visuals with a short word underneath
   [
     {
-      prompt: 'Hangisi miyav der?',
+      promptKey: 'animals.q1.prompt',
       options: [
-        emojiOpt('🐄', 'İnek'),
-        emojiOpt('🐱', 'Kedi'),
-        emojiOpt('🐑', 'Koyun'),
-        emojiOpt('🦁', 'Aslan'),
+        emojiOpt('🐄', 'animals.q1.options.o1'),
+        emojiOpt('🐱', 'animals.q1.options.o2'),
+        emojiOpt('🐑', 'animals.q1.options.o3'),
+        emojiOpt('🦁', 'animals.q1.options.o4'),
       ],
       correctIndex: 1,
     },
     {
-      prompt: 'Hangisi uçar?',
+      promptKey: 'animals.q2.prompt',
       options: [
-        emojiOpt('🐟', 'Balık'),
-        emojiOpt('🐘', 'Fil'),
-        emojiOpt('🐦', 'Kuş'),
-        emojiOpt('🐢', 'Kaplumbağa'),
+        emojiOpt('🐟', 'animals.q2.options.o1'),
+        emojiOpt('🐘', 'animals.q2.options.o2'),
+        emojiOpt('🐦', 'animals.q2.options.o3'),
+        emojiOpt('🐢', 'animals.q2.options.o4'),
       ],
       correctIndex: 2,
     },
     {
-      prompt: 'Hangisi suda yaşar?',
+      promptKey: 'animals.q3.prompt',
       options: [
-        emojiOpt('🐬', 'Yunus'),
-        emojiOpt('🐱', 'Kedi'),
-        emojiOpt('🐶', 'Köpek'),
-        emojiOpt('🐔', 'Tavuk'),
+        emojiOpt('🐬', 'animals.q3.options.o1'),
+        emojiOpt('🐱', 'animals.q3.options.o2'),
+        emojiOpt('🐶', 'animals.q3.options.o3'),
+        emojiOpt('🐔', 'animals.q3.options.o4'),
       ],
       correctIndex: 0,
     },
@@ -199,39 +230,39 @@ const questionSets: readonly QuestionSet[] = [
   // Objects — everyday things, plus the single photo question in the bank
   [
     {
-      prompt: 'Hangisi yuvarlak?',
+      promptKey: 'objects.q1.prompt',
       options: [
-        emojiOpt('⚽', 'Top'),
-        emojiOpt('📦', 'Kutu'),
-        emojiOpt('📏', 'Cetvel'),
-        emojiOpt('📐', 'Gönye'),
+        emojiOpt('⚽', 'objects.q1.options.o1'),
+        emojiOpt('📦', 'objects.q1.options.o2'),
+        emojiOpt('📏', 'objects.q1.options.o3'),
+        emojiOpt('📐', 'objects.q1.options.o4'),
       ],
       correctIndex: 0,
     },
     {
-      prompt: 'Hangisi kare?',
+      promptKey: 'objects.q2.prompt',
       options: [
-        emojiOpt('🎲', 'Zar'),
-        emojiOpt('🌙', 'Ay'),
-        emojiOpt('🥚', 'Yumurta'),
-        emojiOpt('🍩', 'Simit'),
+        emojiOpt('🎲', 'objects.q2.options.o1'),
+        emojiOpt('🌙', 'objects.q2.options.o2'),
+        emojiOpt('🥚', 'objects.q2.options.o3'),
+        emojiOpt('🍩', 'objects.q2.options.o4'),
       ],
       correctIndex: 0,
     },
     {
-      prompt: 'Hangisi köpek?',
+      promptKey: 'objects.q3.prompt',
       options: [
-        emojiOpt('🐱', 'Kedi'),
-        emojiOpt('🐟', 'Balık'),
+        emojiOpt('🐱', 'objects.q3.options.o1'),
+        emojiOpt('🐟', 'objects.q3.options.o2'),
         {
           visual: {
             kind: 'image',
             uri: 'https://picsum.photos/id/237/300/300',
             fallbackEmoji: '🐶',
           },
-          a11yLabel: 'Köpek fotoğrafı',
+          a11yKey: 'objects.q3.options.o3',
         },
-        emojiOpt('🐦', 'Kuş'),
+        emojiOpt('🐦', 'objects.q3.options.o4'),
       ],
       correctIndex: 2,
     },

@@ -1,5 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { strings } from '@/lib/strings';
 import { colors, radius, spacing, typography } from '@/theme';
 
 type Props = {
@@ -10,12 +10,10 @@ type Props = {
 
 /** "Soru 2/3" + one segment per question: done = green, current = blue, ahead = beige. */
 export function SegmentedProgress({ current, total }: Props) {
+  const { t } = useTranslation('exercise');
+  const label = t('question', { current, total });
   return (
-    <View
-      style={styles.row}
-      accessible
-      accessibilityLabel={strings.exercise.question(current, total)}
-    >
+    <View style={styles.row} accessible accessibilityLabel={label}>
       <View style={styles.segments}>
         {Array.from({ length: total }, (_, index) => {
           const state =
@@ -28,7 +26,7 @@ export function SegmentedProgress({ current, total }: Props) {
         })}
       </View>
       <Text style={styles.label} maxFontSizeMultiplier={1.4}>
-        {strings.exercise.question(current, total)}
+        {label}
       </Text>
     </View>
   );

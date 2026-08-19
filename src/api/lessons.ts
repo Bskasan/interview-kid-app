@@ -1,4 +1,3 @@
-import { strings } from '@/lib/strings';
 import type { Lesson } from '@/types/lesson';
 
 const LIST_URL = 'https://picsum.photos/v2/list?page=1&limit=20';
@@ -43,9 +42,12 @@ function mapLesson(item: unknown, lessonNumber: number): Lesson | null {
   if (idText === null || authorText === null) {
     return null;
   }
+  // No display text here: the model (and the persisted query cache) stays
+  // language-neutral, so a locale switch never shows stale-language titles.
   return {
     id: idText,
-    title: strings.home.lessonTitle(lessonNumber, authorText),
+    lessonNumber,
+    author: authorText,
     thumbnailUrl: `https://picsum.photos/id/${idText}/200/200`,
   };
 }

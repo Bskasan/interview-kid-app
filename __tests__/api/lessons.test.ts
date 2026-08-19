@@ -10,12 +10,14 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
     expect(lessons).toEqual([
       {
         id: '10',
-        title: 'Ders 1: Paul Jarvis',
+        lessonNumber: 1,
+        author: 'Paul Jarvis',
         thumbnailUrl: 'https://picsum.photos/id/10/200/200',
       },
       {
         id: '25',
-        title: 'Ders 2: Alejandro Escamilla',
+        lessonNumber: 2,
+        author: 'Alejandro Escamilla',
         thumbnailUrl: 'https://picsum.photos/id/25/200/200',
       },
     ]);
@@ -34,7 +36,10 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
       { id: '4', author: 'Valid Two' },
     ]);
 
-    expect(lessons.map((l) => l.title)).toEqual(['Ders 1: Valid One', 'Ders 2: Valid Two']);
+    expect(lessons.map((l) => [l.lessonNumber, l.author])).toEqual([
+      [1, 'Valid One'],
+      [2, 'Valid Two'],
+    ]);
   });
 
   it.each([null, undefined, 42, 'garbage', { not: 'an array' }])(
@@ -67,7 +72,8 @@ describe('fetchLessons — network fetcher for the lesson list', () => {
     await expect(fetchLessons()).resolves.toEqual([
       {
         id: '7',
-        title: 'Ders 1: Ada',
+        lessonNumber: 1,
+        author: 'Ada',
         thumbnailUrl: 'https://picsum.photos/id/7/200/200',
       },
     ]);
