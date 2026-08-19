@@ -45,7 +45,6 @@ function mapLesson(item: unknown, lessonNumber: number): Lesson | null {
   }
   return {
     id: idText,
-    author: authorText,
     title: strings.home.lessonTitle(lessonNumber, authorText),
     thumbnailUrl: `https://picsum.photos/id/${idText}/200/200`,
   };

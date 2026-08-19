@@ -10,13 +10,11 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
     expect(lessons).toEqual([
       {
         id: '10',
-        author: 'Paul Jarvis',
         title: 'Ders 1: Paul Jarvis',
         thumbnailUrl: 'https://picsum.photos/id/10/200/200',
       },
       {
         id: '25',
-        author: 'Alejandro Escamilla',
         title: 'Ders 2: Alejandro Escamilla',
         thumbnailUrl: 'https://picsum.photos/id/25/200/200',
       },
@@ -69,7 +67,6 @@ describe('fetchLessons — network fetcher for the lesson list', () => {
     await expect(fetchLessons()).resolves.toEqual([
       {
         id: '7',
-        author: 'Ada',
         title: 'Ders 1: Ada',
         thumbnailUrl: 'https://picsum.photos/id/7/200/200',
       },

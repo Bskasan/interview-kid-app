@@ -8,12 +8,6 @@ export const motion = {
   spring: { damping: 14, stiffness: 220 },
   /** withSpring config for celebration pops (badge reveal) — a bit more drama. */
   springSoft: { damping: 12, stiffness: 140 },
-  /** withTiming durations (ms) for color/opacity shifts. */
-  duration: {
-    fast: 200,
-    base: 250,
-    slow: 300,
-  },
   /** Scale applied to pressed chunky controls. */
   pressScale: 0.97,
 } as const;

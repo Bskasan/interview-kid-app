@@ -13,8 +13,7 @@ export const typography = {
   caption: { fontSize: 16, fontWeight: '600', lineHeight: 20 },
 } as const satisfies Record<string, TextStyle>;
 
-/** Minimum touch target sizes (dp) from the design language. */
+/** Touch target size (dp) for primary controls, from the design language. */
 export const touchTarget = {
   primary: 56,
-  minimum: 48,
 } as const;

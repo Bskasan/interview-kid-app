@@ -7,7 +7,6 @@ export const strings = {
   common: {
     loading: 'Yükleniyor…',
     retry: 'Tekrar dene',
-    back: 'Geri',
     errorTitle: 'Bir şeyler ters gitti',
   },
   home: {
@@ -22,7 +21,6 @@ export const strings = {
     badgePerfect: 'Süper 🌟',
   },
   exercise: {
-    comingSoon: 'Alıştırma çok yakında 🛠️',
     startQuiz: 'Alıştırmaya Geç',
     videoError: 'Video açılmadı, sorun değil!',
     videoErrorHint: 'Alıştırmaya geçebilirsin 👇',

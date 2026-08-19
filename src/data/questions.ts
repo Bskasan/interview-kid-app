@@ -54,9 +54,7 @@ const TURKISH_COLOR: Record<keyof typeof colors, string> = {
   sky: 'Mavi',
   skyDark: 'Koyu mavi',
   sun: 'Sarı',
-  sunDark: 'Koyu sarı',
   coral: 'Kırmızı',
-  coralDark: 'Koyu kırmızı',
   grape: 'Mor',
   border: 'Bej',
 };

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { colors, radius, spacing, touchTarget, typography } from '@/theme';
@@ -9,8 +9,7 @@ const EDGE_HEIGHT = 4;
 const variants = {
   primary: { fill: colors.primary, edge: colors.primaryDark },
   sky: { fill: colors.sky, edge: colors.skyDark },
-  sun: { fill: colors.sun, edge: colors.sunDark },
-  // No `coral` variant on purpose: no text color passes 4.5:1 on coral (see ADR 0006).
+  // No `coral` variant on purpose: no text color passes 4.5:1 on coral.
 } as const;
 
 export type ChunkyButtonVariant = keyof typeof variants;
@@ -23,8 +22,6 @@ type Props = {
   /** Optional emoji rendered before the label — labels should rarely stand alone. */
   icon?: string;
   accessibilityLabel?: string;
-  accessibilityHint?: string;
-  style?: StyleProp<ViewStyle>;
 };
 
 export function ChunkyButton({
@@ -34,14 +31,12 @@ export function ChunkyButton({
   disabled = false,
   icon,
   accessibilityLabel,
-  accessibilityHint,
-  style,
 }: Props) {
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled });
   const { fill, edge } = disabled ? { fill: colors.border, edge: colors.muted } : variants[variant];
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
+    <Animated.View style={animatedStyle}>
       <Pressable
         onPress={onPress}
         onPressIn={onPressIn}
@@ -49,7 +44,6 @@ export function ChunkyButton({
         disabled={disabled}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityHint={accessibilityHint}
         accessibilityState={{ disabled }}
         style={({ pressed }) => [
           styles.base,

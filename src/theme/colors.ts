@@ -14,9 +14,7 @@ export const colors = {
   sky: '#2FB5F0', // secondary accent
   skyDark: '#1E8FC4', // sky button bottom edge (derived, same role as primaryDark)
   sun: '#FFC83D', // stars / badges
-  sunDark: '#D9A420', // sun button bottom edge (derived)
   coral: '#FF6B5B', // wrong / danger — soft, never harsh red
-  coralDark: '#D9503F', // coral edge (derived)
   grape: '#8E5CF6', // perfect badge
   border: '#E8E2D4', // hairlines, card borders
 } as const;
