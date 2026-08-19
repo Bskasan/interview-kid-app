@@ -14,7 +14,7 @@ import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
 import { TimerBar } from '@/components/TimerBar';
 import { LESSON_VIDEO_URL } from '@/data/media';
-import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
+import { getQuestionSet, optionA11yLabel, SECONDS_PER_QUESTION } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
 import {
   advanceQuiz,
@@ -154,7 +154,7 @@ export default function ExerciseScreen() {
         {question.options.map((option, index) => (
           <AnswerOption
             key={`${quiz.index}-${index}`}
-            label={option}
+            label={optionA11yLabel(option)}
             feedback={feedbackForOption(quiz, index, question.correctIndex)}
             onPress={() => handleAnswer(index)}
           />
