@@ -66,7 +66,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     const questions = getQuestionSet(LESSON_ID);
     for (const question of questions) {
       await fireEvent.press(
-        screen.getByLabelText(optionA11yLabel(question.options[question.correctIndex]))
+        screen.getByLabelText(optionA11yLabel(question.options[question.correctIndex])),
       );
       await act(() => {
         jest.advanceTimersByTime(FEEDBACK_MS);
@@ -101,7 +101,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     expect(alertSpy).toHaveBeenCalledWith(
       strings.exercise.exitTitle,
       strings.exercise.exitBody,
-      expect.any(Array)
+      expect.any(Array),
     );
 
     const buttons = alertSpy.mock.calls.at(-1)?.[2] ?? [];

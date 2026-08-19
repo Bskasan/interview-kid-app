@@ -30,7 +30,9 @@ describe('question bank — data integrity', () => {
       .flat()
       .flatMap((question) => question.options)
       .map((option) => option.visual)
-      .filter((visual): visual is Extract<OptionVisual, { kind: 'image' }> => visual?.kind === 'image');
+      .filter(
+        (visual): visual is Extract<OptionVisual, { kind: 'image' }> => visual?.kind === 'image',
+      );
     expect(imageVisuals.length).toBeLessThanOrEqual(1);
     for (const visual of imageVisuals) {
       expect(visual.fallbackEmoji.trim().length).toBeGreaterThan(0);

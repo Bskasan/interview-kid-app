@@ -16,7 +16,7 @@ describe('useCountdown — per-question countdown timer', () => {
     const onExpire = jest.fn();
     const utils = await renderHook(
       ({ run }: { run: boolean }) => useCountdown(seconds, { running: run, onExpire }),
-      { initialProps: { run: true } }
+      { initialProps: { run: true } },
     );
     return { onExpire, ...utils };
   };
@@ -87,9 +87,7 @@ describe('useCountdown — per-question countdown timer', () => {
 
   it('never ticks or expires while running is false from the start', async () => {
     const onExpire = jest.fn();
-    const { result } = await renderHook(() =>
-      useCountdown(15, { running: false, onExpire })
-    );
+    const { result } = await renderHook(() => useCountdown(15, { running: false, onExpire }));
 
     await act(() => {
       jest.advanceTimersByTime(20_000);
