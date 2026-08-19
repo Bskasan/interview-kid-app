@@ -26,4 +26,24 @@ describe('progressStore — persisted per-lesson results', () => {
     expect(results['1']?.badge).toBe('perfect');
     expect(results['2']?.badge).toBe('none');
   });
+
+  // Pins today's semantics: an invalid total still creates a neutral entry
+  // instead of throwing or storing a bogus badge.
+  it('stores a neutral empty entry when an attempt reports an invalid total', () => {
+    useProgressStore.getState().recordResult('42', 3, 0);
+
+    expect(useProgressStore.getState().results['42']).toEqual({
+      best: 0,
+      total: 0,
+      badge: 'none',
+    });
+  });
+
+  it('persists only results under the versioned key, never the hydration flag', () => {
+    const options = useProgressStore.persist.getOptions();
+
+    expect(options.name).toBe('progress-v1');
+    const persisted = options.partialize?.(useProgressStore.getState());
+    expect(Object.keys(persisted ?? {})).toEqual(['results']);
+  });
 });

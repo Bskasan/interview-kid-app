@@ -45,4 +45,10 @@ describe('mergeResult — best-attempt policy for retakes', () => {
   it('ignores attempts reporting a zero or negative question total', () => {
     expect(mergeResult(earned, 3, 0)).toBe(earned);
   });
+
+  // Pins the fallback for a first-ever attempt with an invalid total: a neutral
+  // empty record, never a crash or a badge from garbage input.
+  it('falls back to a neutral empty record when there is no previous result', () => {
+    expect(mergeResult(undefined, 3, 0)).toEqual({ best: 0, total: 0, badge: 'none' });
+  });
 });

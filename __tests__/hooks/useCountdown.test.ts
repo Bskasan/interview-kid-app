@@ -85,6 +85,33 @@ describe('useCountdown — per-question countdown timer', () => {
     expect(onExpire).toHaveBeenCalledTimes(2);
   });
 
+  it('never ticks or expires while running is false from the start', async () => {
+    const onExpire = jest.fn();
+    const { result } = await renderHook(() =>
+      useCountdown(15, { running: false, onExpire })
+    );
+
+    await act(() => {
+      jest.advanceTimersByTime(20_000);
+    });
+
+    expect(result.current.remainingSeconds).toBe(15);
+    expect(onExpire).not.toHaveBeenCalled();
+  });
+
+  it('clears its interval on unmount and never expires afterwards', async () => {
+    const { onExpire, unmount } = await setup(2);
+
+    await act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    await unmount();
+
+    // No act: the tree is gone; a surviving interval would still fire the spy.
+    jest.advanceTimersByTime(5000);
+    expect(onExpire).not.toHaveBeenCalled();
+  });
+
   it('pauses while the app is backgrounded and resumes on foreground', async () => {
     let appStateHandler: ((state: AppStateStatus) => void) | undefined;
     jest.spyOn(AppState, 'addEventListener').mockImplementation((_type, handler) => {
