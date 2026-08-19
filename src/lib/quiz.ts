@@ -1,0 +1,55 @@
+/**
+ * Pure quiz state machine driven by the Exercise screen. Keeping transitions pure
+ * makes the double-answer lock, timeout handling and finish condition unit-testable
+ * without rendering anything.
+ */
+export type AnswerChoice = number | 'timeout';
+
+export type QuizAnswer = {
+  choice: AnswerChoice;
+  isCorrect: boolean;
+};
+
+export type QuizState = {
+  /** Index of the question currently on screen. */
+  index: number;
+  /** Correct answers so far (includes the currently shown feedback). */
+  correct: number;
+  /** Non-null while the answer feedback for the current question is showing. */
+  answer: QuizAnswer | null;
+  /** True once the last question's feedback has been advanced past. */
+  finished: boolean;
+};
+
+export function createQuizState(): QuizState {
+  return { index: 0, correct: 0, answer: null, finished: false };
+}
+
+/** Locks in a tapped option. Ignored while feedback is showing (rapid double-tap guard). */
+export function answerQuestion(state: QuizState, choice: number, correctIndex: number): QuizState {
+  if (state.finished || state.answer !== null) {
+    return state;
+  }
+  const isCorrect = choice === correctIndex;
+  return { ...state, answer: { choice, isCorrect }, correct: state.correct + (isCorrect ? 1 : 0) };
+}
+
+/** Timer expiry counts as a wrong answer (assumption #2). Ignored if already answered. */
+export function timeoutQuestion(state: QuizState): QuizState {
+  if (state.finished || state.answer !== null) {
+    return state;
+  }
+  return { ...state, answer: { choice: 'timeout', isCorrect: false } };
+}
+
+/** Moves past the feedback to the next question, or finishes after the last one. */
+export function advanceQuiz(state: QuizState, totalQuestions: number): QuizState {
+  if (state.finished || state.answer === null) {
+    return state;
+  }
+  const nextIndex = state.index + 1;
+  if (nextIndex >= totalQuestions) {
+    return { ...state, answer: null, finished: true };
+  }
+  return { ...state, index: nextIndex, answer: null };
+}
