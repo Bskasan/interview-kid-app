@@ -23,9 +23,10 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0016 — Badge animation](decisions/0016-badge-animation.md) — hand-rolled Reanimated celebration over Lottie/confetti libs; reduced-motion fallback.
 - [0017 — Idempotent result recording](decisions/0017-idempotent-result-recording.md) — single writer + once-per-mount guard + idempotent best-merge.
 - [0018 — Interaction & display hardening](decisions/0018-interaction-hardening.md) — contrast fixes, font-scale caps, navigation double-tap locks, app-active default.
+- [0019 — Visual answer grid](decisions/0019-visual-answer-grid.md) — 2×2 visual tiles for pre-readers: emoji/SVG-shape/image option model, compile-time a11y labels, pure tile sizing with a 120dp floor.
 
 ## Features
 
 - [Home](features/home.md) — lesson list: data flow, offline behavior, progress indicators, edge cases, manual tests.
-- [Exercise](features/exercise.md) — video stage + timed quiz: events, timer, back guard, feedback states, edge cases, manual tests.
+- [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
