@@ -8,15 +8,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { type AnswerFeedback } from '@/lib/quiz';
 import { colors, radius, spacing, touchTarget, typography } from '@/theme';
-
-/**
- * idle: awaiting the child's tap. After an answer locks in:
- * correct = the tapped right answer, wrongChoice = the tapped wrong answer,
- * revealCorrect = the right answer shown after a wrong tap or timeout,
- * lockedOut = the remaining options (dimmed, unpressable).
- */
-export type AnswerFeedback = 'idle' | 'correct' | 'wrongChoice' | 'revealCorrect' | 'lockedOut';
 
 // Feedback is never color-alone: ✓/✗ prefixes + border shapes carry the meaning.
 const feedbackStyles = {

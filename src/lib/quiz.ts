@@ -53,3 +53,29 @@ export function advanceQuiz(state: QuizState, totalQuestions: number): QuizState
   }
   return { ...state, index: nextIndex, answer: null };
 }
+
+/**
+ * idle: awaiting the child's tap. After an answer locks in:
+ * correct = the tapped right answer, wrongChoice = the tapped wrong answer,
+ * revealCorrect = the right answer shown after a wrong tap or timeout,
+ * lockedOut = the remaining options (dimmed, unpressable).
+ */
+export type AnswerFeedback = 'idle' | 'correct' | 'wrongChoice' | 'revealCorrect' | 'lockedOut';
+
+/** Projects the state onto one option's visual feedback. */
+export function feedbackForOption(
+  state: QuizState,
+  index: number,
+  correctIndex: number
+): AnswerFeedback {
+  if (state.answer === null) {
+    return 'idle';
+  }
+  if (state.answer.choice === index) {
+    return state.answer.isCorrect ? 'correct' : 'wrongChoice';
+  }
+  if (index === correctIndex) {
+    return 'revealCorrect';
+  }
+  return 'lockedOut';
+}

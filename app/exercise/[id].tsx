@@ -7,7 +7,7 @@ import { usePreventRemove } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AnswerOption, type AnswerFeedback } from '@/components/AnswerOption';
+import { AnswerOption } from '@/components/AnswerOption';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { ExerciseVideo } from '@/components/ExerciseVideo';
 import { Mascot } from '@/components/Mascot';
@@ -20,6 +20,7 @@ import {
   advanceQuiz,
   answerQuestion,
   createQuizState,
+  feedbackForOption,
   timeoutQuestion,
   type QuizState,
 } from '@/lib/quiz';
@@ -135,19 +136,6 @@ export default function ExerciseScreen() {
     return <SafeAreaView style={styles.screen} />;
   }
 
-  const feedbackFor = (index: number): AnswerFeedback => {
-    if (quiz.answer === null) {
-      return 'idle';
-    }
-    if (quiz.answer.choice === index) {
-      return quiz.answer.isCorrect ? 'correct' : 'wrongChoice';
-    }
-    if (index === question.correctIndex) {
-      return 'revealCorrect';
-    }
-    return 'lockedOut';
-  };
-
   const mascotSpeech =
     quiz.answer === null
       ? undefined
@@ -167,7 +155,7 @@ export default function ExerciseScreen() {
           <AnswerOption
             key={`${quiz.index}-${index}`}
             label={option}
-            feedback={feedbackFor(index)}
+            feedback={feedbackForOption(quiz, index, question.correctIndex)}
             onPress={() => handleAnswer(index)}
           />
         ))}

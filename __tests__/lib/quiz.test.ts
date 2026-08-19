@@ -1,4 +1,10 @@
-import { advanceQuiz, answerQuestion, createQuizState, timeoutQuestion } from '../../src/lib/quiz';
+import {
+  advanceQuiz,
+  answerQuestion,
+  createQuizState,
+  feedbackForOption,
+  timeoutQuestion,
+} from '../../src/lib/quiz';
 
 const TOTAL = 3;
 
@@ -65,5 +71,40 @@ describe('quiz state machine — advancing', () => {
       state = advanceQuiz(answerQuestion(state, 0, 1), TOTAL);
     }
     expect(advanceQuiz(state, TOTAL)).toBe(state);
+  });
+});
+
+describe('feedbackForOption — per-option feedback projection', () => {
+  const CORRECT = 2;
+
+  it('shows every option as idle while no answer is locked in', () => {
+    const state = createQuizState();
+    for (const index of [0, 1, 2, 3]) {
+      expect(feedbackForOption(state, index, CORRECT)).toBe('idle');
+    }
+  });
+
+  it('marks a correct tap and dims the rest without revealing anything', () => {
+    const state = answerQuestion(createQuizState(), CORRECT, CORRECT);
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('correct');
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
+  });
+
+  it('marks a wrong tap and reveals the correct option', () => {
+    const state = answerQuestion(createQuizState(), 0, CORRECT);
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('wrongChoice');
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('revealCorrect');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
+  });
+
+  it('reveals the correct option after a timeout without marking any tap', () => {
+    const state = timeoutQuestion(createQuizState());
+    expect(feedbackForOption(state, CORRECT, CORRECT)).toBe('revealCorrect');
+    expect(feedbackForOption(state, 0, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 1, CORRECT)).toBe('lockedOut');
+    expect(feedbackForOption(state, 3, CORRECT)).toBe('lockedOut');
   });
 });
