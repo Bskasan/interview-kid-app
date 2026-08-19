@@ -11,8 +11,12 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 2. The fox mascot says "Önce videoyu izle 🎬"; the "🎯 Alıştırmaya Geç" button is disabled (muted).
 3. When the video plays to the end, the mascot switches to "Süper! Şimdi alıştırma zamanı 🎯"
    and the button becomes green and pressable.
-4. If the video fails to load, the mascot says "Video açılmadı, sorun değil!" with the hint
-   "Alıştırmaya geçebilirsin 👇" and the button unlocks anyway — media never blocks the flow.
+4. If the video can't play — a player error, no playable video within 12 s, or the device
+   is offline — the video area is replaced by a card: the mascot explains "Video şu an
+   açılmıyor. Sorular bu videoyla ilgili." with two big choices, "🔄 Tekrar dene" (tries
+   the video again; if still offline the card stays) and "➡️ Videosuz devam et" (straight
+   to the quiz). The child decides — nothing skips silently, and the quiz button of the
+   happy path only ever enables after the video actually ends.
 5. Backgrounding the app pauses playback.
 
 **Quiz stage**
@@ -40,9 +44,17 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 
 ## b) How it works in code
 
-- **Video** — `src/components/ExerciseVideo.tsx`: `useVideoPlayer(uri)` autoplays; `useEventListener`
-  subscribes to `playToEnd` (→ unlock) and `statusChange` `error` (→ friendly fallback + unlock)
-  (ADR 0012). `useAppActive` pauses on background; unmounting (stage switch/leaving) releases the
+- **Video** — the screen owns an explicit state machine `loading → ready → ended | error`
+  (ADR 0035). `src/components/ExerciseVideo.tsx` stays dumb: `useVideoPlayer(uri)`
+  autoplays; `useEventListener` reports `statusChange: readyToPlay` (→ `onReady`),
+  `playToEnd` (→ `onEnded`, the only unlock), and `statusChange: error` (→
+  `onError(cause)`). `error` is also entered by a 12 s ready watchdog (paused while the
+  exit sheet is open, re-armed per retry) and by being offline while loading
+  (`useNetworkStatus`). On error, `src/components/VideoUnavailableCard.tsx` replaces the
+  video area; retry bumps a `playerKey` so the remount recreates the player. Every error
+  entry logs via `handleError(MEDIA, silent)`. Late events can't corrupt the machine: a
+  stray `readyToPlay` never resurrects `ended`/`error`, an error never downgrades `ended`.
+  `useAppActive` pauses on background; unmounting (stage switch/leaving) releases the
   player. Clip URL in `src/data/media.ts`.
 - **Questions** — `src/data/questions.ts`: five Turkish sets (shapes, colors, counting, animals,
   objects); `getQuestionSet(lessonId)` picks one via a stable string hash, so a lesson always
@@ -88,7 +100,9 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 
 ## c) Edge cases handled
 
-- Video error → flow continues (CTA unlocked + friendly message); video never blocks.
+- Video error, stall (>12 s without becoming playable) or offline entry → the choice card;
+  the flow is never blocked (continue is one tap) and never skipped silently. Retry while
+  still offline stays on the card instead of faking progress.
 - Backgrounding: video pauses (AppState + expo-video default), quiz timer freezes and resumes.
 - Rapid double-tap on options: first tap locks the machine, later taps are no-ops.
 - Timeout racing a tap in the same instant: whichever transition runs first wins; the loser is
@@ -126,8 +140,12 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
    the next question must not appear until after you tap "Devam et".
 9. Finish 3 questions → Result placeholder shows "N/3 doğru"; Android back from Result goes
    Home, not back into the quiz.
-10. Airplane mode, then open a lesson → video errors → mascot fallback + enabled CTA; quiz
-    works fully offline; the photo question shows its 🐶 emoji fallback instead of the image.
+10. Airplane mode, then open a lesson → the unavailable card appears (no 12 s wait);
+    "Tekrar dene" while still offline stays on the card; "Videosuz devam et" starts the
+    quiz, which works fully offline; the photo question shows its 🐶 emoji fallback.
+    Re-enable network on the card → "Tekrar dene" → video loads and plays.
+    With network on, cut the connection mid-load (or throttle) → the card appears at
+    ~12 s. The exit sheet works from the card too.
 11. Timer bar: verify green → yellow (≤10 s) → coral (≤5 s) plus the number turning coral.
 12. Reduced motion on (system setting) → no shake/bounce; fills, badges and haptics remain.
 13. TalkBack spot-check: tiles announce their Turkish labels + selected/disabled state.

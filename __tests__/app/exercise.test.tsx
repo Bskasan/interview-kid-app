@@ -10,11 +10,17 @@ const FEEDBACK_MS = 1400;
 // tests survive copy edits without hardcoding strings.
 const t = i18n.getFixedT(null, 'exercise');
 const tq = i18n.getFixedT(null, 'questions');
+const tCommon = i18n.getFixedT(null, 'common');
 
 const mockReplace = jest.fn();
 const mockDispatch = jest.fn();
 const mockUsePreventRemove = jest.fn();
-let mockVideoProps: { onEnded: () => void; onError: (cause: unknown) => void } | undefined;
+type VideoProps = {
+  onReady: () => void;
+  onEnded: () => void;
+  onError: (cause: unknown) => void;
+};
+let mockVideoProps: VideoProps | undefined;
 
 jest.mock('expo-router', () => ({
   useLocalSearchParams: () => ({ id: LESSON_ID }),
@@ -29,7 +35,7 @@ jest.mock('expo-router/react-navigation', () => ({
 
 // The video stage is native (expo-video); the screen only needs its callbacks.
 jest.mock('@/components/ExerciseVideo', () => ({
-  ExerciseVideo: (props: { onEnded: () => void; onError: (cause: unknown) => void }) => {
+  ExerciseVideo: (props: VideoProps) => {
     mockVideoProps = props;
     return null;
   },
@@ -88,14 +94,17 @@ describe('Exercise screen — back guard lifecycle', () => {
     });
   });
 
-  it('unlocks the quiz through the error path and confirms an intercepted back via the sheet', async () => {
+  it('lets the child continue without the video and confirms an intercepted back via the sheet', async () => {
     await render(<ExerciseScreen />);
 
-    // Video failure must never block the flow: the CTA unlocks anyway.
+    // Video failure: the card replaces the video area, the quiz CTA is gone,
+    // and the child decides — here, continue without the video.
     await act(() => {
       mockVideoProps?.onError(new Error('media'));
     });
-    await fireEvent.press(screen.getByLabelText(t('startQuiz')));
+    expect(screen.getByText(t('videoUnavailable'), { exact: false })).toBeTruthy();
+    expect(screen.queryByLabelText(t('startQuiz'))).toBeNull();
+    await fireEvent.press(screen.getByLabelText(t('videoSkip')));
     expect(guardEnabled()).toBe(true);
 
     const action = { type: 'GO_BACK' };
@@ -129,6 +138,44 @@ describe('Exercise screen — back guard lifecycle', () => {
     await fireEvent.press(screen.getByLabelText(t('exitLeave')));
     expect(mockReplace).toHaveBeenCalledWith('/');
     expect(mockDispatch).not.toHaveBeenCalled(); // no intercepted action to replay
+  });
+
+  it('fails a silent stall via the 12 s watchdog and recovers through retry', async () => {
+    await render(<ExerciseScreen />);
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+
+    // No ready/error event arrives: the watchdog turns the stall into the card.
+    await act(() => {
+      jest.advanceTimersByTime(12_000);
+    });
+    expect(screen.getByText(t('videoUnavailable'), { exact: false })).toBeTruthy();
+
+    // Retry (online in tests): the player remounts and the happy path resumes.
+    await fireEvent.press(screen.getByLabelText(tCommon('retry')));
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+    expect(screen.getByText(t('watchFirst'), { exact: false })).toBeTruthy();
+
+    await act(() => {
+      mockVideoProps?.onReady();
+      mockVideoProps?.onEnded();
+    });
+    await fireEvent.press(screen.getByLabelText(t('startQuiz')));
+    expect(screen.getAllByText(t('question', { current: 1, total: 3 })).length).toBeGreaterThan(0);
+  });
+
+  it('keeps a ready video failing the watchdog off the error card', async () => {
+    await render(<ExerciseScreen />);
+
+    // readyToPlay arrives in time: the watchdog is disarmed for good.
+    await act(() => {
+      mockVideoProps?.onReady();
+    });
+    await act(() => {
+      jest.advanceTimersByTime(30_000);
+    });
+    expect(screen.queryByText(t('videoUnavailable'), { exact: false })).toBeNull();
+    // The CTA stays locked until the video actually ends (happy path intact).
+    expect(screen.getByLabelText(t('startQuiz'))).toBeTruthy();
   });
 
   it('freezes the feedback auto-advance while the sheet is open', async () => {

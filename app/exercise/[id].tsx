@@ -17,9 +17,11 @@ import { ExitConfirmSheet } from '@/components/ExitConfirmSheet';
 import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
 import { TimerBar } from '@/components/TimerBar';
+import { VideoUnavailableCard } from '@/components/VideoUnavailableCard';
 import { LESSON_VIDEO_URL } from '@/data/media';
 import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { handleError } from '@/lib/errors/handleError';
 import {
   advanceQuiz,
@@ -33,6 +35,21 @@ import { colors, spacing, typography } from '@/theme';
 
 /** How long the ✓/✗ feedback stays on screen before auto-advancing. */
 const FEEDBACK_MS = 1400;
+
+/**
+ * A video that is neither playable nor errored after this long counts as
+ * failed: a silent stall must not leave the child staring at a spinner with a
+ * locked CTA. 12 s rides out a slow cell handshake for a ~1 MB clip without
+ * feeling infinite to a 5-year-old.
+ */
+const VIDEO_READY_TIMEOUT_MS = 12_000;
+
+/**
+ * The video step as an explicit machine. `error` is entered from the player's
+ * error event, the ready watchdog, or being offline on entry — and leads to
+ * the child's choice (retry / continue without video), never a silent skip.
+ */
+type VideoState = 'loading' | 'ready' | 'ended' | 'error';
 
 // The intercepted navigation action, typed via the hook itself so no
 // standalone @react-navigation package needs importing (see comment above).
@@ -48,9 +65,12 @@ export default function ExerciseScreen() {
   const lessonId = typeof id === 'string' ? id : '';
 
   const questions = useMemo(() => getQuestionSet(lessonId), [lessonId]);
+  const { isOffline } = useNetworkStatus();
   const [stage, setStage] = useState<'video' | 'quiz'>('video');
-  const [videoEnded, setVideoEnded] = useState(false);
-  const [videoFailed, setVideoFailed] = useState(false);
+  const [videoState, setVideoState] = useState<VideoState>('loading');
+  // Bumping the key remounts ExerciseVideo: useVideoPlayer recreates the
+  // player from scratch — the simplest reliable retry in Expo Go.
+  const [playerKey, setPlayerKey] = useState(0);
   const [quiz, setQuiz] = useState<QuizState>(createQuizState);
 
   // Exit-to-home flow: the sheet is the single confirmation surface for the 🏠
@@ -137,12 +157,56 @@ export default function ExerciseScreen() {
     setLeaving(true);
   }, []);
 
-  const handleVideoEnded = useCallback(() => setVideoEnded(true), []);
-  // Silent: this screen renders its own failure UI (mascot line + open CTA).
-  const handleVideoError = useCallback((cause: unknown) => {
+  // Silent: this screen renders its own failure UI (the unavailable card).
+  // An already-ended video never downgrades — the child's unlock is kept.
+  const toVideoError = useCallback((cause: unknown) => {
     handleError(cause, { context: 'exercise.video', code: 'MEDIA', severity: 'silent' });
-    setVideoFailed(true);
+    setVideoState((state) => (state === 'ended' ? state : 'error'));
   }, []);
+
+  const handleVideoReady = useCallback(
+    // Functional update: a late readyToPlay must not resurrect an ended or
+    // errored video.
+    () => setVideoState((state) => (state === 'loading' ? 'ready' : state)),
+    [],
+  );
+  const handleVideoEnded = useCallback(() => setVideoState('ended'), []);
+
+  // Watchdog: still 'loading' after the timeout counts as failed — and while
+  // offline (on entry or mid-load) it fires immediately instead of making the
+  // child wait out the full window. Paused while the exit sheet is open (a
+  // full window restarts on close); re-armed per retry via playerKey.
+  useEffect(() => {
+    if (stage !== 'video' || videoState !== 'loading' || sheetVisible) {
+      return;
+    }
+    const timer = setTimeout(
+      () =>
+        toVideoError(
+          isOffline
+            ? new Error('Device is offline')
+            : new Error(`Video not ready within ${VIDEO_READY_TIMEOUT_MS} ms`),
+        ),
+      isOffline ? 0 : VIDEO_READY_TIMEOUT_MS,
+    );
+    return () => clearTimeout(timer);
+  }, [stage, videoState, playerKey, sheetVisible, isOffline, toVideoError]);
+
+  const retryVideo = useCallback(() => {
+    if (isOffline) {
+      // Still offline: stay on the card; log the attempt for observability.
+      handleError(new Error('Video retry while offline'), {
+        context: 'exercise.video',
+        code: 'MEDIA',
+        severity: 'silent',
+      });
+      return;
+    }
+    setPlayerKey((key) => key + 1);
+    setVideoState('loading');
+  }, [isOffline]);
+
+  const continueWithoutVideo = useCallback(() => setStage('quiz'), []);
 
   const handleAnswer = (choiceIndex: number) => {
     if (!question || quiz.answer !== null || quiz.finished) {
@@ -164,30 +228,40 @@ export default function ExerciseScreen() {
   );
 
   if (stage === 'video') {
-    const mascotSpeech = videoFailed
-      ? t('videoError')
-      : videoEnded
-        ? t('videoDone')
-        : t('watchFirst');
+    if (videoState === 'error') {
+      // The card carries the message and the two choices; no other action
+      // competes with them (the quiz CTA only exists on the happy path).
+      return (
+        <SafeAreaView style={styles.screen}>
+          <View style={styles.topRow}>
+            <ExitButton onPress={openExitSheet} />
+          </View>
+          <VideoUnavailableCard onRetry={retryVideo} onContinue={continueWithoutVideo} />
+          {exitSheet}
+        </SafeAreaView>
+      );
+    }
+
     return (
       <SafeAreaView style={styles.screen}>
         <View style={styles.topRow}>
           <ExitButton onPress={openExitSheet} />
         </View>
         <ExerciseVideo
+          key={playerKey}
           uri={LESSON_VIDEO_URL}
           suspended={sheetVisible}
+          onReady={handleVideoReady}
           onEnded={handleVideoEnded}
-          onError={handleVideoError}
+          onError={toVideoError}
         />
         <View style={styles.videoMascot}>
-          <Mascot size={64} speech={mascotSpeech} />
-          {videoFailed ? <Text style={styles.hint}>{t('videoErrorHint')}</Text> : null}
+          <Mascot size={64} speech={videoState === 'ended' ? t('videoDone') : t('watchFirst')} />
         </View>
         <ChunkyButton
           label={t('startQuiz')}
           icon="🎯"
-          disabled={!videoEnded && !videoFailed}
+          disabled={videoState !== 'ended'}
           onPress={() => setStage('quiz')}
         />
         {exitSheet}
@@ -255,10 +329,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: spacing.md,
-  },
-  hint: {
-    ...typography.body,
-    color: colors.muted,
   },
   prompt: {
     ...typography.subtitle,

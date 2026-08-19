@@ -13,6 +13,8 @@ type Props = {
    * ended or user-paused video stays put.
    */
   suspended?: boolean;
+  /** Fired when the source becomes playable (clears the loading watchdog). */
+  onReady: () => void;
   /** Fired when playback reaches the end (unlocks the quiz CTA). */
   onEnded: () => void;
   /** Fired when the source fails to load/play, with the player's error payload. */
@@ -25,7 +27,7 @@ type Props = {
  * stage) stops playback via unmount. Backgrounding pauses explicitly on top of
  * expo-video's default staysActiveInBackground=false.
  */
-export function ExerciseVideo({ uri, suspended = false, onEnded, onError }: Props) {
+export function ExerciseVideo({ uri, suspended = false, onReady, onEnded, onError }: Props) {
   const player = useVideoPlayer(uri, (instance) => {
     instance.loop = false;
     instance.play();
@@ -37,6 +39,8 @@ export function ExerciseVideo({ uri, suspended = false, onEnded, onError }: Prop
   useEventListener(player, 'statusChange', ({ status, error }) => {
     if (status === 'error') {
       onError(error);
+    } else if (status === 'readyToPlay') {
+      onReady();
     }
   });
 
