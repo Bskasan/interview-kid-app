@@ -18,6 +18,11 @@ jest.mock('react-native/Libraries/AppState/AppState', () => ({
   },
 }));
 
+// Official mock: screens render without wrapping every test in a provider.
+jest.mock('react-native-safe-area-context', () =>
+  require('react-native-safe-area-context/jest/mock').default
+);
+
 // Haptics calls chain .catch() on the returned promise, so the mocks must
 // resolve — jest's automock would return undefined and crash on press.
 jest.mock('expo-haptics', () => ({
