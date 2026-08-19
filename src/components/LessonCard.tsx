@@ -1,8 +1,8 @@
 import { Image } from 'expo-image';
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { strings } from '@/lib/strings';
 import { useProgressStore } from '@/store/progressStore';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
@@ -18,10 +18,14 @@ const DEFAULT_TOTAL = 3;
 type Status = 'none' | 'attempted' | 'earned' | 'perfect';
 
 // Pills carry meaning via icon + text; the colored border is only an accent.
-const statusPill: Record<Exclude<Status, 'none'>, { label: string; borderColor: string }> = {
-  attempted: { label: strings.home.keepGoing, borderColor: colors.coral },
-  earned: { label: strings.home.badgeEarned, borderColor: colors.sun },
-  perfect: { label: strings.home.badgePerfect, borderColor: colors.grape },
+// Labels are keys, resolved at render time so a language switch re-labels live.
+const statusPill: Record<
+  Exclude<Status, 'none'>,
+  { labelKey: 'keepGoing' | 'badgeEarned' | 'badgePerfect'; borderColor: string }
+> = {
+  attempted: { labelKey: 'keepGoing', borderColor: colors.coral },
+  earned: { labelKey: 'badgeEarned', borderColor: colors.sun },
+  perfect: { labelKey: 'badgePerfect', borderColor: colors.grape },
 };
 
 type Props = {
@@ -30,6 +34,7 @@ type Props = {
 };
 
 export function LessonCard({ lesson, onPress }: Props) {
+  const { t } = useTranslation('home');
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback();
   // Until hydration completes we render the neutral state rather than "never tried".
   const result = useProgressStore((s) => (s.hasHydrated ? s.results[lesson.id] : undefined));
@@ -39,6 +44,7 @@ export function LessonCard({ lesson, onPress }: Props) {
   const best = Math.max(0, Math.min(result?.best ?? 0, total));
   const stars = '⭐'.repeat(best) + '☆'.repeat(total - best);
   const pill = status === 'none' ? null : statusPill[status];
+  const title = t('lessonTitle', { number: lesson.lessonNumber, author: lesson.author });
 
   return (
     <Animated.View style={animatedStyle}>
@@ -47,10 +53,7 @@ export function LessonCard({ lesson, onPress }: Props) {
         onPressIn={onPressIn}
         onPressOut={onPressOut}
         accessibilityRole="button"
-        accessibilityLabel={strings.a11y.lessonCard(
-          lesson.title,
-          strings.a11y.lessonStatus[status],
-        )}
+        accessibilityLabel={t('lessonCardA11y', { title, status: t(`lessonStatus.${status}`) })}
         style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
       >
         <Image
@@ -62,7 +65,7 @@ export function LessonCard({ lesson, onPress }: Props) {
         />
         <View style={styles.content}>
           <Text style={styles.title} numberOfLines={2} maxFontSizeMultiplier={1.4}>
-            {lesson.title}
+            {title}
           </Text>
           <View style={styles.statusRow}>
             <Text style={styles.stars} accessible={false} maxFontSizeMultiplier={1.4}>
@@ -71,7 +74,7 @@ export function LessonCard({ lesson, onPress }: Props) {
             {pill ? (
               <View style={[styles.pill, { borderColor: pill.borderColor }]}>
                 <Text style={styles.pillLabel} maxFontSizeMultiplier={1.4}>
-                  {pill.label}
+                  {t(pill.labelKey)}
                 </Text>
               </View>
             ) : null}
