@@ -18,7 +18,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
-import { handleError } from '@/lib/errors/handleError';
+import { reportImageError } from '@/lib/errors/handleError';
 import { colors, motion, radius, spacing } from '@/theme';
 
 const ENTER_OFFSET = 80;
@@ -51,14 +51,8 @@ export function ExitConfirmSheet({ visible, thumbnailUrl, onStay, onLeave }: Pro
             contentFit="cover"
             transition={150}
             accessible={false}
-            // Decorative: the bordered placeholder is fine; log for observability.
-            onError={(event) =>
-              handleError(event?.error ?? event, {
-                context: 'exit-sheet.thumbnail',
-                code: 'MEDIA',
-                severity: 'silent',
-              })
-            }
+            // Decorative: the bordered placeholder is the fallback UI.
+            onError={(event) => reportImageError(event, 'exit-sheet.thumbnail')}
           />
         ) : null}
         <Mascot size={56} speech={t('exitPrompt')} readAloud />

@@ -57,6 +57,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0050 — Speech stub](decisions/0050-speech-stub.md) — SpeakButton ships the read-aloud affordance with honest press feedback while `speak(text, language)` stays a no-op byte-compatible with expo-speech; placement rule, deliberate non-placements, and the no-double-announce label choice.
 - [0051 — Layout invariants for inline controls](decisions/0051-layout-invariants-inline-controls.md) — rows pairing flexible content with a fixed control need a definite width and exactly one shrinkable child (the bug that hid the 🔊 button); font caps on shared rows; 48dp floor; narrow-viewport verification because jest has no layout engine.
 - [0052 — Per-question countdown via keyed remount](decisions/0052-per-question-countdown-remount.md) — the timer carry-over bug: reset() raced the effect-armed interval (timeout path worked by accident); fix scopes one hook instance per question via a keyed QuestionTimer, deleting the imperative reset instead of guarding it.
+- [0053 — Cleanup policy](decisions/0053-cleanup-policy.md) — final sweep rules: logic duplication extracted (stars, usePulse, reportImageError, useHydratedResults, clamp), style repetition stays; evidence-based dead-code and dependency triage (typescript-eslint removed, Expo false positives kept); dead-key detection with closed dynamic unions (7 color keys deleted); same-text-different-context keys never merged; raw-source duplicate-key test.
 
 ## Features
 

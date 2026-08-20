@@ -6,16 +6,12 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { ReduceMotion, ZoomIn } from 'react-native-reanimated';
+import { EARNED_STAR, HOLLOW_STAR, starCounts } from '@/lib/stars';
 import { colors } from '@/theme';
-import { clamp } from '@/utils/clamp';
 
 const STAR_SIZE = 40;
 const FIRST_STAR_DELAY_MS = 250;
 const STAR_STAGGER_MS = 350;
-
-// Language-neutral glyphs (AnswerTile badge pattern), not copy — no t() needed.
-const EARNED_GLYPH = '⭐';
-const HOLLOW_GLYPH = '☆';
 
 type Props = {
   earned: number;
@@ -24,13 +20,12 @@ type Props = {
 
 export function StarReveal({ earned, total }: Props) {
   const { t } = useTranslation('result');
-  const safeTotal = Math.max(0, Math.trunc(total));
-  const safeEarned = clamp(Math.trunc(earned), 0, safeTotal);
+  const safe = starCounts(earned, total);
 
   return (
-    <View style={styles.row} accessible accessibilityLabel={t('starsA11y', { count: safeEarned })}>
-      {Array.from({ length: safeTotal }, (_, index) =>
-        index < safeEarned ? (
+    <View style={styles.row} accessible accessibilityLabel={t('starsA11y', { count: safe.earned })}>
+      {Array.from({ length: safe.total }, (_, index) =>
+        index < safe.earned ? (
           <Animated.Text
             key={index}
             entering={ZoomIn.delay(FIRST_STAR_DELAY_MS + index * STAR_STAGGER_MS)
@@ -40,11 +35,11 @@ export function StarReveal({ earned, total }: Props) {
             style={styles.star}
             maxFontSizeMultiplier={1}
           >
-            {EARNED_GLYPH}
+            {EARNED_STAR}
           </Animated.Text>
         ) : (
           <Text key={index} style={[styles.star, styles.hollow]} maxFontSizeMultiplier={1}>
-            {HOLLOW_GLYPH}
+            {HOLLOW_STAR}
           </Text>
         ),
       )}

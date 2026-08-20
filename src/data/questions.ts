@@ -13,7 +13,7 @@ import { type ColorToken } from '@/theme';
 import { hashString } from '@/utils/hashString';
 import type { TFunction } from 'i18next';
 
-export type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
+type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
 
 type QuestionsResource = (typeof tr)['questions'];
 
@@ -24,17 +24,17 @@ type DotPaths<T> = T extends string
     }[keyof T & string];
 
 /** A key inside the `questions` namespace, checked against tr.json by tsc. */
-export type QuestionTextKey = DotPaths<QuestionsResource>;
+type QuestionTextKey = DotPaths<QuestionsResource>;
 
 /** The t function bound to the `questions` namespace. */
-export type QuestionsT = TFunction<'questions'>;
+type QuestionsT = TFunction<'questions'>;
 
 /**
  * A shape may only use a palette color that also has a spoken name in the
  * `questions.color` namespace — feedback-only tokens (tints) are excluded by
  * construction, so "green tile wash" can never leak into an option's label.
  */
-export type SpeakableColor = ColorToken & keyof (typeof tr)['questions']['color'];
+type SpeakableColor = ColorToken & keyof (typeof tr)['questions']['color'];
 
 export type OptionVisual =
   | { kind: 'emoji'; value: string }
@@ -63,7 +63,7 @@ export type Question = {
   correctIndex: 0 | 1 | 2 | 3;
 };
 
-export type QuestionSet = readonly Question[];
+type QuestionSet = readonly Question[];
 
 /** Visible caption under a visual, when the option has one. */
 export function optionLabel(option: AnswerOptionData, t: QuestionsT): string | undefined {

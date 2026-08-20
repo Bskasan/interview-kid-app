@@ -13,10 +13,11 @@ import { SpeakButton } from '@/components/SpeakButton';
 import { StarRow } from '@/components/StarRow';
 import { MAP_NODE_SIZE } from '@/constants/map';
 import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
-import { handleError } from '@/lib/errors/handleError';
+import { reportImageError } from '@/lib/errors/handleError';
 import { type MapNodeState } from '@/lib/unlock';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
+import { clamp } from '@/utils/clamp';
 
 const BUBBLE_MAX_WIDTH = 340;
 const POINTER_SIZE = 16;
@@ -57,8 +58,9 @@ export function LessonBubble({
   const title = t('home:lessonTitle', { number: lesson.lessonNumber, author: lesson.author });
 
   const width = Math.min(BUBBLE_MAX_WIDTH, containerWidth - 2 * spacing.lg);
-  const left = Math.min(
-    Math.max(spacing.lg, anchor.x - width / 2),
+  const left = clamp(
+    anchor.x - width / 2,
+    spacing.lg,
     Math.max(spacing.lg, containerWidth - spacing.lg - width),
   );
   // Below the node by default; flip above when the node sits low enough that a
@@ -70,13 +72,15 @@ export function LessonBubble({
   // ends inside the viewport — the Start button must never be unreachable
   // (scrolling to it is impossible: a scroll closes the bubble).
   const maxOffset = Math.max(spacing.sm, containerHeight - PLACEMENT_ESTIMATE - spacing.sm);
-  const topWhenBelow = Math.min(Math.max(spacing.sm, nodeBottom + POINTER_SIZE / 2 + 2), maxOffset);
-  const bottomWhenAbove = Math.min(
-    Math.max(spacing.sm, containerHeight - nodeTop + POINTER_SIZE / 2 + 2),
+  const topWhenBelow = clamp(nodeBottom + POINTER_SIZE / 2 + 2, spacing.sm, maxOffset);
+  const bottomWhenAbove = clamp(
+    containerHeight - nodeTop + POINTER_SIZE / 2 + 2,
+    spacing.sm,
     maxOffset,
   );
-  const pointerX = Math.min(
-    Math.max(anchor.x - POINTER_SIZE / 2, left + radius.card),
+  const pointerX = clamp(
+    anchor.x - POINTER_SIZE / 2,
+    left + radius.card,
     left + width - radius.card - POINTER_SIZE,
   );
 
@@ -118,15 +122,8 @@ export function LessonBubble({
             contentFit="cover"
             transition={200}
             accessible={false}
-            // Silent: the bordered placeholder is the fallback UI; the log
-            // line keeps the failure observable.
-            onError={(event) =>
-              handleError(event?.error ?? event, {
-                context: `lesson-bubble.${lesson.id}`,
-                code: 'MEDIA',
-                severity: 'silent',
-              })
-            }
+            // Decorative: the bordered placeholder is the fallback UI.
+            onError={(event) => reportImageError(event, `lesson-bubble.${lesson.id}`)}
           />
           <View style={styles.titleBlock}>
             <Text style={styles.title} numberOfLines={2} maxFontSizeMultiplier={1.4}>

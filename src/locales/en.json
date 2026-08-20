@@ -151,18 +151,11 @@
       }
     },
     "color": {
-      "background": "Cream",
-      "surface": "White",
-      "ink": "Black",
-      "muted": "Gray",
       "primary": "Green",
-      "primaryDark": "Dark green",
       "sky": "Blue",
-      "skyDark": "Dark blue",
       "sun": "Yellow",
       "coral": "Red",
-      "grape": "Purple",
-      "border": "Beige"
+      "grape": "Purple"
     },
     "shape": {
       "circle": "circle",

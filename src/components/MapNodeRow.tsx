@@ -4,23 +4,15 @@
  * lesson node with its state visuals: 🔒 locked, number when open, pulse on
  * the current node, stars underneath once earned. Never color alone.
  */
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  cancelAnimation,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useReducedMotion } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { StarRow } from '@/components/StarRow';
 import { MAP_CONNECTOR_WIDTH, MAP_NODE_SIZE, MAP_ROW_HEIGHT } from '@/constants/map';
 import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { usePulse } from '@/hooks/usePulse';
 import { entryPath, exitPath, NODE_CENTER_Y, nodeCenterX } from '@/lib/mapPath';
 import { type MapNodeState } from '@/lib/unlock';
 import { colors, radius, typography } from '@/theme';
@@ -52,19 +44,7 @@ export function MapNodeRow({ lesson, index, state, stars, width, isLast, onPress
 
   // The current node breathes gently to say "you are here"; reduced motion
   // swaps the loop for a static sun-colored highlight ring.
-  const pulse = useSharedValue(1);
-  const isPulsing = state === 'current' && !reduceMotion;
-  useEffect(() => {
-    if (isPulsing) {
-      pulse.value = withRepeat(
-        withSequence(withTiming(1.07, { duration: 600 }), withTiming(1, { duration: 600 })),
-        -1,
-      );
-      return () => cancelAnimation(pulse);
-    }
-    pulse.value = 1;
-    return undefined;
-  }, [isPulsing, pulse]);
+  const pulse = usePulse(state === 'current', 1.07);
   const pulseStyle = useAnimatedStyle(() => ({ transform: [{ scale: pulse.value }] }));
 
   const centerX = nodeCenterX(index, width);

@@ -13,7 +13,7 @@ import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
 import { useCountUp } from '@/hooks/useCountUp';
 import { totalStars } from '@/lib/scoring';
-import { EMPTY_RESULTS, useProgressStore } from '@/store/progressStore';
+import { useHydratedResults } from '@/store/progressStore';
 import { useStreakStore } from '@/store/streakStore';
 import { colors, radius, spacing, typography } from '@/theme';
 
@@ -22,7 +22,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
 
-  const results = useProgressStore((state) => (state.hasHydrated ? state.results : EMPTY_RESULTS));
+  const results = useHydratedResults();
   const streakCount = useStreakStore((state) => (state.hasHydrated ? state.count : 0));
   const starsTarget = totalStars(results);
 

@@ -18,7 +18,7 @@ const variants = {
   // No `coral` variant on purpose: no text color passes 4.5:1 on coral.
 } as const;
 
-export type ChunkyButtonVariant = keyof typeof variants;
+type ChunkyButtonVariant = keyof typeof variants;
 
 type Props = {
   label: string;
