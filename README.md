@@ -15,7 +15,7 @@ Uygulama tamamen iki dillidir: **Türkçe / English**. Kullanıcı dili uygulama
 Sunucu verileri TanStack Query ile alınır ve AsyncStorage'a kalıcı olarak kaydedilir. İlerleme, seri ve ayarlar kalıcı Zustand store'larında tutulur. Animasyonlar Reanimated ile yapılır. Çalışma zamanı hataları tek bir merkezî ve çocuk dostu hata akışından işlenir.
 
 > ⚠️ Bilinen eksikler, teknik borç ve bilinçli takaslar ayrı bir dosyada:
-> **[KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md#turkce)**
+> **[KNOWN-LIMITATIONS-TRADE-OFFS.md](KNOWN-LIMITATIONS-TRADE-OFFS.md)**
 
 ## Nasıl çalıştırılır
 
@@ -25,13 +25,13 @@ Her ortam için **Node LTS (20+)** gerekir. Kurulumdan sonra bir kez `npm instal
 
 Fiziksel telefon kullanıyorsanız güncel **Expo Go** gerekir (Play Store / App Store). Expo Go yalnızca en yeni SDK'yı çalıştırır; bu proje SDK 57 kullanıyor.
 
-| Geliştirme makinesi | Hedef                      | Adımlar                                                                                                                                                                         | Doğrulandı mı?                  |
-| ------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| Windows             | Android telefon (Expo Go)  | `npx expo start` çalıştırın ve QR kodu Expo Go ile okutun. Telefon ve PC aynı Wi-Fi'da olmalı. Ağ veya güvenlik duvarı sorunu varsa `npx expo start --tunnel` kullanın.         | ✅ Bizzat test edildi           |
-| Windows             | Android emülatörü          | Android Studio ve bir AVD kurun. `npx expo start` çalıştırın ve `a` tuşuna basın.                                                                                               | ✅ Bizzat test edildi           |
-| Windows             | iPhone (Expo Go)           | `npx expo start` çalıştırın. QR kodu iPhone kamerasıyla okutun ve Expo Go'da açın. Aynı ağ kullanılmalı; gerekirse `--tunnel` kullanılabilir. Windows'ta iOS simülatörü yoktur. | ⚪ Standart akış, test edilmedi |
-| macOS               | iOS Simülatörü             | Xcode + iOS Simulator kurulu olmalı. `npx expo start` çalıştırın ve `i` tuşuna basın.                                                                                           | ⚪ Standart akış, test edilmedi |
-| macOS               | Android (emülatör/telefon) | Android Studio + AVD ile `npx expo start` çalıştırın ve `a` tuşuna basın. Fiziksel telefonda ise Expo Go + QR kod kullanabilirsiniz.                                            | ⚪ Standart akış, test edilmedi |
+| Geliştirme makinesi | Hedef                      | Adımlar                                                                                                                                                                         | Doğrulandı mı?                   |
+| ------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| Windows             | Android telefon (Expo Go)  | `npx expo start` çalıştırın ve QR kodu Expo Go ile okutun. Telefon ve PC aynı Wi-Fi'da olmalı. Ağ veya güvenlik duvarı sorunu varsa `npx expo start --tunnel` kullanın.         | ✅ Bizzat test edildi            |
+| Windows             | Android emülatörü          | Android Studio ve bir AVD kurun. `npx expo start` çalıştırın ve `a` tuşuna basın.                                                                                               | ✅ Bizzat test edildi            |
+| Windows             | iPhone (Expo Go)           | `npx expo start` çalıştırın. QR kodu iPhone kamerasıyla okutun ve Expo Go'da açın. Aynı ağ kullanılmalı; gerekirse `--tunnel` kullanılabilir. Windows'ta iOS simülatörü yoktur. | ⚪ Standart akış, test edilemedi |
+| macOS               | iOS Simülatörü             | Xcode + iOS Simulator kurulu olmalı. `npx expo start` çalıştırın ve `i` tuşuna basın.                                                                                           | ⚪ Standart akış, test edilemedi |
+| macOS               | Android (emülatör/telefon) | Android Studio + AVD ile `npx expo start` çalıştırın ve `a` tuşuna basın. Fiziksel telefonda ise Expo Go + QR kod kullanabilirsiniz.                                            | ⚪ Standart akış, test edilemedi |
 
 `npm test` ve `npm run check` Windows ve macOS'ta aynı şekilde çalışır. npm script'leri ve git hook'ları POSIX `sh` kullanır. Windows'ta Git Bash, macOS'ta ise zsh/bash kullanılabilir. Platforma özel bir sözdizimi veya yol ayracı yoktur.
 
