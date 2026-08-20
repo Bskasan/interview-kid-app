@@ -10,9 +10,10 @@ for free and is not a supported target.
 ## b) How it works in code
 
 - **One JS codebase, zero platform forks**: no `.ios.tsx`/`.android.tsx` files, no
-  `Platform.select` branches. Every native capability comes from Expo SDK modules
-  (expo-video, expo-haptics, expo-image, expo-localization, safe-area-context, NetInfo,
-  reanimated) that support both platforms inside Expo Go.
+  `Platform.select` branches. Every native capability comes from Expo SDK modules or
+  Expo-Go-bundled community packages (expo-video, expo-haptics, expo-image,
+  expo-localization, safe-area-context, NetInfo, reanimated, react-native-svg) that support
+  both platforms inside Expo Go.
 - **`app.json`**: shared config plus an `ios` section (Icon Composer icon at
   `assets/expo.icon`, `supportsTablet: true`) and the pre-existing `android` adaptive icon.
   Nothing requires a dev client or prebuild.
@@ -45,7 +46,7 @@ Mac/iPhone, this is the priority order:
 2. `npx expo start` → `i` (Simulator) or QR scan with an iPhone (Expo Go): app boots to
    Home, lessons load.
 3. Safe areas: no content under the notch/home indicator on Home, Exercise, Result.
-4. Video: plays, native controls work, "Alıştırmaya Geç" unlocks at the end.
+4. Video: plays, native controls work, the quiz CTA unlocks when it ends.
 5. Haptics on a physical iPhone: gentle tap feedback on presses, success buzz on pass.
 6. Flags on the language tiles render as 🇹🇷/🇬🇧 (iOS renders flag emoji natively).
 7. Language transition, exit sheet, error banner (airplane mode) — same behavior as
