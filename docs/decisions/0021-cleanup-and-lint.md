@@ -1,6 +1,7 @@
 # 0021 — Cleanup pass and lint setup
 
-Status: accepted
+Status: accepted (the Lesson.author removal was reversed by 0029 — titles now compose
+from author at render time; every other removal stands)
 Date: 2026-08-19
 
 ## Context

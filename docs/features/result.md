@@ -4,6 +4,8 @@ Route: `app/result.tsx` — celebration (or encouragement) after a completed qui
 
 ## a) What the user sees
 
+All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is quoted here.
+
 **Passed (2/3 or 3/3)**
 
 1. Big title: "Bravo! 🎉" (2/3) or "Müthiş! Hepsi doğru 🌟" (3/3), with the score line
@@ -27,8 +29,10 @@ lesson card's updated stars/badge immediately.
 ## b) How it works in code
 
 - **Params** — `lessonId`, `correct`, `total` arrive as route-param strings from the quiz's
-  `router.replace`; they are number-parsed defensively and `computeOutcome` (unit-tested,
-  clamped) derives `{passed, badge}` — the screen never trusts raw params.
+  `router.replace`; they are coerced defensively (`paramString`/`paramNumber`,
+  `src/utils/routeParams.ts`) and `computeOutcome` (unit-tested, clamped, pass rule =
+  `PASS_RATIO` 2-of-3 in `src/lib/scoring.ts`) derives `{passed, badge}` — the screen never
+  trusts raw params.
 - **Recording (ADR 0017)** — a `useEffect` guarded by a ref calls
   `useProgressStore.recordResult(lessonId, correct, total)` exactly once per visit; the store's
   `mergeResult` keeps the best attempt and is idempotent, and only this screen ever writes
@@ -39,8 +43,9 @@ lesson card's updated stars/badge immediately.
   confetti pieces (index-derived offsets/delays); `useReducedMotion` short-circuits to a static
   badge. Colors follow ADR 0010: sun ring = earned, grape ring = perfect.
 - **Navigation** — both buttons use `router.replace` ("Tekrar Dene" →
-  `/exercise/[id]`, "Ana Sayfa" → `/`), so the history never contains a finished quiz or a
-  stale result. Home updates live because `LessonCard` subscribes to the zustand store.
+  `/exercise/[id]`, "Ana Sayfa" → `/`) through `useNavigationLock()`, so a double-tap
+  replaces exactly once and the history never contains a finished quiz or a stale result.
+  Home updates live because `LessonCard` subscribes to the zustand store.
 - Primary/secondary button variants swap with the outcome so the _likely_ next action is the
   big green one (design principle: one primary action).
 

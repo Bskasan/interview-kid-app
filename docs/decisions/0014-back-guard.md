@@ -1,6 +1,7 @@
 # 0014 — Quiz back guard via usePreventRemove + native Alert
 
-Status: accepted
+Status: accepted (Alert surface and quiz-only scope superseded by 0034; the
+usePreventRemove mechanism stands)
 Date: 2026-08-19
 
 ## Context
@@ -18,9 +19,10 @@ React Navigation's **`usePreventRemove`** hook, imported from **`expo-router/rea
 `@react-navigation/*` imports at bundle time (see the official SDK 55→56 migration guide).
 The vendored entry also shares Expo Router's `PreventRemoveContext`, which the standalone
 package would not — a plain `beforeRemove` listener without that context cannot reliably block
-the native back gesture on a native stack. Enabled while `stage === 'quiz' && !quiz.finished`. The callback shows a native
-`Alert.alert` — "Çıkmak istiyor musun? / İlerlemen kaybolur." with "Kal" (cancel) and "Çık"
-(destructive) — and dispatches the intercepted `data.action` only on "Çık".
+the native back gesture on a native stack. Enabled while `stage === 'quiz' && !quiz.finished` (0034 widened this to both stages:
+`!quiz.finished && !leaving`). The callback showed a native `Alert.alert` and dispatched the
+intercepted `data.action` on confirm; 0034 replaced that surface — the callback now stashes
+the action and opens `ExitConfirmSheet`, and the dispatch happens in the `leaving` effect.
 
 Finish interplay: the hook is declared **before** the finish effect, and the guard condition
 turns false in the same render that sets `finished`, so by the time `router.replace('/result')`
@@ -42,10 +44,10 @@ dispatches, nothing intercepts it (replace also triggers removal events — guar
 
 - All exits funnel through one confirmation; a confirmed exit simply pops — no progress is
   written anywhere (progress writes happen only on the Result screen in Phase 3).
-- The video stage is intentionally unguarded: no answers exist yet, so there is nothing to lose
-  and an extra dialog would only annoy.
-- The Alert's copy lives in `strings.ts` like all user-facing text; the dialog itself renders
-  in the OS style, not the app theme (accepted trade-off).
+- The video stage was intentionally unguarded at the time (no answers to lose); 0034
+  reversed this so every exit path shares one confirmation surface.
+- The Alert's copy lived in `strings.ts` like all user-facing text then; today the sheet's
+  copy lives in the `exercise` i18n namespace (`src/locales/*.json`).
 
 ## References
 

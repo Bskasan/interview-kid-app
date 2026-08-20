@@ -24,8 +24,8 @@ Concretely, three layers:
 2. **Screens only at their decision points**, with boundaries mocked (expo-router params/
    navigation, the video component): Result records exactly once even when the effect
    re-fires, skips garbage params, navigation double-tap lock; Exercise arms the back guard
-   only while a quiz is in progress and drops it before replacing to Result; the video error
-   path still unlocks the quiz.
+   on both stages and drops it before replacing to Result; the video failure
+   path offers retry / continue-without-video.
 3. **Components for behavior a child depends on**: grid tiles lock after the first tap,
    every visual kind announces a descriptive Turkish label, a failing image swaps to its
    emoji fallback.
@@ -58,8 +58,8 @@ throughout — an un-awaited `unmount()` demonstrably leaves effects alive.
 
 ## Consequences
 
-- 65 tests across 10 suites, each named for the behavior it protects; suite runs in ~3 s
-  with zero console noise.
+- 65 tests across 10 suites at the time of writing (108 across 18 by round 4), each named
+  for the behavior it protects; the suite stays in the seconds range with zero console noise.
 - Component/screen tests are now possible at all (transform + Reanimated + mock setup), so
   future UI work can be tested at its decision points instead of by hand.
 - Screens are tested through mocked boundaries, so a breaking change _inside_ expo-router or

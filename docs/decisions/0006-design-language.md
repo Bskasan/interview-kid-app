@@ -44,10 +44,12 @@ was 3.2:1 on cream, below the 4.5:1 floor. Role unchanged. See ADR 0018.
 ## Consequences
 
 - Every screen styles itself from `src/theme` — changing the palette or scale is a one-file edit.
-- Two derived tokens were added beyond the spec (`skyDark`, `sunDark`, `coralDark`) so any chunky
-  control can have a matching pressed edge; same role as `primaryDark`.
-- No dark mode, no i18n system (Turkish strings centralized in `src/lib/strings.ts` — swapping
-  to a real i18n lib later is a mechanical change).
+- Derived tokens were added beyond the spec (`skyDark`, plus `sunDark`/`coralDark`, the latter
+  two later removed as unused in 0021) so any chunky control can have a matching pressed edge;
+  same role as `primaryDark`.
+- No dark mode. No i18n system at the time (Turkish strings centralized in `src/lib/strings.ts`);
+  0027 later replaced that file with i18next + `src/locales/*.json`, confirming the swap was
+  mechanical.
 - Motion depends on Reanimated's `useReducedMotion` — every animated component must branch on it.
 
 ## References

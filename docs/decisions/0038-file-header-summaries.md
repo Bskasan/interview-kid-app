@@ -13,8 +13,10 @@ Two goals in tension: comments must not narrate code, yet a newcomer needs orien
 
 ## Decision
 
-Every `.ts`/`.tsx` under `app/` and `src/` starts with a 2–4 line block comment stating what
-the file contains and its role in the flow — _what, not how_, no import restating. This header
+Every `.ts`/`.tsx` under `app/` and `src/` opens with a block comment stating what the file
+contains and its role in the flow — _what, not how_, no import restating. 2–4 lines is the
+norm; a few dense modules run longer where the summary carries policy rationale, and
+`logger.ts`'s file-level `eslint-disable` precedes its header by necessity. This header
 is the one sanctioned "what" comment; all other comments remain why-only (rationale, non-obvious
 constraints, genuinely complex logic such as the timer/AppState math). A change that alters a
 file's responsibility must update the header in the same change. Config files (`*.config.js`,

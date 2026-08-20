@@ -1,6 +1,6 @@
 # 0012 — Event-driven video stage (expo-video)
 
-Status: accepted
+Status: accepted (unlock-on-error superseded by 0035; the event-driven happy path stands)
 Date: 2026-08-19
 
 ## Context
@@ -14,7 +14,8 @@ We need reliable "ended" and "failed" signals from expo-video (0003).
 
 `ExerciseVideo` subscribes to the player's events with `useEventListener` (from the `expo`
 package): **`playToEnd`** unlocks the CTA, and **`statusChange` with `status === 'error'`**
-triggers the mascot's error message and unlocks the CTA too. No polling. Playback lifecycle
+triggered the mascot's error message and unlocked the CTA too (0035 replaced this: error now
+enters an explicit error state and the child chooses retry / continue). No polling. Playback lifecycle
 is owned by `useVideoPlayer`, which releases the player on unmount — switching to the quiz
 stage or leaving the screen stops the video structurally. Backgrounding: expo-video's default
 `staysActiveInBackground = false` plus an explicit `pause()` when AppState leaves `active`.
@@ -34,9 +35,11 @@ is harmless — the CTA is already unlocked).
 
 ## Consequences
 
-- The unlock logic is two one-line event handlers; no timers or state polling to maintain.
+- The unlock logic is two one-line event handlers; no timers or state polling to maintain
+  (0035 later added a `readyToPlay` handler and a ready watchdog on top).
 - A stalled network with no error event keeps the CTA locked (spec-compliant); the child can
-  still leave with back. A production app would add a stall watchdog.
+  still leave with back. A production app would add a stall watchdog — added in 0035
+  (12 s ready watchdog, immediate while offline).
 - Scrubbing to the end with native controls also counts as finishing — acceptable for this
   age group and scope.
 

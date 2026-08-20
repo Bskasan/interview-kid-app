@@ -7,8 +7,8 @@
    for a broken photo). These are logged, not announced.
 2. When something with no dedicated UI goes wrong (saving progress failed, corrupted
    storage on launch), a calm banner slides in under the status bar: the fox, one short
-   translated sentence ("Kaydederken bir sorun oldu"), a big "Tamam", and — when the error
-   knows how to recover — a "Tekrar dene" button. Never an error code, URL, stack trace or
+   translated sentence ("Kaydederken bir sorun oldu"), a big "Tamam", and — for call sites
+   that pass a `retry` action (none currently do) — a "Tekrar dene" button. Never an error code, URL, stack trace or
    library name. A new problem replaces the banner text; banners never stack.
 3. If a screen crashes outright, instead of a red screen the child gets a full-screen
    fallback: the fox, "Bir şeyler ters gitti", and one big "Ana Sayfa" button that goes
@@ -20,8 +20,8 @@
   `{ kind: 'AppError', code: NETWORK|MEDIA|STORAGE|UNKNOWN, userMessageKey, retry?, cause? }`
   - `createAppError` / `isAppError`. `userMessageKey` is typed to the `errors.*` namespace.
 - **`src/lib/errors/normalize.ts`** — `normalizeError(unknown, code?)`: AppError passes
-  through; explicit code wins; `AbortError` and RN's fetch `TypeError` → NETWORK; else
-  UNKNOWN. The original value rides along as `cause` for the logger only.
+  through; explicit code wins; `AbortError` and RN's fetch `TypeError` (message matching
+  `/network request failed/i`) → NETWORK; else UNKNOWN. The original value rides along as `cause` for the logger only.
 - **`src/lib/errors/handleError.ts`** — the funnel: normalize → `logger.error(context,...)`
   always → `errorStore.show` unless `severity: 'silent'`. Returns the AppError for callers
   with their own failure UI.
@@ -31,8 +31,9 @@
 - **`src/store/errorStore.ts`** — single current-error slot, replace-on-new, not persisted.
 - **`src/components/GlobalErrorBanner.tsx`** — mounted once in `app/_layout.tsx`; renders
   the translated message + Tamam + optional retry; spring slide-in, instant under reduced
-  motion; `accessibilityLiveRegion="polite"`. Falls back to the hardcoded Turkish line in
-  `src/lib/errors/fallbackText.ts` if i18next itself is down (the one audit exception).
+  motion; `accessibilityLiveRegion="polite"`. Falls back to the hardcoded Turkish lines in
+  `src/lib/errors/fallbackText.ts` if i18next itself is down (the one audit exception); the
+  fox glyph comes from the exported `MASCOT_FACE` so the face can never fork.
 - **`app/_layout.tsx`** — `QueryCache({ onError })` reports every query failure (silent —
   Home owns that UI); the persister uses `reportingStorage`; `export function
 ErrorBoundary({ error, retry })` (Expo Router convention) renders the crash fallback and
@@ -45,8 +46,8 @@ ErrorBoundary({ error, retry })` (Expo Router convention) renders the crash fall
   silent (device language simply applies).
 - **Media** — `ExerciseVideo` forwards the `statusChange` error payload
   (`onError(cause)`); the exercise screen logs MEDIA silent and keeps its own failure UI.
-  `LessonCard` thumbnails and `AnswerTile` images log MEDIA silent; their fallbacks
-  (bordered placeholder / emoji) remain the visible behavior.
+  `LessonCard` thumbnails, `AnswerTile` images and the `ExitConfirmSheet` thumbnail log
+  MEDIA silent; their fallbacks (bordered placeholder / emoji) remain the visible behavior.
 
 ## Edge cases handled
 
@@ -64,7 +65,8 @@ ErrorBoundary({ error, retry })` (Expo Router convention) renders the crash fall
 ## How to test manually
 
 1. Airplane mode, cold start (no cache): Home shows the retry screen; Metro console logs
-   one `[query.lessons] NETWORK …` line per attempt; **no banner** (silent policy).
+   one `[query.lessons] NETWORK …` line per failed query (after its 2 retries settle);
+   **no banner** (silent policy).
 2. Simulate a storage write failure (dev): temporarily make `reportingStorage.setItem`
    throw, finish a quiz → banner "Kaydederken bir sorun oldu" with Tamam; toggle language
    to English → the same flow shows "Something went wrong while saving".

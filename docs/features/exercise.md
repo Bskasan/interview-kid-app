@@ -4,6 +4,8 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 
 ## a) What the user sees
 
+All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is quoted here.
+
 **Video stage**
 
 1. A round 🏠 exit button floats top-left (both stages, always visible). The lesson video
@@ -55,13 +57,17 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
   entry logs via `handleError(MEDIA, silent)`. Late events can't corrupt the machine: a
   stray `readyToPlay` never resurrects `ended`/`error`, an error never downgrades `ended`.
   `useAppActive` pauses on background; unmounting (stage switch/leaving) releases the
-  player. Clip URL in `src/data/media.ts`.
-- **Questions** — `src/data/questions.ts`: five Turkish sets (shapes, colors, counting, animals,
-  objects); `getQuestionSet(lessonId)` picks one via a stable string hash, so a lesson always
+  player. Clip URL is `LESSON_VIDEO_URL` in `src/constants/media.ts`; the timings are
+  `VIDEO_READY_TIMEOUT_MS` (12 s), `ANSWER_FEEDBACK_MS` (1.4 s), `SECONDS_PER_QUESTION`
+  (15 s) and `COUNTDOWN_TICK_MS` (100 ms) in `src/constants/timing.ts`.
+- **Questions** — `src/data/questions.ts`: five language-neutral sets (shapes, colors,
+  counting, animals, objects) whose text resolves from the `questions` i18n namespace;
+  `getQuestionSet(lessonId)` picks one via a stable string hash, so a lesson always
   gets the same quiz (ADR 0015). Each option is an `AnswerOptionData`: an optional visual
-  (`emoji | shape | image`) plus a label — the type requires a visible `label` or an explicit
-  `a11yLabel`, so every option has a guaranteed spoken name (shape options auto-generate
-  Turkish names like "Kırmızı üçgen"). Exactly one question in the bank uses a network image
+  (`emoji | shape | image`) plus a label — the type requires a visible `labelKey` or an
+  explicit `a11yKey`, so every option has a guaranteed spoken name (shape options derive
+  theirs in the active language, e.g. tr "Kırmızı üçgen"). Exactly one question in the bank
+  uses a network image
   (picsum id 237) and carries a `fallbackEmoji` so it stays answerable offline (ADR 0019).
 - **Quiz state** — `src/lib/quiz.ts`: pure transitions `answerQuestion` / `timeoutQuestion` /
   `advanceQuiz` over `{index, correct, answer, finished}`; guards against double taps and the
@@ -119,7 +125,7 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
 - Reduced motion: no shake, no press bounce (feedback stays visible via fills/icons/haptics).
 - Image option offline or failing to load: the tile renders its `fallbackEmoji`, so the
   question stays answerable; only one question in the bank uses an image at all.
-- Small screens (360×640): everything fits without scrolling; below ~510dp of usable height
+- Small screens (360×640): everything fits without scrolling; below ~545dp of window height
   tiles clamp to 120dp and only the inner visual shrinks.
 - TalkBack: every tile announces a descriptive Turkish label ("Kırmızı üçgen", "Köpek
   fotoğrafı") plus selected/disabled state; ✓/✗ are part of the spoken label.
@@ -138,7 +144,7 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
    resumes with the timer where it stopped; "Ana sayfa" lands on Home with no progress
    change for that lesson. During the ✓/✗ feedback moment, open the sheet and wait —
    the next question must not appear until after you tap "Devam et".
-9. Finish 3 questions → Result placeholder shows "N/3 doğru"; Android back from Result goes
+9. Finish 3 questions → the Result screen shows "N/3 doğru"; Android back from Result goes
    Home, not back into the quiz.
 10. Airplane mode, then open a lesson → the unavailable card appears (no 12 s wait);
     "Tekrar dene" while still offline stays on the card; "Videosuz devam et" starts the
@@ -146,7 +152,8 @@ Route: `app/exercise/[id].tsx` — video stage, then a timed 3-question quiz.
     Re-enable network on the card → "Tekrar dene" → video loads and plays.
     With network on, cut the connection mid-load (or throttle) → the card appears at
     ~12 s. The exit sheet works from the card too.
-11. Timer bar: verify green → yellow (≤10 s) → coral (≤5 s) plus the number turning coral.
+11. Timer bar: verify green → yellow (≤10 s) → coral (≤5 s); the seconds number stays ink
+    at all times (coral text would fail the contrast policy).
 12. Reduced motion on (system setting) → no shake/bounce; fills, badges and haptics remain.
 13. TalkBack spot-check: tiles announce their Turkish labels + selected/disabled state.
 

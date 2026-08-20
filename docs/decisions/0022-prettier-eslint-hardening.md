@@ -20,7 +20,7 @@ ESLint config so no lint rule ever fights the formatter. Harden ESLint with
 `no-console: error` (all logging must go through the future central logger),
 `@typescript-eslint/no-explicit-any: error` (promotes the CLAUDE-era convention to a gate),
 and `react-hooks/exhaustive-deps: error` (React Compiler is enabled; stale deps are real
-bugs here). Pin `endOfLine` to Prettier's default LF and add a `.gitattributes` with
+bugs here). Rely on Prettier's default `endOfLine: "lf"` and add a `.gitattributes` with
 `* text=auto eol=lf`: the index already stores LF everywhere, and forcing LF working copies
 stops Windows `core.autocrlf` from flipping checkouts to CRLF and failing `format:check`.
 The mechanical reformat of the repo ships as its own `style:` commit — this record covers
