@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { TOUCH_TARGET } from '@/constants/layout';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { colors, radius, spacing, touchTarget, typography } from '@/theme';
+import { colors, radius, spacing, typography } from '@/theme';
 
 /** Height of the darker "3D" bottom edge that collapses while pressed. */
 const EDGE_HEIGHT = 4;
@@ -63,7 +64,7 @@ export function ChunkyButton({
 const styles = StyleSheet.create({
   base: {
     // Content area stays >= 56dp; the edge is extra.
-    minHeight: touchTarget.primary + EDGE_HEIGHT,
+    minHeight: TOUCH_TARGET.primary + EDGE_HEIGHT,
     borderRadius: radius.button,
     borderBottomWidth: EDGE_HEIGHT,
     alignItems: 'center',

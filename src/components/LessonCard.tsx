@@ -2,6 +2,7 @@ import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { handleError } from '@/lib/errors/handleError';
 import { useProgressStore } from '@/store/progressStore';
@@ -9,13 +10,10 @@ import { colors, radius, spacing, typography } from '@/theme';
 import { clamp } from '@/utils/clamp';
 import type { Lesson } from '@/types/lesson';
 
-/** Fixed dimensions exported for FlatList's getItemLayout. */
+/** Fixed dimensions exported for FlatList's getItemLayout and the skeleton. */
 export const LESSON_CARD_HEIGHT = 120;
 export const LESSON_CARD_GAP = spacing.md;
-
-const THUMB_SIZE = 72;
-/** Stars shown before any attempt; matches the quiz length. */
-const DEFAULT_TOTAL = 3;
+export const LESSON_CARD_THUMB_SIZE = 72;
 
 type Status = 'none' | 'attempted' | 'earned' | 'perfect';
 
@@ -42,7 +40,8 @@ export function LessonCard({ lesson, onPress }: Props) {
   const result = useProgressStore((s) => (s.hasHydrated ? s.results[lesson.id] : undefined));
 
   const status: Status = !result ? 'none' : result.badge === 'none' ? 'attempted' : result.badge;
-  const total = result?.total ?? DEFAULT_TOTAL;
+  // Stars shown before any attempt match the quiz length.
+  const total = result?.total ?? QUESTIONS_PER_ATTEMPT;
   const best = clamp(result?.best ?? 0, 0, total);
   const stars = '⭐'.repeat(best) + '☆'.repeat(total - best);
   const pill = status === 'none' ? null : statusPill[status];
@@ -112,8 +111,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   thumbnail: {
-    width: THUMB_SIZE,
-    height: THUMB_SIZE,
+    width: LESSON_CARD_THUMB_SIZE,
+    height: LESSON_CARD_THUMB_SIZE,
     borderRadius: radius.button,
     backgroundColor: colors.border,
   },

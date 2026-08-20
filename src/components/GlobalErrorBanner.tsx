@@ -10,7 +10,8 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import i18n from '@/i18n';
 import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
-import { colors, motion, radius, spacing, touchTarget, typography } from '@/theme';
+import { TOUCH_TARGET } from '@/constants/layout';
+import { colors, motion, radius, spacing, typography } from '@/theme';
 import { useErrorStore } from '@/store/errorStore';
 
 const ENTER_OFFSET = -24;
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   action: {
-    minHeight: touchTarget.primary - 8,
+    minHeight: TOUCH_TARGET.compact,
     minWidth: 96,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.pill,

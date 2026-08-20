@@ -12,8 +12,3 @@ export const typography = {
   button: { fontSize: 20, fontWeight: '800', lineHeight: 24 },
   caption: { fontSize: 16, fontWeight: '600', lineHeight: 20 },
 } as const satisfies Record<string, TextStyle>;
-
-/** Touch target size (dp) for primary controls, from the design language. */
-export const touchTarget = {
-  primary: 56,
-} as const;

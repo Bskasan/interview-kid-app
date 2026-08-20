@@ -1,8 +1,8 @@
+import { QUESTIONS_PER_ATTEMPT } from '../../src/constants/quiz';
 import {
   allQuestionSets,
   getQuestionSet,
   optionA11yLabel,
-  QUESTIONS_PER_ATTEMPT,
   type OptionVisual,
 } from '../../src/data/questions';
 import i18n from '../../src/i18n';

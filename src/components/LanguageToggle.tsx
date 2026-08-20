@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { TOUCH_TARGET } from '@/constants/layout';
 import { SUPPORTED_LANGUAGES, isAppLanguage } from '@/i18n';
 import { useSettingsStore } from '@/store/settingsStore';
-import { colors, radius, touchTarget, typography } from '@/theme';
+import { colors, radius, typography } from '@/theme';
 
 /**
  * Two-segment language pill for the Home header. Each language is shown in its
@@ -55,7 +56,7 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   segment: {
-    minHeight: touchTarget.primary - 8,
+    minHeight: TOUCH_TARGET.compact,
     minWidth: 88,
     paddingHorizontal: 14,
     borderRadius: radius.pill,

@@ -57,9 +57,6 @@ export type Question = {
 
 export type QuestionSet = readonly Question[];
 
-export const QUESTIONS_PER_ATTEMPT = 3;
-export const SECONDS_PER_QUESTION = 15;
-
 /** Visible caption under a visual, when the option has one. */
 export function optionLabel(option: AnswerOptionData, t: QuestionsT): string | undefined {
   return option.labelKey !== undefined ? t(option.labelKey) : undefined;

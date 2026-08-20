@@ -7,9 +7,15 @@ export type Outcome = {
 };
 
 /**
- * Pass/badge rules: pass = at least 2/3 correct, perfect badge = all correct,
+ * Pass rule: at least `numerator` of every `denominator` answers correct (2/3).
+ * Kept beside the scoring logic as a ratio, not a flat count, so the rule holds
+ * for any total; written as integer math to avoid float threshold bugs.
+ */
+export const PASS_RATIO = { numerator: 2, denominator: 3 } as const;
+
+/**
+ * Pass/badge rules: pass per PASS_RATIO, perfect badge = all correct,
  * normal badge = passed.
- * Written as integer math (3*correct >= 2*total) to avoid float threshold bugs.
  * Inputs are clamped so garbage route params can never produce a bogus badge.
  */
 export function computeOutcome(correct: number, total: number): Outcome {
@@ -17,7 +23,7 @@ export function computeOutcome(correct: number, total: number): Outcome {
     return { passed: false, badge: 'none' };
   }
   const safeCorrect = clamp(Math.trunc(correct), 0, total);
-  const passed = 3 * safeCorrect >= 2 * total;
+  const passed = PASS_RATIO.denominator * safeCorrect >= PASS_RATIO.numerator * total;
   const badge: Badge = safeCorrect === total ? 'perfect' : passed ? 'earned' : 'none';
   return { passed, badge };
 }

@@ -20,6 +20,7 @@ import { reportingStorage } from '@/lib/storage';
 import { colors, spacing } from '@/theme';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const LESSONS_STALE_MS = 5 * 60 * 1000;
 
 // On native, React Query cannot see connectivity by itself; NetInfo drives its
 // online state so stale queries refetch automatically on reconnect.
@@ -37,7 +38,7 @@ const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: LESSONS_STALE_MS,
       // gcTime must outlive the persister's maxAge, or restored queries are
       // garbage-collected right after hydration.
       gcTime: DAY_MS,

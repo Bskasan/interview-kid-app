@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { COUNTDOWN_TICK_MS } from '@/constants/timing';
 import { useAppActive } from '@/hooks/useAppActive';
-
-const TICK_MS = 100;
 
 type Options = {
   /** The countdown only consumes time while true (and the app is foregrounded). */
@@ -48,7 +47,7 @@ export function useCountdown(totalSeconds: number, { running, onExpire }: Option
         }
       }
     };
-    const intervalId = setInterval(tick, TICK_MS);
+    const intervalId = setInterval(tick, COUNTDOWN_TICK_MS);
     return () => {
       clearInterval(intervalId);
       // Snapshot the pause point so a resume continues where it stopped.
