@@ -44,6 +44,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0037 — Categorized constants](decisions/0037-constants-extraction.md) — src/constants (timing/layout/api/media/quiz), no barrel; constants = cross-cutting config vs theme = visual tokens; pass ratio and derived values deliberately stay beside their logic.
 - [0038 — File header summaries + comment policy](decisions/0038-file-header-summaries.md) — every app/src file opens with a 2–4 line what/role summary (the one sanctioned "what" comment); all other comments stay why-only; config/JSON exempt.
 - [0039 — Visual language switch](decisions/0039-visual-language-switch.md) — flag tiles with endonyms (flags-vs-languages trade-off accepted, supersedes 0031's toggle design), root-sibling overlay with timer-driven swap under full opacity, eslint-plugin-i18next adopted at defaults.
+- [0040 — Cross-platform dev + iOS gate](decisions/0040-cross-platform-ios-gate.md) — `expo export --platform all` in every gate proves the iOS bundle builds without a Mac; EAS/macOS runners rejected; explicit casing enforcement; what stays hardware-untested.
 
 ## Features
 
@@ -52,3 +53,4 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
 - [i18n](features/i18n.md) — Turkish + English: detection, persisted flag-tile switch with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.
 - [Error handling](features/error-handling.md) — the central funnel, banner/boundary surfaces, silent policy, storage wrapper, edge cases, manual tests.
+- [Platforms](features/platforms.md) — Windows/macOS dev with Android/iOS targets: portability guarantees, the all-platform bundle gate, what stays hardware-untested, borrowed-Mac checklist.
