@@ -11,10 +11,6 @@
       "tr": "Dil: Türkçe. İngilizceye geçmek için dokun.",
       "en": "Dil: İngilizce. Türkçeye geçmek için dokun."
     },
-    "language": {
-      "tr": "Türkçe",
-      "en": "English"
-    },
     "tabs": {
       "home": "Ana Sayfa",
       "exercises": "Alıştırmalar",
@@ -49,20 +45,12 @@
     "closeA11y": "Kapat"
   },
   "home": {
-    "title": "Dersler",
-    "greeting": "Merhaba! Hadi öğrenelim 🚀",
     "emptyTitle": "Henüz ders yok",
     "offlineBanner": "İnternet yok — kayıtlı dersler açık 📚",
     "offlineNoCache": "İnternete bağlanınca dersler gelecek",
     "loadingMore": "Daha fazla ders geliyor…",
     "lessonTitle": "Ders {{number}}: {{author}}",
-    "lessonCardA11y": "{{title}}. {{status}}",
-    "keepGoing": "Devam et 💪",
-    "badgeEarned": "Rozet 🏅",
-    "badgePerfect": "Süper 🌟",
     "lessonStatus": {
-      "none": "Henüz denenmedi",
-      "attempted": "Denendi, henüz rozet yok",
       "earned": "Rozet kazanıldı",
       "perfect": "Mükemmel rozet kazanıldı"
     }

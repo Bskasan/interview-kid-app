@@ -11,10 +11,6 @@
       "tr": "Language: Turkish. Tap to switch to English.",
       "en": "Language: English. Tap to switch to Turkish."
     },
-    "language": {
-      "tr": "Türkçe",
-      "en": "English"
-    },
     "tabs": {
       "home": "Home",
       "exercises": "Exercises",
@@ -49,20 +45,12 @@
     "closeA11y": "Close"
   },
   "home": {
-    "title": "Lessons",
-    "greeting": "Hi! Let's learn 🚀",
     "emptyTitle": "No lessons yet",
     "offlineBanner": "No internet — saved lessons ready 📚",
     "offlineNoCache": "Lessons will load when you're online",
     "loadingMore": "More lessons coming…",
     "lessonTitle": "Lesson {{number}}: {{author}}",
-    "lessonCardA11y": "{{title}}. {{status}}",
-    "keepGoing": "Keep going 💪",
-    "badgeEarned": "Badge 🏅",
-    "badgePerfect": "Super 🌟",
     "lessonStatus": {
-      "none": "Not tried yet",
-      "attempted": "Tried, no badge yet",
       "earned": "Badge earned",
       "perfect": "Perfect badge earned"
     }

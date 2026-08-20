@@ -5,5 +5,5 @@
 import type { AppLanguage } from '@/i18n';
 
 // expo-speech's Speech.speak(text, { language }) drops in here later — the
-// signature is byte-compatible on purpose (ADR 0050); not installed by design.
+// signature is byte-compatible on purpose; not installed by design.
 export function speak(_text: string, _language: AppLanguage): void {}

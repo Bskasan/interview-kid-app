@@ -55,7 +55,7 @@ export function SpeakButton({ text }: Props) {
         onPressOut={onPressOut}
         accessibilityRole="button"
         // Just "read aloud": screen readers already read the adjacent text, so
-        // duplicating the sentence here would double-announce it (ADR 0050).
+        // duplicating the sentence here would double-announce it.
         accessibilityLabel={t('speakA11y')}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
       >

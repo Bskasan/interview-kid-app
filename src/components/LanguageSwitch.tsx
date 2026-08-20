@@ -96,7 +96,7 @@ export function LanguageSwitch() {
         disabled={transitioning}
         // Not a "switch": that role announces on/off, and neither language is
         // an off state. A button with an explicit label says exactly what a
-        // tap does (ADR 0043).
+        // tap does.
         accessibilityRole="button"
         accessibilityLabel={t(`languageToggleA11y.${shown}`)}
         accessibilityState={{ disabled: transitioning, busy: transitioning }}

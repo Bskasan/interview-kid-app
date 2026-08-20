@@ -1,7 +1,7 @@
 /**
- * Star row: one ⭐ per earned star, ☆ for the rest (ADR 0010 semantics —
- * shape carries the meaning, a child can count stars). Decorative by default:
- * parents fold the count into their own accessibility label.
+ * Star row: one ⭐ per earned star, ☆ for the rest — shape carries the
+ * meaning, a child can count stars. Decorative by default: parents fold the
+ * count into their own accessibility label.
  */
 import { StyleSheet, Text } from 'react-native';
 import { colors } from '@/theme';

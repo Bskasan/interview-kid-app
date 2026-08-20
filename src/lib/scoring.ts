@@ -35,8 +35,8 @@ export function computeOutcome(correct: number, total: number): Outcome {
 
 /**
  * Total stars across all lessons — the dashboard's headline number. One star
- * per correct answer of each lesson's best attempt (ADR 0010's semantics),
- * clamped per record so a corrupt entry can't inflate the sum.
+ * per correct answer of each lesson's best attempt, clamped per record so a
+ * corrupt entry can't inflate the sum.
  */
 export function totalStars(results: Record<string, LessonResult>): number {
   return Object.values(results).reduce((sum, result) => {
