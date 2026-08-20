@@ -8,7 +8,9 @@ import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
 
 // Original generic fox — deliberately not an owl or any existing app's character.
-const FACE = '🦊';
+// Exported so the one other face render (error banner) can't drift to a
+// different character.
+export const MASCOT_FACE = '🦊';
 
 type Props = {
   /** Diameter of the face circle, dp. */
@@ -27,7 +29,7 @@ export function Mascot({ size = 64, speech }: Props) {
       accessibilityLabel={speech ? t('mascotSays', { text: speech }) : t('mascotA11y')}
     >
       <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-        <Text style={{ fontSize: size * 0.55 }}>{FACE}</Text>
+        <Text style={{ fontSize: size * 0.55 }}>{MASCOT_FACE}</Text>
       </View>
       {speech ? (
         <View style={styles.bubble}>
