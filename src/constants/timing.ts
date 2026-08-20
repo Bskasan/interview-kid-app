@@ -23,3 +23,20 @@ export const REQUEST_TIMEOUT_MS = 10_000;
 
 /** Countdown display refresh interval; timing itself is timestamp-based. */
 export const COUNTDOWN_TICK_MS = 100;
+
+/**
+ * Language-change overlay choreography (all measured from the tap). The swap
+ * fires 50 ms after the fade-in completes so JS-timer drift can never expose a
+ * half-translated frame; the hold keeps the overlay fully opaque through the
+ * re-render. Total stays within the 700–900 ms "springy but calm" budget.
+ */
+export const LANGUAGE_TRANSITION = {
+  /** Overlay opacity 0 → 1. */
+  fadeInMs: 250,
+  /** i18next changeLanguage fires under full opacity. */
+  swapAtMs: 300,
+  /** Opacity 1 → 0 starts here (300 ms fully-opaque hold). */
+  fadeOutAtMs: 600,
+  /** Overlay unmounts; interaction unblocks. */
+  totalMs: 850,
+} as const;

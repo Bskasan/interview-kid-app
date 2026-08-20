@@ -1,7 +1,7 @@
 /**
  * Root layout: global providers (safe area, React Query persisted to
  * AsyncStorage, i18n side-effect init), the navigation Stack, the error-banner
- * overlay, and the kid-friendly root error boundary.
+ * and language-transition overlays, and the kid-friendly root error boundary.
  */
 // Side-effect import: initializes i18next synchronously before any screen
 // (or the module-scope wiring below) can render user-facing text.
@@ -18,6 +18,7 @@ import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { GlobalErrorBanner } from '@/components/GlobalErrorBanner';
+import { LanguageTransitionOverlay } from '@/components/LanguageTransitionOverlay';
 import { Mascot } from '@/components/Mascot';
 import { handleError } from '@/lib/errors/handleError';
 import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
@@ -104,6 +105,7 @@ export default function RootLayout() {
           }}
         />
         <GlobalErrorBanner />
+        <LanguageTransitionOverlay />
       </PersistQueryClientProvider>
     </SafeAreaProvider>
   );

@@ -6,6 +6,7 @@
     "mascotA11y": "Friendly fox mascot",
     "mascotSays": "The fox says: {{text}}",
     "languagePickerA11y": "Language choice",
+    "languageChanging": "Changing language…",
     "language": {
       "tr": "Türkçe",
       "en": "English"
