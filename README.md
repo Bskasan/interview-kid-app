@@ -10,27 +10,33 @@ are Reanimated; runtime failures funnel through one central, kid-friendly error 
 
 ## How to run
 
-Built and tested on **Windows + a physical Android phone (Expo Go)**. iOS is untested — the
-code uses only cross-platform APIs, but I could not verify it.
+I built and personally verified everything on **Windows + a physical Android phone (Expo
+Go)**. The other cells follow standard Expo tooling — the code uses only cross-platform Expo
+SDK APIs and CI builds the iOS bundle on every push — but I could not run them myself, so
+they are marked honestly below.
 
-Prerequisites: Node LTS (20+), and the latest **Expo Go** from the Play Store (Expo Go only
-runs the newest SDK; this project is on SDK 57).
+Prerequisites everywhere: Node LTS (20+), then `npm install` once. For a physical phone, the
+latest **Expo Go** (Play Store / App Store — Expo Go only runs the newest SDK; this project
+is on SDK 57).
 
-```bash
-npm install
-npx expo start
-```
+| Dev machine | Target                   | Steps                                                                                                                                  | Verified                   |
+| ----------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
+| Windows     | Android phone (Expo Go)  | `npx expo start`, scan the QR with Expo Go (phone and PC on the same Wi-Fi). Network problems (firewalls): `npx expo start --tunnel`.  | ✅ personally tested       |
+| Windows     | Android emulator         | Android Studio with an AVD, `npx expo start`, press `a`.                                                                               | ✅ personally tested       |
+| Windows     | iPhone (Expo Go)         | `npx expo start`, scan the QR with the iPhone camera → opens in Expo Go (same LAN, or `--tunnel`). No iOS simulator exists on Windows. | ⚪ standard flow, untested |
+| macOS       | iOS Simulator            | Xcode with its iOS Simulator installed, `npx expo start`, press `i`.                                                                   | ⚪ standard flow, untested |
+| macOS       | Android (emulator/phone) | Android Studio with an AVD, `npx expo start`, press `a` — or Expo Go + QR on a physical phone.                                         | ⚪ standard flow, untested |
 
-- **Physical phone**: scan the QR code with Expo Go (phone and PC on the same Wi-Fi).
-- **Network problems** (firewalls, hotel Wi-Fi): `npx expo start --tunnel` — slower, but
-  always reaches the phone.
-- **Emulator**: press `a` in the Expo CLI (needs Android Studio with an AVD).
+`npm test` and `npm run check` behave identically on Windows and macOS: the npm scripts and
+git hooks are plain POSIX sh (Git Bash on Windows, zsh/bash on macOS) with no
+platform-specific syntax or paths.
 
 Checks: `npm run check` runs the whole gate suite in order — typecheck (which first
 regenerates Expo Router's gitignored typed routes, so it works on a fresh clone), ESLint,
-Prettier check, Jest (100 tests) and an Android bundle export. Individual scripts:
-`npm run typecheck` · `npm run lint` / `lint:fix` · `npm run format` / `format:check` ·
-`npm test` · `npm run build`. `npx expo-doctor` for environment sanity.
+Prettier check, Jest (108 tests) and a bundle export for **Android, iOS and web** in one
+pass. Individual scripts: `npm run typecheck` · `npm run lint` / `lint:fix` ·
+`npm run format` / `format:check` · `npm test` · `npm run build`. `npx expo-doctor` for
+environment sanity.
 
 Git hooks are installed automatically by `npm install` (husky): **pre-commit** runs
 lint-staged (ESLint + Prettier on staged files) plus a full typecheck, **commit-msg**
@@ -40,9 +46,10 @@ that fails a gate leaves the machine.
 ## Quality gates & CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs the same suite as `npm run check` — install,
-typecheck, lint, format check, tests, Android export — as a single fail-fast job on every
-pull request into `main` and every push to `main`; superseded runs are auto-cancelled, and
-`main` pushes upload the exported bundle as an artifact (proof that main always builds).
+typecheck, lint, format check, tests, and the Android + iOS + web bundle export — as a single
+fail-fast job on every pull request into `main` and every push to `main`; superseded runs are
+auto-cancelled, and `main` pushes upload the exported bundles as an artifact (proof that main
+always builds, for both mobile platforms).
 The repo is private on the GitHub Free plan, where branch rulesets cannot be enforced
 server-side yet; an import-ready ruleset (require PR, require the green `ci` check, linear
 history, no force pushes or deletion) is committed at `.github/rulesets/main.json` to apply
