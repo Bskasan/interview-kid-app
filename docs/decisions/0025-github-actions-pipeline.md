@@ -1,6 +1,6 @@
 # 0025 — GitHub Actions CI pipeline
 
-Status: accepted
+Status: accepted (the export step was widened to --platform all by 0040)
 Date: 2026-08-19
 
 ## Context
@@ -13,7 +13,8 @@ suite needs to run on neutral hardware for every PR into `main` and on every pus
 
 One workflow (`.github/workflows/ci.yml`), one job `ci`, on `pull_request` targeting
 `main` and `push` to `main`: checkout → setup-node (current LTS, npm cache) → `npm ci` →
-`typecheck` → `lint` → `format:check` → `test` → `build` (`expo export --platform android`).
+`typecheck` → `lint` → `format:check` → `test` → `build` (`expo export`, Android-only
+then — all three platforms since 0040).
 Steps are ordered fastest-failing first and a single sequential job is inherently
 fail-fast — a type error stops the run before the multi-minute export. `concurrency` keyed
 on the ref with `cancel-in-progress` kills superseded runs on force-push. On `main` pushes
@@ -39,8 +40,9 @@ exports cleanly. The export needs no Expo account or secrets.
 
 - Every PR to `main` shows the full gate suite as a single required-check context (`ci`),
   which 0026's ruleset references.
-- The android export runs on every CI pass (~minutes); acceptable at this scale, and it is
-  the only step that proves the Metro bundle actually builds.
+- The export runs on every CI pass (~minutes; all three platform bundles since 0040);
+  acceptable at this scale, and it is the only step that proves the Metro bundle actually
+  builds.
 - `node-version: lts/*` tracks the current LTS automatically; a Node LTS rollover could
   surface new warnings in CI first — visible, and pinnable to a major if it ever bites.
 

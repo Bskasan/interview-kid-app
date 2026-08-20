@@ -11,8 +11,9 @@ The quiz also needs rules for double-taps and for what happens right after an an
 
 ## Decision
 
-- **Five question sets** in `src/data/questions.ts` (colors, counting, animals, addition,
-  shapes — Turkish, emoji-paired, 3 questions × 4 options). A lesson picks its set with a
+- **Five question sets** in `src/data/questions.ts` (shapes, colors, counting, animals,
+  objects — 3 questions × 4 options; originally Turkish emoji-paired text, made
+  language-neutral with visual options by 0019/0030). A lesson picks its set with a
   **stable string hash of the lesson id** (`getQuestionSet`), so the same lesson always asks
   the same questions with no storage involved.
 - **Pure state machine** (`src/lib/quiz.ts`): `answerQuestion` / `timeoutQuestion` /
@@ -29,7 +30,7 @@ The quiz also needs rules for double-taps and for what happens right after an an
 - **Shuffling options per render** — anti-memorization, but the correct answer moving around
   between retakes confuses young kids and breaks "the same lesson is the same quiz".
 - **Quiz logic inside the component (useState + handlers)** — fewer files, but the double-tap
-  and timeout-vs-tap races become untestable render logic; the pure machine gets 9 unit tests.
+  and timeout-vs-tap races become untestable render logic; the pure machine gets its own unit suite (`__tests__/lib/quiz.test.ts`).
 
 ## Consequences
 

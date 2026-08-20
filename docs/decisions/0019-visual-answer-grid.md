@@ -17,8 +17,10 @@ must survive; Expo Go only.
 
 Replace the button list with a 2×2 grid of equal square-ish tiles (`AnswerGrid` +
 `AnswerTile`). The option model becomes a union that carries an optional visual —
-`emoji | shape | image` — where either a visible `label` or an explicit `a11yLabel` is
-required at the type level, so every option is guaranteed a spoken name at compile time.
+`emoji | shape | image` — where either a visible label or an explicit a11y text is
+required at the type level, so every option is guaranteed a spoken name at compile time
+(0030 renamed the fields to `labelKey`/`a11yKey` and added a third branch whose label is
+derived from shape + color tokens).
 Shapes are drawn with `react-native-svg` (bundled in Expo Go); images use `expo-image` with a
 mandatory `fallbackEmoji` rendered on load error. Tile size comes from a pure
 `computeTileSize(windowDimensions)`: width fills two columns, height is capped square-ish

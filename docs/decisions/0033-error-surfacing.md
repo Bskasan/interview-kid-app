@@ -23,8 +23,8 @@ with no dedicated UI: storage write/rehydrate problems, i18n init failure. (3) A
 `ErrorBoundary` exported from `app/_layout.tsx` (the documented Expo Router convention)
 catches uncaught render/effect throws with a kid-friendly full-screen fallback (mascot +
 "Bir şeyler ters gitti" + "Ana Sayfa"), reporting through the same funnel. If i18next
-itself failed to initialize, the banner and boundary fall back to one hardcoded Turkish
-constant (`fallbackText.ts`) — the single documented exception to the no-hardcoded-strings
+itself failed to initialize, the banner and boundary fall back to hardcoded Turkish
+constants (`fallbackText.ts`) — the single documented exception to the no-hardcoded-strings
 audit, for the moment `t()` cannot be trusted.
 
 ## Alternatives considered

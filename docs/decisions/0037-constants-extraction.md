@@ -51,7 +51,8 @@ Deliberately _not_ moved, to keep value and rationale together:
 - The 48dp compact size and the questions-per-attempt count each exist exactly once;
   `LessonCardSkeleton` now shares `LESSON_CARD_THUMB_SIZE` instead of repeating `72`.
 - `touchTarget` left the theme barrel (`TOUCH_TARGET` in constants), so 0021's "no dead tokens"
-  bar still holds: `compact` ships with three consumers.
+  bar still holds: `compact` shipped with three consumers (two since 0039 replaced the
+  language toggle).
 - Composed picsum URLs are byte-identical to the previous strings — the API tests pass
   unmodified, which is the no-behavior-change proof.
 - At production scale the same scheme extends (e.g. `constants/analytics.ts`), with remote

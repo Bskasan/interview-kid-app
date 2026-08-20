@@ -23,8 +23,7 @@ matches the REST request body for creating a ruleset, so it applies either way:
   select `.github/rulesets/main.json`.
 - **CLI:** `gh api repos/{owner}/{repo}/rulesets --method POST --input .github/rulesets/main.json`
 
-Until then the `pre-push` hook running `npm run check` (0024) is the enforced gate, and the
-PR template documents the expectation.
+Until then the `pre-push` hook running `npm run check` (0024) is the enforced gate.
 
 ## Alternatives considered
 
