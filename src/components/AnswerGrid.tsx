@@ -1,3 +1,8 @@
+/**
+ * 2×2 answer grid for the quiz stage: sizes tiles from the window via a pure,
+ * unit-tested function so four tiles fit scroll-free with a 120dp touch floor,
+ * and renders one AnswerTile per option.
+ */
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { AnswerTile } from '@/components/AnswerTile';
 import { type Question } from '@/data/questions';

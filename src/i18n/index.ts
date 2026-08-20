@@ -1,3 +1,8 @@
+/**
+ * i18next setup: bundled tr/en resources, synchronous init with the device
+ * language (Turkish fallback), plus the supported-language vocabulary and
+ * guards. Imported for its side effect once, at the app root.
+ */
 import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';

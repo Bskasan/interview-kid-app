@@ -1,14 +1,13 @@
-import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { colors, radius } from '@/theme';
-
-const SIZE = 48;
-
 /**
  * Round, always-visible exit control for the exercise flow (top-left on both
  * the video and quiz stages). It only *opens* the confirm sheet — leaving is
  * never one accidental tap.
  */
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { TOUCH_TARGET } from '@/constants/layout';
+import { colors, radius } from '@/theme';
+
 export function ExitButton({ onPress }: { onPress: () => void }) {
   const { t } = useTranslation('exercise');
   return (
@@ -27,8 +26,8 @@ export function ExitButton({ onPress }: { onPress: () => void }) {
 
 const styles = StyleSheet.create({
   button: {
-    width: SIZE,
-    height: SIZE,
+    width: TOUCH_TARGET.compact,
+    height: TOUCH_TARGET.compact,
     borderRadius: radius.pill,
     backgroundColor: colors.surface,
     borderWidth: 2,

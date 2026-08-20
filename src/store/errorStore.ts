@@ -1,3 +1,7 @@
+/**
+ * Transient store for the one currently-surfaced error; the global banner
+ * renders it, handleError writes it. Never persisted.
+ */
 import { create } from 'zustand';
 import type { AppError } from '@/lib/errors/types';
 

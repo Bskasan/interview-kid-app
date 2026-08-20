@@ -1,3 +1,8 @@
+/**
+ * Result-screen celebration badge: springs in with a tilt-and-settle, emits a
+ * one-shot glow ring and deterministic confetti — all hand-rolled Reanimated.
+ * Reduced motion renders a static badge with no confetti.
+ */
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -25,11 +30,6 @@ type Props = {
   badge: Exclude<Badge, 'none'>;
 };
 
-/**
- * Celebration badge: pops in with a spring (scale + settle from a tilt), emits a
- * one-shot glow ring and a few confetti pieces — all hand-rolled with Reanimated.
- * Reduced motion renders everything static, no confetti.
- */
 export function BadgeReveal({ badge }: Props) {
   const { t } = useTranslation('home');
   const reduceMotion = useReducedMotion();

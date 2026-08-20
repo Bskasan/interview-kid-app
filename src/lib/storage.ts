@@ -1,6 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { handleError } from '@/lib/errors/handleError';
-
 /**
  * AsyncStorage wrapper used by every persistence consumer (zustand stores, the
  * React Query persister) so storage failures are reported instead of vanishing.
@@ -9,6 +6,9 @@ import { handleError } from '@/lib/errors/handleError';
  * the child's new badge may not survive a restart, which is worth one calm
  * message.
  */
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { handleError } from '@/lib/errors/handleError';
+
 export const reportingStorage = {
   async getItem(key: string): Promise<string | null> {
     try {

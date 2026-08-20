@@ -1,3 +1,8 @@
+/**
+ * One quiz answer tile: a big visual (emoji, drawn SVG shape, or photo with
+ * emoji fallback) plus optional caption, with press feedback, a wrong-answer
+ * shake, and ✓/✗ feedback states that never rely on color alone.
+ */
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

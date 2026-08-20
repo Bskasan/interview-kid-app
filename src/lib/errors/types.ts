@@ -1,3 +1,7 @@
+/**
+ * The app's error vocabulary: the AppError shape every failure normalizes to,
+ * its code → translated-message-key mapping, and the factory/guard around it.
+ */
 import type tr from '@/locales/tr.json';
 
 export type AppErrorCode = 'NETWORK' | 'MEDIA' | 'STORAGE' | 'UNKNOWN';

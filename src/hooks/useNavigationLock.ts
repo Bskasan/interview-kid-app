@@ -1,6 +1,3 @@
-import { useFocusEffect } from 'expo-router';
-import { useCallback, useRef } from 'react';
-
 /**
  * One-shot navigation lock: the returned function runs its navigation at most
  * once, so a fast double-tap can never push or replace twice. With
@@ -8,6 +5,9 @@ import { useCallback, useRef } from 'react';
  * back must allow the next tap); without it the lock is permanent for the
  * mount (Result: the screen is replaced away and never returns).
  */
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef } from 'react';
+
 export function useNavigationLock({ resetOnFocus = false }: { resetOnFocus?: boolean } = {}) {
   const lockRef = useRef(false);
 

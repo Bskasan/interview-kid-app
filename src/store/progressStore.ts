@@ -1,3 +1,8 @@
+/**
+ * Persisted per-lesson progress: the best completed attempt for each lesson,
+ * written idempotently from the Result screen and read by Home's cards.
+ * Survives restarts via AsyncStorage.
+ */
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { handleError } from '@/lib/errors/handleError';
@@ -31,7 +36,6 @@ export const useProgressStore = create<ProgressState>()(
     }),
     {
       name: 'progress-v1',
-      // reportingStorage: I/O failures are logged/surfaced instead of vanishing.
       storage: createJSONStorage(() => reportingStorage),
       partialize: (state) => ({ results: state.results }),
       // The error argument covers what the storage wrapper can't see: corrupt

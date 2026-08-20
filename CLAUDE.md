@@ -13,9 +13,14 @@ explain and defend every decision in a follow-up interview — so every decision
 
 ## Hard constraints
 
-- **Expo managed workflow, must run in Expo Go** (developer is on Windows, tests on a physical Android
-  phone; iOS is untested). Do not add any library that requires a custom dev client or native config
-  changes. Before adding a dependency, confirm it is Expo Go–compatible.
+- **Expo managed workflow, must run in Expo Go** (primary development happens on Windows with a
+  physical Android phone; iOS support is required but device-untested). Do not add any library that
+  requires a custom dev client or native config changes. Before adding a dependency, confirm it is
+  Expo Go–compatible on both Android and iOS.
+- **Cross-platform dev.** The project must be runnable by a developer on Windows or macOS, testing
+  on Android or iOS. Nothing may assume Windows paths or shells: npm scripts and Husky hooks must be
+  POSIX-sh compatible (they run in Git Bash on Windows and in zsh/bash on macOS), no `cmd`-only
+  syntax, no hardcoded path separators. CI validates the exported bundles for both platforms.
 - **Never use `expo-av`.** It is deprecated and removed from the SDK. Use `expo-video` for video
   (`useVideoPlayer` + `<VideoView>`). If audio is ever needed, use `expo-audio`.
 - Install dependencies with `npx expo install <pkg>` (SDK-pinned versions), never plain `npm install`
@@ -46,12 +51,16 @@ app/                 # routes only — thin screens that compose components/hook
 src/
   api/               # fetchers + mappers (picsum → Lesson)
   components/        # presentational, reusable UI
+  constants/         # cross-cutting config values (timing, layout, api, media, quiz) — no barrel
   data/              # mock questions
   hooks/             # useCountdown, useNetworkStatus, etc.
-  lib/               # pure logic (scoring, badge rules, strings) — unit-tested
+  i18n/              # i18next init + compile-time typed keys
+  lib/               # pure logic (scoring, badge rules, errors) — unit-tested
+  locales/           # tr.json + en.json message resources
   store/             # zustand stores
   theme/             # design tokens (colors, spacing, radius, typography, motion)
   types/             # shared types
+  utils/             # small shared pure helpers — no barrel
 __tests__/           # mirrors src/
 docs/                # decisions + feature docs (see "Documentation rules")
   README.md          # index of all docs
@@ -89,8 +98,9 @@ Principles (apply on every screen):
    speech-bubble copy. Keep it cheap: emoji in a circle is enough.
 9. **Safe by default.** No outbound links, no ads, no social, no text input. (Parental gate is out of
    scope — note it in README as a production requirement.)
-10. **Copy:** short, friendly Turkish, 2nd person singular, exclamation-light, max ~6 words per label.
-    Centralized in `src/lib/strings.ts`.
+10. **Copy:** short, friendly, 2nd person singular, exclamation-light, max ~6 words per label.
+    All user-facing copy goes through i18n (`src/locales/tr.json` + `en.json`, compile-time typed
+    keys); Turkish is the product default, English is the second language.
 
 Tokens (put in `src/theme/`; these are ours, tweak freely but keep the roles):
 
@@ -106,8 +116,16 @@ Tokens (put in `src/theme/`; these are ours, tweak freely but keep the roles):
 
 ## Code conventions
 
-- Code, comments and commit messages in **English**. All **user-facing strings in Turkish**. Docs in
-  `docs/` are written in **English** unless the developer says otherwise (they are review material).
+- Code, comments and commit messages in **English**. All **user-facing strings through i18n**
+  (Turkish + English, Turkish default). Docs in `docs/` are written in **English** unless the
+  developer says otherwise (they are review material).
+- **File header summaries.** Every `.ts`/`.tsx` file under `app/` and `src/` starts with a 2–4 line
+  block comment summarizing what the file contains and its role in the flow (what, not how; no
+  restating imports). Any change that alters a file's responsibility must update its header in the
+  same change. Config files (`*.config.js`, `jest.setup.js`, etc.) and JSON are exempt.
+- **Comments.** Header summaries are the one sanctioned "what" comment. All other comments explain
+  _why_ or genuinely complex logic (e.g. timer/AppState math) — never narrate the code, restate
+  names, or describe standard React/Expo/library behaviour.
 - Pure logic (scoring, pass threshold, badge level, timer math) lives in `src/lib` and has unit tests.
   Screens stay thin.
 - Every async/remote state handles: loading, error (with retry), empty, offline. No silent failures.

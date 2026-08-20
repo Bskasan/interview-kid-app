@@ -1,3 +1,9 @@
+/**
+ * The one place runtime errors surface to the child: a calm top banner with
+ * the mascot, a generic translated line and a big OK — plus "try again" when
+ * the error carries a recovery action. Never shows codes, stacks, URLs or
+ * library names. Mounted once in the root layout; a new error replaces the old.
+ */
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -10,17 +16,12 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import i18n from '@/i18n';
 import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
-import { colors, motion, radius, spacing, touchTarget, typography } from '@/theme';
+import { TOUCH_TARGET } from '@/constants/layout';
+import { colors, motion, radius, spacing, typography } from '@/theme';
 import { useErrorStore } from '@/store/errorStore';
 
 const ENTER_OFFSET = -24;
 
-/**
- * The one place runtime errors surface to the child: a calm top banner with the
- * mascot, a generic translated line and a big OK — plus "try again" when the
- * error carries a recovery action. Never shows codes, stacks, URLs or library
- * names. Mounted once in the root layout; a new error replaces the current one.
- */
 export function GlobalErrorBanner() {
   const { t } = useTranslation(['errors', 'common']);
   const insets = useSafeAreaInsets();
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   action: {
-    minHeight: touchTarget.primary - 8,
+    minHeight: TOUCH_TARGET.compact,
     minWidth: 96,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.pill,

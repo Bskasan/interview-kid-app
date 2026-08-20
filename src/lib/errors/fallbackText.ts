@@ -1,5 +1,5 @@
 /**
- * The single sanctioned hardcoded user-facing string in the codebase: shown
+ * The only sanctioned hardcoded user-facing strings in the codebase: shown
  * only if i18next itself failed to initialize, i.e. when t() cannot be
  * trusted. Turkish because it is the product's fallback language.
  */

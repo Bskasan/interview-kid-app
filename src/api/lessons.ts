@@ -1,7 +1,18 @@
+/**
+ * The Home list's data layer: fetches the picsum listing (with an abort
+ * timeout), defensively maps unknown JSON to language-neutral Lessons, and
+ * derives thumbnail URLs from lesson ids.
+ */
+import {
+  LESSON_THUMBNAIL_SIZE,
+  LESSONS_PAGE,
+  LESSONS_PAGE_SIZE,
+  PICSUM_BASE_URL,
+} from '@/constants/api';
+import { REQUEST_TIMEOUT_MS } from '@/constants/timing';
 import type { Lesson } from '@/types/lesson';
 
-const LIST_URL = 'https://picsum.photos/v2/list?page=1&limit=20';
-const REQUEST_TIMEOUT_MS = 10_000;
+const LIST_URL = `${PICSUM_BASE_URL}/v2/list?page=${LESSONS_PAGE}&limit=${LESSONS_PAGE_SIZE}`;
 
 /**
  * Maps the raw picsum list response to Lesson[].
@@ -57,7 +68,7 @@ function mapLesson(item: unknown, lessonNumber: number): Lesson | null {
  * that only have the route param (e.g. the exit sheet) need no query access.
  */
 export function lessonThumbnailUrl(lessonId: string): string {
-  return `https://picsum.photos/id/${lessonId}/200/200`;
+  return `${PICSUM_BASE_URL}/id/${lessonId}/${LESSON_THUMBNAIL_SIZE}/${LESSON_THUMBNAIL_SIZE}`;
 }
 
 export async function fetchLessons(): Promise<Lesson[]> {

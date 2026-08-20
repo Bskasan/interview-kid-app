@@ -1,3 +1,8 @@
+/**
+ * Exercise screen: a lesson's video stage (explicit loading/ready/ended/error
+ * machine) followed by a timed multiple-choice quiz on visual answer tiles.
+ * Every exit path routes through one confirm sheet; finishing replaces to Result.
+ */
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
@@ -17,8 +22,13 @@ import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
 import { TimerBar } from '@/components/TimerBar';
 import { VideoUnavailableCard } from '@/components/VideoUnavailableCard';
-import { LESSON_VIDEO_URL } from '@/data/media';
-import { getQuestionSet, SECONDS_PER_QUESTION } from '@/data/questions';
+import { LESSON_VIDEO_URL } from '@/constants/media';
+import {
+  ANSWER_FEEDBACK_MS,
+  SECONDS_PER_QUESTION,
+  VIDEO_READY_TIMEOUT_MS,
+} from '@/constants/timing';
+import { getQuestionSet } from '@/data/questions';
 import { useCountdown } from '@/hooks/useCountdown';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { handleError } from '@/lib/errors/handleError';
@@ -33,17 +43,6 @@ import {
 } from '@/lib/quiz';
 import { colors, spacing, typography } from '@/theme';
 import { paramString } from '@/utils/routeParams';
-
-/** How long the ✓/✗ feedback stays on screen before auto-advancing. */
-const FEEDBACK_MS = 1400;
-
-/**
- * A video that is neither playable nor errored after this long counts as
- * failed: a silent stall must not leave the child staring at a spinner with a
- * locked CTA. 12 s rides out a slow cell handshake for a ~1 MB clip without
- * feeling infinite to a 5-year-old.
- */
-const VIDEO_READY_TIMEOUT_MS = 12_000;
 
 /**
  * The video step as an explicit machine. `error` is entered from the player's
@@ -94,7 +93,6 @@ export default function ExerciseScreen() {
     onExpire: handleExpire,
   });
 
-  // Every question starts with a full timer.
   useEffect(() => {
     reset();
   }, [quiz.index, reset]);
@@ -107,7 +105,7 @@ export default function ExerciseScreen() {
     }
     const timer = setTimeout(
       () => setQuiz((state) => advanceQuiz(state, questions.length)),
-      FEEDBACK_MS,
+      ANSWER_FEEDBACK_MS,
     );
     return () => clearTimeout(timer);
   }, [quiz.answer, quiz.finished, sheetVisible, questions.length]);

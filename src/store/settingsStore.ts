@@ -1,3 +1,8 @@
+/**
+ * Persisted user settings — today only the explicit language choice. Applies
+ * the choice to i18next immediately on change and again after rehydration,
+ * where it overrides the device-language default.
+ */
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import i18n, { isAppLanguage, type AppLanguage } from '@/i18n';
@@ -23,7 +28,6 @@ export const useSettingsStore = create<SettingsState>()(
     }),
     {
       name: 'settings-v1',
-      // reportingStorage: I/O failures are logged/surfaced instead of vanishing.
       storage: createJSONStorage(() => reportingStorage),
       partialize: (state) => ({ language: state.language }),
       // i18n boots with the device language before hydration finishes; a stored

@@ -1,3 +1,8 @@
+/**
+ * Home screen: scrollable lesson list from picsum (cached for offline) with
+ * per-lesson progress on each card, pull-to-refresh, offline banner, and
+ * loading/error/empty states. Tapping a card opens the Exercise screen.
+ */
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';

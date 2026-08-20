@@ -1,4 +1,8 @@
 /**
+ * Sample media URLs for the exercise flow (real lesson content is out of scope).
+ */
+
+/**
  * Short sample clip (~10 s, H.264 mp4) standing in for real lesson videos.
  * Google's classic gtv-videos-bucket samples (ForBiggerBlazes etc.) started
  * returning 403 in 2026 and even current Expo docs still point at them —

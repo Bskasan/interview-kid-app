@@ -1,6 +1,6 @@
 # 0036 — Shared utils layout: `src/utils/`, no barrel exports
 
-Status: accepted
+Status: accepted (the "FEEDBACK_MS not extracted" clause is superseded by 0037)
 Date: 2026-08-20
 
 ## Context

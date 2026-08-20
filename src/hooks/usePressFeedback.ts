@@ -1,3 +1,9 @@
+/**
+ * Shared press physics for every tappable element (design principle: each tap
+ * gives color + scale bounce + haptic). Spread the returned handlers onto a
+ * Pressable and put `animatedStyle` on an Animated.View around it. Respects
+ * reduced motion (no bounce); haptics are best-effort.
+ */
 import {
   useAnimatedStyle,
   useReducedMotion,
@@ -7,12 +13,6 @@ import {
 import { hapticImpactLight } from '@/lib/haptics';
 import { motion } from '@/theme';
 
-/**
- * Shared press physics for every tappable element (design principle: each tap gives
- * color + scale bounce + haptic). Spread the returned handlers onto a Pressable and
- * put `animatedStyle` on an Animated.View around it. Respects reduced motion
- * (no bounce); haptics are best-effort.
- */
 export function usePressFeedback({ disabled = false }: { disabled?: boolean } = {}) {
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(1);

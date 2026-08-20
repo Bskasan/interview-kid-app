@@ -1,3 +1,7 @@
+/**
+ * Video-stage player: wraps expo-video's useVideoPlayer/VideoView and reports
+ * ready/ended/error events up to the exercise screen's video state machine.
+ */
 import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef } from 'react';

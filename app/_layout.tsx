@@ -1,3 +1,8 @@
+/**
+ * Root layout: global providers (safe area, React Query persisted to
+ * AsyncStorage, i18n side-effect init), the navigation Stack, the error-banner
+ * overlay, and the kid-friendly root error boundary.
+ */
 // Side-effect import: initializes i18next synchronously before any screen
 // (or the module-scope wiring below) can render user-facing text.
 import '@/i18n';
@@ -20,6 +25,7 @@ import { reportingStorage } from '@/lib/storage';
 import { colors, spacing } from '@/theme';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const LESSONS_STALE_MS = 5 * 60 * 1000;
 
 // On native, React Query cannot see connectivity by itself; NetInfo drives its
 // online state so stale queries refetch automatically on reconnect.
@@ -37,7 +43,7 @@ const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000,
+      staleTime: LESSONS_STALE_MS,
       // gcTime must outlive the persister's maxAge, or restored queries are
       // garbage-collected right after hydration.
       gcTime: DAY_MS,
@@ -46,7 +52,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// reportingStorage: AsyncStorage with STORAGE failures routed to handleError.
 const persister = createAsyncStoragePersister({ storage: reportingStorage });
 
 /**

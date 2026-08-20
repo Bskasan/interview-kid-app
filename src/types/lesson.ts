@@ -1,3 +1,7 @@
+/**
+ * The language-neutral lesson model mapped from the picsum list — no display
+ * text baked in, so persisted caches survive a language switch.
+ */
 export type Lesson = {
   /** picsum image id — also selects the question set and the thumbnail. */
   id: string;
