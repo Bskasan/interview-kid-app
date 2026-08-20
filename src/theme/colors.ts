@@ -5,6 +5,7 @@
  * used only as a feedback fill/border, never as a text-bearing surface. On the feedback
  * tints only `ink` text is allowed (ink 9.8:1/9.4:1; `muted` fails at 4.4:1).
  */
+
 export const colors = {
   background: '#FFF8EC', // cream app background
   surface: '#FFFFFF', // cards, bubbles

@@ -19,15 +19,29 @@ export type Outcome = {
 export const PASS_RATIO = { numerator: 2, denominator: 3 } as const;
 
 /**
+ * The one place a raw (correct, total) pair becomes a trustworthy score: a
+ * non-positive or non-finite total means "no usable attempt" (null), otherwise
+ * the count is truncated into range. Scoring, the star model and the persisted
+ * migration all read stored results through this, so a corrupt record cannot
+ * mean different things to the dashboard, the map and storage.
+ */
+export function safeScore(correct: number, total: number): number | null {
+  if (!Number.isFinite(total) || total <= 0) {
+    return null;
+  }
+  return clamp(Math.trunc(correct), 0, total);
+}
+
+/**
  * Pass/badge rules: pass per PASS_RATIO, perfect badge = all correct,
  * normal badge = passed.
  * Inputs are clamped so garbage route params can never produce a bogus badge.
  */
 export function computeOutcome(correct: number, total: number): Outcome {
-  if (!Number.isFinite(total) || total <= 0) {
+  const safeCorrect = safeScore(correct, total);
+  if (safeCorrect === null) {
     return { passed: false, badge: 'none' };
   }
-  const safeCorrect = clamp(Math.trunc(correct), 0, total);
   const passed = PASS_RATIO.denominator * safeCorrect >= PASS_RATIO.numerator * total;
   const badge: Badge = safeCorrect === total ? 'perfect' : passed ? 'earned' : 'none';
   return { passed, badge };
@@ -39,12 +53,10 @@ export function computeOutcome(correct: number, total: number): Outcome {
  * corrupt entry can't inflate the sum.
  */
 export function totalStars(results: Record<string, LessonResult>): number {
-  return Object.values(results).reduce((sum, result) => {
-    if (!Number.isFinite(result.total) || result.total <= 0) {
-      return sum;
-    }
-    return sum + clamp(Math.trunc(result.best), 0, result.total);
-  }, 0);
+  return Object.values(results).reduce(
+    (sum, result) => sum + (safeScore(result.best, result.total) ?? 0),
+    0,
+  );
 }
 
 /**

@@ -55,6 +55,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0048 — Versioned progress persistence](decisions/0048-progress-persist-migration.md) — zustand version+migrate on the kept `progress-v1` key (renaming would delete earned progress); legacy records normalized once; stars derived, never stored.
 - [0049 — Quiz outcome history](decisions/0049-quiz-outcome-history.md) — QuizState records each question's outcome at lock-in time; the segmented bar shows ✓/✗ per segment (timeout renders as wrong but is announced distinctly); pushed-at-lock-in vs at-advance vs screen-side state.
 - [0050 — Speech stub](decisions/0050-speech-stub.md) — SpeakButton ships the read-aloud affordance with honest press feedback while `speak(text, language)` stays a no-op byte-compatible with expo-speech; placement rule, deliberate non-placements, and the no-double-announce label choice.
+- [0051 — Layout invariants for inline controls](decisions/0051-layout-invariants-inline-controls.md) — rows pairing flexible content with a fixed control need a definite width and exactly one shrinkable child (the bug that hid the 🔊 button); font caps on shared rows; 48dp floor; narrow-viewport verification because jest has no layout engine.
 
 ## Features
 

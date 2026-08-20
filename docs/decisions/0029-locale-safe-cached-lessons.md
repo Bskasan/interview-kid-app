@@ -14,7 +14,8 @@ layer also imported the strings module, coupling data fetching to presentation.
 ## Decision
 
 The `Lesson` model became language-neutral: `{ id, lessonNumber, author, thumbnailUrl }`.
-`mapLessons` no longer touches copy; `LessonCard` composes the title at render time via
+`mapLessons` no longer touches copy; the lesson card (since 0047, the map row and its bubble)
+composes the title at render time via
 `t('home:lessonTitle', { number, author })`, so a language switch re-renders every title
 instantly and the persisted cache can never be language-stale. The persister `buster` was
 bumped `lessons-v1 → lessons-v2`, discarding persisted entries with the old shape instead

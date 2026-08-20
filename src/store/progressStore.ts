@@ -7,9 +7,8 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { handleError } from '@/lib/errors/handleError';
-import { computeOutcome, mergeResult } from '@/lib/scoring';
+import { computeOutcome, mergeResult, safeScore } from '@/lib/scoring';
 import { reportingStorage } from '@/lib/storage';
-import { clamp } from '@/utils/clamp';
 import type { LessonResult } from '@/types/progress';
 
 type ProgressState = {
@@ -24,6 +23,12 @@ type ProgressState = {
 };
 
 type PersistedProgress = { results: Record<string, LessonResult> };
+
+/**
+ * Pre-hydration stand-in for `results`. A stable reference: returning a fresh
+ * `{}` from a selector would make every store update look like a change.
+ */
+export const EMPTY_RESULTS: Record<string, LessonResult> = {};
 
 /** Current persisted-schema version (see migrateProgress). */
 export const PROGRESS_VERSION = 1;
@@ -48,10 +53,10 @@ export function migrateProgress(persisted: unknown, fromVersion: number): Persis
       }
       const record = value as { best?: unknown; total?: unknown };
       const total = typeof record.total === 'number' ? Math.trunc(record.total) : NaN;
-      if (!Number.isFinite(total) || total <= 0) {
+      const best = safeScore(typeof record.best === 'number' ? record.best : 0, total);
+      if (best === null) {
         continue;
       }
-      const best = clamp(typeof record.best === 'number' ? Math.trunc(record.best) : 0, 0, total);
       results[lessonId] = { best, total, badge: computeOutcome(best, total).badge };
     }
   }

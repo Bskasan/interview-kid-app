@@ -18,7 +18,7 @@ export const ANSWER_FEEDBACK_MS = 1400;
  */
 export const VIDEO_READY_TIMEOUT_MS = 12_000;
 
-/** Abort budget for the Home lessons request. */
+/** Abort budget for one lesson-catalog page request. */
 export const REQUEST_TIMEOUT_MS = 10_000;
 
 /** Countdown display refresh interval; timing itself is timestamp-based. */

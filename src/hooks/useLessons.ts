@@ -1,7 +1,7 @@
 /**
- * The lesson list's server state: an infinite React Query over picsum pages
+ * The lesson catalog's server state: an infinite React Query over picsum pages
  * (capped at the fixed 20-lesson catalog), cached (and offline-restored) under
- * the 'lessons' key by the root provider. Screens receive a flat, deduped,
+ * the 'lessons' key by the root provider. The map receives a flat, deduped,
  * globally numbered Lesson[] via select.
  */
 import { useInfiniteQuery } from '@tanstack/react-query';

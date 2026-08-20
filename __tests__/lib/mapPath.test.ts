@@ -1,5 +1,12 @@
 import { MAP_COLUMN_X, MAP_ROW_HEIGHT } from '../../src/constants/map';
-import { entryPath, exitPath, NODE_CENTER_Y, nodeCenterX, nodeColumn } from '../../src/lib/mapPath';
+import {
+  entryPath,
+  exitPath,
+  NODE_CENTER_Y,
+  nodeAnchor,
+  nodeCenterX,
+  nodeColumn,
+} from '../../src/lib/mapPath';
 
 const WIDTH = 300;
 
@@ -46,5 +53,39 @@ describe('connector paths — per-row segments', () => {
       const exitX = nodeCenterX(i, WIDTH);
       expect(entryPath(i + 1, WIDTH)!.startsWith(`M ${exitX} 0 `)).toBe(true);
     }
+  });
+});
+
+describe('nodeAnchor — where a node sits in the viewport', () => {
+  const PADDING = 16;
+
+  it('offsets the column by the list padding and the row by the scroll position', () => {
+    expect(nodeAnchor({ index: 0, width: WIDTH, padding: PADDING, scrollOffset: 0 })).toEqual({
+      x: PADDING + nodeCenterX(0, WIDTH),
+      y: NODE_CENTER_Y,
+    });
+    expect(nodeAnchor({ index: 3, width: WIDTH, padding: PADDING, scrollOffset: 0 }).y).toBe(
+      3 * MAP_ROW_HEIGHT + NODE_CENTER_Y,
+    );
+  });
+
+  it('moves a node up by exactly what has been scrolled past', () => {
+    const resting = nodeAnchor({ index: 4, width: WIDTH, padding: PADDING, scrollOffset: 0 });
+    const scrolled = nodeAnchor({ index: 4, width: WIDTH, padding: PADDING, scrollOffset: 150 });
+
+    expect(scrolled.y).toBe(resting.y - 150);
+    expect(scrolled.x).toBe(resting.x); // vertical list: scrolling never moves x
+  });
+
+  it('keeps a node scrolled exactly one row up in the previous row slot', () => {
+    const first = nodeAnchor({ index: 1, width: WIDTH, padding: PADDING, scrollOffset: 0 });
+    const second = nodeAnchor({
+      index: 2,
+      width: WIDTH,
+      padding: PADDING,
+      scrollOffset: MAP_ROW_HEIGHT,
+    });
+
+    expect(second.y).toBe(first.y);
   });
 });

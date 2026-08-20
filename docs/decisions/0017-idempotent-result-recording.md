@@ -41,8 +41,9 @@ success haptic fires in the same guarded effect so it also runs at most once.
 
 - Progress can only move upward, matching the best-result policy; replaying the Result screen
   is harmless.
-- Home reflects the new badge immediately on return: `LessonCard` subscribes to the store, and
-  navigation is `replace`, so no stale screen instance survives.
+- The lesson list reflected the new badge immediately on return because its cards subscribed to
+  the store, and navigation is `replace`, so no stale screen instance survives. Since 0047 the
+  same holds for the map: it subscribes to the store, so earning 2⭐ unlocks the next node live.
 - If richer analytics ever need exactly-once _delivery_ (not just idempotent state), a real
   attempt id would be introduced (noted for production).
 

@@ -5,13 +5,13 @@
  * language-transition overlays, the streak tracker, and the kid-friendly
  * root error boundary.
  */
-// Side-effect import: initializes i18next synchronously before any screen
-// (or the module-scope wiring below) can render user-facing text.
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { GlobalErrorBanner } from '@/components/GlobalErrorBanner';
 import { LanguageTransitionOverlay } from '@/components/LanguageTransitionOverlay';
 import { Mascot } from '@/components/Mascot';
 import { useStreakTracker } from '@/hooks/useStreakTracker';
+// Side-effect import: initializes i18next synchronously, so translation is
+// ready before this file's module-scope wiring or any screen renders text.
 import '@/i18n';
 import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
 import { handleError } from '@/lib/errors/handleError';

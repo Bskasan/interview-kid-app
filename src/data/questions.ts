@@ -9,7 +9,7 @@
  */
 
 import type tr from '@/locales/tr.json';
-import { colors } from '@/theme';
+import { type ColorToken } from '@/theme';
 import { hashString } from '@/utils/hashString';
 import type { TFunction } from 'i18next';
 
@@ -34,7 +34,7 @@ export type QuestionsT = TFunction<'questions'>;
  * `questions.color` namespace — feedback-only tokens (tints) are excluded by
  * construction, so "green tile wash" can never leak into an option's label.
  */
-export type SpeakableColor = keyof typeof colors & keyof (typeof tr)['questions']['color'];
+export type SpeakableColor = ColorToken & keyof (typeof tr)['questions']['color'];
 
 export type OptionVisual =
   | { kind: 'emoji'; value: string }

@@ -4,8 +4,7 @@
  * the pass-grade star count. Single source of truth: the threshold IS the
  * pass rule's numerator.
  */
-import { PASS_RATIO } from '@/lib/scoring';
-import { clamp } from '@/utils/clamp';
+import { PASS_RATIO, safeScore } from '@/lib/scoring';
 import type { LessonResult } from '@/types/progress';
 
 /** Stars needed on lesson N to unlock lesson N+1 — the pass grade (2). */
@@ -15,10 +14,10 @@ export type MapNodeState = 'locked' | 'unlocked' | 'current' | 'completed';
 
 /** Stars for one lesson: best correct answers, clamped; no record = 0. */
 export function lessonStars(result: LessonResult | undefined): number {
-  if (!result || !Number.isFinite(result.total) || result.total <= 0) {
+  if (!result) {
     return 0;
   }
-  return clamp(Math.trunc(result.best), 0, result.total);
+  return safeScore(result.best, result.total) ?? 0;
 }
 
 /**

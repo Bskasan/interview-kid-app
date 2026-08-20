@@ -1,7 +1,7 @@
 /**
- * Dashboard tab (Ana Sayfa): mascot greeting, streak and total-star cards,
- * and one big CTA into the exercises tab. The star count animates up each
- * time the tab gains focus (static under reduced motion).
+ * Dashboard tab (Ana Sayfa): read-aloud mascot greeting, streak and total-star
+ * cards, and one big CTA into the exercises tab. The star count animates up
+ * each time the tab gains focus (static under reduced motion).
  */
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -13,7 +13,7 @@ import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
 import { useCountUp } from '@/hooks/useCountUp';
 import { totalStars } from '@/lib/scoring';
-import { useProgressStore } from '@/store/progressStore';
+import { EMPTY_RESULTS, useProgressStore } from '@/store/progressStore';
 import { useStreakStore } from '@/store/streakStore';
 import { colors, radius, spacing, typography } from '@/theme';
 
@@ -22,9 +22,9 @@ export default function DashboardScreen() {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
 
-  const results = useProgressStore((state) => (state.hasHydrated ? state.results : undefined));
+  const results = useProgressStore((state) => (state.hasHydrated ? state.results : EMPTY_RESULTS));
   const streakCount = useStreakStore((state) => (state.hasHydrated ? state.count : 0));
-  const starsTarget = totalStars(results ?? {});
+  const starsTarget = totalStars(results);
 
   // Replay the count-up on every visit to the tab, not only on first mount.
   const [focusKey, setFocusKey] = useState(0);

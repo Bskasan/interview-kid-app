@@ -101,6 +101,10 @@ false`); offline → no fetch, no stranded spinner; failed page → earlier page
 9. Reduced motion → current node wears the yellow ring, no pulsing; bubble appears instantly.
 10. TalkBack: nodes announce "Ders N: {author}. kilitli/açık/yıldız 2/3"; the backdrop
     announces "Kapat".
+11. Narrow screen + edges: on 360dp the ⭐ row under a completed node sits clear of the path
+    line and never touches the next node's row; open a bubble on a node near the **bottom** of
+    the viewport — it must flip above (or clamp) so "Başla" is always reachable, and the 🔊 next
+    to the title stays inside the card.
 
 ## e) References
 

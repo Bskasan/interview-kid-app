@@ -39,6 +39,24 @@ export function entryPath(index: number, width: number): string | null {
 }
 
 /**
+ * Where a node's centre sits in the map viewport, given how far the list has
+ * scrolled. Computed rather than measured: rows are fixed-height, so this is
+ * exact, and it cannot hand back a stale frame the way an async native
+ * measurement can. `padding` is the list's horizontal content padding.
+ */
+export function nodeAnchor(args: {
+  index: number;
+  width: number;
+  padding: number;
+  scrollOffset: number;
+}): { x: number; y: number } {
+  return {
+    x: args.padding + nodeCenterX(args.index, args.width),
+    y: args.index * MAP_ROW_HEIGHT + NODE_CENTER_Y - args.scrollOffset,
+  };
+}
+
+/**
  * The straight stub a row draws from its node down to its bottom edge, where
  * the next row's entry curve picks it up. The last loaded node draws none.
  */

@@ -180,6 +180,11 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
     at all times (coral text would fail the contrast policy).
 12. Reduced motion on (system setting) → no shake/bounce; fills, badges and haptics remain.
 13. TalkBack spot-check: tiles announce their Turkish labels + selected/disabled state.
+14. Narrow screen + large font: on 360×640 the 🔊 beside the question prompt is fully visible
+    and the 2×2 grid still fits without scrolling; at the largest system font the prompt shrinks
+    to its cap rather than ellipsizing mid-question, and the mascot bubble does not overlap the
+    grid. Same check for the exit sheet and the video-unavailable card, whose mascot has the
+    least room of any screen.
 
 ## e) References
 

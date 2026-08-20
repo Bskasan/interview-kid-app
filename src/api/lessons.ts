@@ -1,5 +1,5 @@
 /**
- * The lesson list's data layer: fetches picsum pages (with an abort timeout),
+ * The lesson catalog's data layer: fetches picsum pages (with an abort timeout),
  * defensively maps unknown JSON to language-neutral Lessons with globally
  * sequential numbering, and provides the pure pagination helpers (capped
  * next-page param, cross-page flatten + dedupe, load-more guard) for useLessons.

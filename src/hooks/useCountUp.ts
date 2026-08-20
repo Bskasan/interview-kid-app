@@ -25,7 +25,7 @@ export function useCountUp(
     const tick = (now: number) => {
       start ??= now;
       const progress = Math.min(1, (now - start) / COUNT_UP_MS);
-      // Ease-out cubic: fast start, gentle landing on the final number.
+      // Eased so the number lands gently instead of stopping dead.
       setFrameState({ key: restartKey, value: Math.round(target * (1 - (1 - progress) ** 3)) });
       if (progress < 1) {
         frame = requestAnimationFrame(tick);

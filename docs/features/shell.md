@@ -88,6 +88,11 @@ All copy resolves from `src/locales/{tr,en}.json`; Turkish quoted here.
    app.json.
 7. Trigger the error banner (airplane mode + pull-to-refresh on the list) → the banner renders
    above the tab bar.
+8. Narrow screen + large font (the check that caught the round-5.1 bug): on a 360dp-wide device
+   confirm the 🔊 button is fully visible **and tappable** beside the welcome and dashboard
+   mascots — the bubble text should wrap rather than push the button off the edge. Then set the
+   system font to its largest step: tab labels must stay uncut ("Alıştırmalar" not clipped), and
+   in English the Settings row's "Language" label must stay inside the card with the toggle.
 
 ## e) References
 
