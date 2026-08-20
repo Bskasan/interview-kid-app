@@ -225,6 +225,24 @@ describe('Exercise screen — per-question countdown', () => {
     );
   };
 
+  // The suite silences console.error for the intentional video-error logs,
+  // which also hides React warnings — so React's duplicate-sibling-key error
+  // (timer and grid both keyed by the question index) is asserted explicitly.
+  it('renders the quiz without duplicate sibling-key warnings', async () => {
+    await render(<ExerciseScreen />);
+    await startQuiz();
+    await answerFirstCorrectly();
+    await act(() => {
+      jest.advanceTimersByTime(FEEDBACK_MS);
+    });
+
+    // eslint-disable-next-line no-console
+    const keyWarnings = (console.error as jest.Mock).mock.calls.filter(
+      ([message]) => typeof message === 'string' && message.includes('same key'),
+    );
+    expect(keyWarnings).toEqual([]);
+  });
+
   it('starts the next question with the full time after an in-time answer', async () => {
     await render(<ExerciseScreen />);
     await startQuiz();
