@@ -77,7 +77,7 @@ app/                 # routes: _layout (providers, error boundary), index (Home)
 src/
   api/               # picsum fetcher + defensive mapper → Lesson[]
   components/        # AnswerGrid/AnswerTile, ChunkyButton, Mascot, LessonCard, ExerciseVideo,
-                     # ExitConfirmSheet, VideoUnavailableCard, GlobalErrorBanner, LanguageToggle,
+                     # ExitConfirmSheet, VideoUnavailableCard, GlobalErrorBanner, LanguageSwitch,
                      # TimerBar, SegmentedProgress, BadgeReveal…
   data/              # question bank (5 visual sets; text via i18n), sample video url
   hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive,

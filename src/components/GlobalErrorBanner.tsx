@@ -15,7 +15,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import i18n from '@/i18n';
-import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
+import { MASCOT_FACE } from '@/components/Mascot';
+import {
+  FALLBACK_ERROR_TEXT,
+  FALLBACK_OK_TEXT,
+  FALLBACK_RETRY_TEXT,
+} from '@/lib/errors/fallbackText';
 import { TOUCH_TARGET } from '@/constants/layout';
 import { colors, motion, radius, spacing, typography } from '@/theme';
 import { useErrorStore } from '@/store/errorStore';
@@ -50,7 +55,7 @@ export function GlobalErrorBanner() {
     <BannerShell key={current.id} topInset={insets.top}>
       <View style={styles.messageRow}>
         <Text style={styles.face} maxFontSizeMultiplier={1.2}>
-          🦊
+          {MASCOT_FACE}
         </Text>
         <Text style={styles.message} maxFontSizeMultiplier={1.4}>
           {message}
@@ -64,7 +69,7 @@ export function GlobalErrorBanner() {
             style={({ pressed }) => [styles.action, pressed && styles.actionPressed]}
           >
             <Text style={styles.actionLabel} maxFontSizeMultiplier={1.2}>
-              🔄 {ready ? t('common:retry') : FALLBACK_OK_TEXT}
+              🔄 {ready ? t('common:retry') : FALLBACK_RETRY_TEXT}
             </Text>
           </Pressable>
         ) : null}
@@ -126,7 +131,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.card,
     padding: spacing.lg,
     gap: spacing.md,
-    // Above every screen, below nothing — the banner is the only overlay.
+    // Above every screen; only the language-transition overlay (20/8) covers
+    // it, deliberately — an opaque sub-second cover with a tappable banner
+    // poking through would be worse than the banner reappearing after it.
     zIndex: 10,
     elevation: 6,
     shadowColor: colors.ink,

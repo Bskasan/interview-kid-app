@@ -6,6 +6,7 @@
     "mascotA11y": "Sevimli tilki maskot",
     "mascotSays": "Tilki diyor ki: {{text}}",
     "languagePickerA11y": "Dil seçimi",
+    "languageChanging": "Dil değişiyor…",
     "language": {
       "tr": "Türkçe",
       "en": "English"

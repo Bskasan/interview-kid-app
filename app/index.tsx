@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FullScreenMessage } from '@/components/FullScreenMessage';
-import { LanguageToggle } from '@/components/LanguageToggle';
+import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { LESSON_CARD_GAP, LESSON_CARD_HEIGHT, LessonCard } from '@/components/LessonCard';
 import { LessonCardSkeleton } from '@/components/LessonCardSkeleton';
 import { Mascot } from '@/components/Mascot';
@@ -101,7 +101,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{t('title')}</Text>
-          <LanguageToggle />
+          <LanguageSwitch />
         </View>
         <Mascot size={48} speech={t('greeting')} />
       </View>
