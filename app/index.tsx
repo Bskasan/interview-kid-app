@@ -1,13 +1,15 @@
 /**
- * Home screen: scrollable lesson list from picsum (cached for offline) with
- * per-lesson progress on each card, pull-to-refresh, offline banner, and
- * loading/error/empty states. Tapping a card opens the Exercise screen.
+ * Home screen: lesson list loaded page by page from picsum as the child
+ * scrolls (cached for offline), with per-lesson progress on each card,
+ * pull-to-refresh, offline banner, and loading/error/empty states.
+ * Tapping a card opens the Exercise screen.
  */
 import { useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { canLoadMoreLessons } from '@/api/lessons';
 import { FullScreenMessage } from '@/components/FullScreenMessage';
 import { LanguageSwitch } from '@/components/LanguageSwitch';
 import { LESSON_CARD_GAP, LESSON_CARD_HEIGHT, LessonCard } from '@/components/LessonCard';
@@ -21,13 +23,26 @@ import { colors, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
 
 const SKELETON_COUNT = 5;
+const END_REACHED_THRESHOLD = 0.5;
 
 const ListGap = () => <View style={{ height: LESSON_CARD_GAP }} />;
 
 export default function HomeScreen() {
   const { t } = useTranslation(['home', 'common']);
   const router = useRouter();
-  const { data: lessons, isPending, isError, refetch, isRefetching } = useLessons();
+  const {
+    data: lessons,
+    isPending,
+    isError,
+    refetch,
+    isRefetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchPreviousPage,
+    hasPreviousPage,
+    isFetchingPreviousPage,
+  } = useLessons();
   const { isOffline } = useNetworkStatus();
 
   // A fast double-tap on a card must not push two exercise screens; the lock
@@ -37,6 +52,22 @@ export default function HomeScreen() {
     (lessonId: string) => navigateOnce(() => router.push(`/exercise/${lessonId}`)),
     [navigateOnce, router],
   );
+
+  // FlatList is known to fire onEndReached more than once per scroll; the pure
+  // guard stops calls once React Query's state has flipped, and cancelRefetch:
+  // false makes any same-render duplicate a no-op instead of a restarted fetch.
+  const handleEndReached = useCallback(() => {
+    if (canLoadMoreLessons({ hasNextPage, isFetchingNextPage, isOffline })) {
+      void fetchNextPage({ cancelRefetch: false });
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isOffline]);
+
+  // Refill pages maxPages dropped from the front when the child scrolls back up.
+  const handleStartReached = useCallback(() => {
+    if (hasPreviousPage && !isFetchingPreviousPage && !isOffline) {
+      void fetchPreviousPage({ cancelRefetch: false });
+    }
+  }, [fetchPreviousPage, hasPreviousPage, isFetchingPreviousPage, isOffline]);
 
   const renderItem = useCallback(
     ({ item }: { item: Lesson }) => (
@@ -70,9 +101,25 @@ export default function HomeScreen() {
           offset: (LESSON_CARD_HEIGHT + LESSON_CARD_GAP) * index,
           index,
         })}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={END_REACHED_THRESHOLD}
+        onStartReached={handleStartReached}
+        testID="lesson-list"
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={styles.footer}>
+              <ActivityIndicator color={colors.primary} />
+              <Text style={styles.footerText} maxFontSizeMultiplier={1.4}>
+                {t('loadingMore')}
+              </Text>
+            </View>
+          ) : null
+        }
         refreshControl={
           <RefreshControl
-            refreshing={isRefetching}
+            // isRefetching is also true while a next page loads; only a real
+            // pull-to-refresh should show the top spinner.
+            refreshing={isRefetching && !isFetchingNextPage && !isFetchingPreviousPage}
             onRefresh={() => refetch()}
             colors={[colors.primary]}
             tintColor={colors.primary}
@@ -138,5 +185,16 @@ const styles = StyleSheet.create({
   skeletons: {
     paddingHorizontal: spacing.lg,
     gap: LESSON_CARD_GAP,
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+  },
+  footerText: {
+    ...typography.caption,
+    color: colors.muted,
   },
 });

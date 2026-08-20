@@ -1,33 +1,38 @@
 /**
- * The Home list's data layer: fetches the picsum listing (with an abort
- * timeout), defensively maps unknown JSON to language-neutral Lessons, and
- * derives thumbnail URLs from lesson ids.
+ * The lesson list's data layer: fetches picsum pages (with an abort timeout),
+ * defensively maps unknown JSON to language-neutral Lessons with globally
+ * sequential numbering, and provides the pure pagination helpers (next/prev
+ * page params, cross-page flatten + dedupe, load-more guard) for useLessons.
  */
-import {
-  LESSON_THUMBNAIL_SIZE,
-  LESSONS_PAGE,
-  LESSONS_PAGE_SIZE,
-  PICSUM_BASE_URL,
-} from '@/constants/api';
+import type { InfiniteData } from '@tanstack/react-query';
+import { LESSON_THUMBNAIL_SIZE, LESSONS_PAGE_SIZE, PICSUM_BASE_URL } from '@/constants/api';
 import { REQUEST_TIMEOUT_MS } from '@/constants/timing';
 import type { Lesson } from '@/types/lesson';
 
-const LIST_URL = `${PICSUM_BASE_URL}/v2/list?page=${LESSONS_PAGE}&limit=${LESSONS_PAGE_SIZE}`;
+/** One fetched page plus what the pager needs to know about it. */
+export type LessonsPage = {
+  lessons: Lesson[];
+  page: number;
+  /** True when picsum returned fewer raw items than a full page — end of list. */
+  isLastPage: boolean;
+};
 
 /**
- * Maps the raw picsum list response to Lesson[].
- * Defensive by policy: unknown input never throws — a malformed item is
- * skipped, a malformed payload yields []. Lesson numbering stays contiguous over the
- * items that survived, so a skipped item never produces a gap like "Ders 7" missing.
+ * Maps one raw picsum page to Lesson[]. Defensive by policy: unknown input
+ * never throws — a malformed item is skipped, a malformed payload yields [].
+ * "Ders N" numbering is anchored to the page slot ((page-1) × page size), so
+ * numbers never shift when other pages load, refetch, or are dropped from the
+ * cache; a skipped item moves numbers only inside its own page.
  */
-export function mapLessons(data: unknown): Lesson[] {
+export function mapLessons(data: unknown, page: number): Lesson[] {
   if (!Array.isArray(data)) {
     return [];
   }
+  const firstNumber = (page - 1) * LESSONS_PAGE_SIZE + 1;
   const lessons: Lesson[] = [];
   const seenIds = new Set<string>();
   for (const item of data) {
-    const lesson = mapLesson(item, lessons.length + 1);
+    const lesson = mapLesson(item, firstNumber + lessons.length);
     if (lesson && !seenIds.has(lesson.id)) {
       seenIds.add(lesson.id);
       lessons.push(lesson);
@@ -71,17 +76,69 @@ export function lessonThumbnailUrl(lessonId: string): string {
   return `${PICSUM_BASE_URL}/id/${lessonId}/${LESSON_THUMBNAIL_SIZE}/${LESSON_THUMBNAIL_SIZE}`;
 }
 
-export async function fetchLessons(): Promise<Lesson[]> {
+/** getNextPageParam: keep paging while pages come back full. */
+export function nextLessonsPageParam(lastPage: LessonsPage): number | undefined {
+  return lastPage.isLastPage ? undefined : lastPage.page + 1;
+}
+
+/**
+ * getPreviousPageParam: required alongside maxPages — lets React Query refill
+ * a page it dropped from the front of the window when the child scrolls back.
+ */
+export function previousLessonsPageParam(firstPage: LessonsPage): number | undefined {
+  return firstPage.page > 1 ? firstPage.page - 1 : undefined;
+}
+
+/**
+ * Flattens cached pages for the list. Picsum can repeat an id at page
+ * boundaries; the first occurrence wins so FlatList keys stay unique.
+ */
+export function flattenLessonPages(data: InfiniteData<LessonsPage, number>): Lesson[] {
+  const seenIds = new Set<string>();
+  const lessons: Lesson[] = [];
+  for (const pageData of data.pages) {
+    for (const lesson of pageData.lessons) {
+      if (!seenIds.has(lesson.id)) {
+        seenIds.add(lesson.id);
+        lessons.push(lesson);
+      }
+    }
+  }
+  return lessons;
+}
+
+/**
+ * Single gate for onEndReached: no request while one is in flight (FlatList
+ * fires the callback repeatedly), past the end, or offline (a paused fetch
+ * would strand the footer spinner).
+ */
+export function canLoadMoreLessons(args: {
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  isOffline: boolean;
+}): boolean {
+  return args.hasNextPage && !args.isFetchingNextPage && !args.isOffline;
+}
+
+export async function fetchLessonsPage(page: number): Promise<LessonsPage> {
   // Hermes has no AbortSignal.timeout; a manual controller keeps a hung request
   // from pinning the query in loading state forever.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch(LIST_URL, { signal: controller.signal });
+    const response = await fetch(
+      `${PICSUM_BASE_URL}/v2/list?page=${page}&limit=${LESSONS_PAGE_SIZE}`,
+      { signal: controller.signal },
+    );
     if (!response.ok) {
       throw new Error(`Lessons request failed with status ${response.status}`);
     }
-    return mapLessons(await response.json());
+    const raw: unknown = await response.json();
+    // End-of-list is judged on the RAW length: validation may drop items from a
+    // full page, and a short mapped page must not end pagination early. A
+    // non-array payload maps to [] and ends the list instead of looping.
+    const isLastPage = !Array.isArray(raw) || raw.length < LESSONS_PAGE_SIZE;
+    return { lessons: mapLessons(raw, page), page, isLastPage };
   } finally {
     clearTimeout(timer);
   }

@@ -9,32 +9,52 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 1. Header: big "Dersler" title, the two language flag tiles (see i18n.md) and the fox mascot
    greeting "Merhaba! Hadi öğrenelim 🚀".
 2. While loading: five pulsing skeleton cards (static blocks if reduced motion is on).
-3. Loaded: 20 lesson cards. Each card shows a rounded thumbnail, "Ders N: {author}", and a
-   progress indicator — a star row (⭐ per correct answer of the best attempt, ☆ otherwise) plus,
-   after a completed attempt, a pill: "Devam et 💪" (tried, no badge), "Rozet 🏅" (passed) or
-   "Süper 🌟" (perfect).
+3. Loaded: lesson cards arrive **10 at a time as the child scrolls** (infinite loading). While
+   the next page loads, a small spinner + "Daha fazla ders geliyor…" sits under the list; at the
+   true end of the catalog nothing extra is shown. Each card shows a rounded thumbnail,
+   "Ders N: {author}" (N continues across pages: 1–10, 11–20, …), and a progress indicator — a
+   star row (⭐ per correct answer of the best attempt, ☆ otherwise) plus, after a completed
+   attempt, a pill: "Devam et 💪" (tried, no badge), "Rozet 🏅" (passed) or "Süper 🌟" (perfect).
 4. Pressing a card bounces it, ticks a light haptic, and opens the Exercise screen for that
    lesson (a double-tap can never open it twice).
-5. Pull down to refresh the list (green spinner).
-6. Offline: a bordered banner "İnternet yok — kayıtlı dersler açık 📚" appears above the list.
-   Offline **without** any cached list: full-screen mascot message with "Tekrar dene". Other
-   errors: "Bir şeyler ters gitti" + retry. Empty payload: "Henüz ders yok" + retry.
+5. Pull down to refresh (green spinner): the already-loaded pages refetch in place; scroll
+   position is kept.
+6. Offline: a bordered banner "İnternet yok — kayıtlı dersler açık 📚" appears above the list;
+   the cached pages stay scrollable and **no bottom spinner appears** (loading resumes on the
+   next scroll once back online). Offline **without** any cached list: full-screen mascot
+   message with "Tekrar dene". Other errors: "Bir şeyler ters gitti" + retry. Empty payload:
+   "Henüz ders yok" + retry.
 
 ## b) How it works in code
 
-- `src/api/lessons.ts` — `fetchLessons` GETs `https://picsum.photos/v2/list?page=1&limit=20`
-  (composed from `PICSUM_BASE_URL`/`LESSONS_PAGE`/`LESSONS_PAGE_SIZE` in `src/constants/api.ts`)
-  with a 10 s `AbortController` timeout (`REQUEST_TIMEOUT_MS`, `src/constants/timing.ts`), then
-  `mapLessons` narrows the unknown payload into `Lesson[]` (skip bad items, dedupe ids,
-  contiguous "Ders N" numbering — the title itself composes at render time from
-  `lessonNumber` + `author`, so cached data is language-neutral). Thumbnails use
-  `https://picsum.photos/id/{id}/200/200` (`LESSON_THUMBNAIL_SIZE`).
-- `src/hooks/useLessons.ts` — `useQuery({ queryKey: ['lessons'] })`. Defaults set in
-  `app/_layout.tsx`: `staleTime` 5 min, `gcTime` 24 h, `retry` 2.
+- `src/api/lessons.ts` — `fetchLessonsPage(page)` GETs
+  `https://picsum.photos/v2/list?page=N&limit=10` (composed from
+  `PICSUM_BASE_URL`/`LESSONS_PAGE_SIZE` in `src/constants/api.ts`) with a 10 s `AbortController`
+  timeout (`REQUEST_TIMEOUT_MS`, `src/constants/timing.ts`) and returns
+  `{ lessons, page, isLastPage }` — `isLastPage` is judged on the **raw** array length so a page
+  with skipped invalid items doesn't end pagination early. `mapLessons(data, page)` narrows the
+  unknown payload into `Lesson[]` (skip bad items, dedupe ids within the page, numbering
+  anchored to the page slot: `(page−1)×10 + index + 1` — the title itself composes at render
+  time from `lessonNumber` + `author`, so cached data is language-neutral). The module also
+  exports the pure pagination helpers: `nextLessonsPageParam` / `previousLessonsPageParam`,
+  `flattenLessonPages` (cross-page dedupe, first occurrence wins) and `canLoadMoreLessons` (the
+  onEndReached gate). Thumbnails use `https://picsum.photos/id/{id}/200/200`
+  (`LESSON_THUMBNAIL_SIZE`).
+- `src/hooks/useLessons.ts` — `useInfiniteQuery({ queryKey: ['lessons'] })` with
+  `initialPageParam: LESSONS_FIRST_PAGE`, `getNextPageParam`/`getPreviousPageParam`,
+  `maxPages: LESSONS_MAX_PAGES` (5) and `select: flattenLessonPages`, so screens receive a flat
+  deduped `Lesson[]`. Defaults set in `app/_layout.tsx`: `staleTime` 5 min, `gcTime` 24 h,
+  `retry` 2 (ADR 0041).
+- `app/index.tsx` list wiring — `onEndReached` (threshold 0.5) calls
+  `fetchNextPage({ cancelRefetch: false })` behind `canLoadMoreLessons` (not in flight, not at
+  the end, not offline); `onStartReached` refills pages the `maxPages` window dropped when
+  scrolling back up; `ListFooterComponent` renders the spinner row only while
+  `isFetchingNextPage`; the `RefreshControl` spinner is gated `isRefetching &&
+!isFetchingNextPage` because page appends also flip `isRefetching`.
 - `app/_layout.tsx` — `PersistQueryClientProvider` + `createAsyncStoragePersister` persist the
-  query cache to AsyncStorage (24 h `maxAge`, `buster: 'lessons-v2'`), so a cold start offline
-  rehydrates the last good list; `onlineManager` is fed by NetInfo so reconnect triggers refetch
-  (ADR 0008).
+  query cache to AsyncStorage (24 h `maxAge`, `buster: 'lessons-v3'` — bumped for the infinite
+  `{pages, pageParams}` shape), so a cold start offline rehydrates the last-loaded pages (up to
+  5); `onlineManager` is fed by NetInfo so reconnect triggers refetch (ADR 0008).
 - `src/hooks/useNetworkStatus.ts` — NetInfo subscription; offline only on definite negatives
   (`isConnected === false` or `isInternetReachable === false`), so the unknown initial state
   never flashes the banner.
@@ -57,9 +77,20 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 ## c) Edge cases handled
 
 - Malformed API payload or items → skipped/empty, never a crash; empty state with retry.
-- Duplicate ids from the API → deduplicated (stable FlatList keys).
+- Duplicate ids from the API → deduplicated within a page **and across page boundaries** (first
+  occurrence wins), so FlatList keys stay unique.
+- A full raw page whose items partly fail validation → still pages on (end-of-list is judged on
+  the raw length, not the mapped length); an empty or non-array payload ends the list instead
+  of looping.
+- FlatList's known repeated `onEndReached` firing → pure gate + `cancelRefetch: false` make
+  duplicates no-ops; VirtualizedList itself also fires once per content length.
+- Offline while scrolling → no `fetchNextPage`, no stranded footer spinner; loading resumes
+  after reconnect on the next scroll.
+- Scrolling past 50 loaded lessons → the `maxPages` window drops the earliest pages;
+  `onStartReached` refills them when the child scrolls back up.
+- A failed page request → that page errors (retry ×2), already-loaded pages stay on screen.
 - Request hangs → aborted at 10 s, standard error/retry path.
-- Offline cold start with cache → list + banner; without cache → offline-specific message.
+- Offline cold start with cache → cached pages + banner; without cache → offline-specific message.
 - Refetch failure while data on screen → cached list stays, no jarring error swap.
 - Shaky/unknown connectivity at startup → no false offline banner (definite-negative rule).
 - Store not yet rehydrated → neutral progress visuals; a11y label matches what is shown.
@@ -68,12 +99,16 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 
 ## d) Manual test steps
 
-1. Fresh start online → skeletons, then 20 cards with images; scroll is smooth.
+1. Fresh start online → skeletons, then 10 cards with images; scrolling near the bottom shows
+   the footer spinner + "Daha fazla ders geliyor…" and appends the next 10 ("Ders 11" continues
+   the numbering). A fast fling to the bottom loads one page, not several.
 2. Tap a card → the lesson's video stage opens; 🏠 (or back) raises the exit sheet and
    "Ana sayfa" returns to Home.
-3. Pull to refresh → green spinner, list settles.
-4. Airplane mode ON (app open) → banner appears; list still scrolls; pull-to-refresh keeps the
-   list; airplane OFF → banner disappears, list silently refetches when stale.
+3. Pull to refresh → green spinner at the top (never during a page append), list settles in
+   place.
+4. Airplane mode ON after loading ~2 pages → banner appears; the loaded cards still scroll and
+   **no footer spinner appears at the bottom**; airplane OFF → next scroll loads more again,
+   stale pages silently refetch.
 5. Force-close app, airplane mode ON, reopen → cached list + banner (persistence proof).
 6. Clear Expo Go's data (or uninstall/reinstall), airplane mode ON, open → full-screen offline
    message with retry; disable airplane mode, tap "Tekrar dene" → list loads.
@@ -81,7 +116,9 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 
 ## e) References
 
-- FlatList: https://reactnative.dev/docs/flatlist
+- FlatList (onEndReached/onStartReached): https://reactnative.dev/docs/flatlist
+- Infinite queries: https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries
+- useInfiniteQuery: https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery
 - expo-image (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/image/
 - React Query + React Native (onlineManager/NetInfo): https://tanstack.com/query/latest/docs/framework/react/react-native
 - persistQueryClient: https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient

@@ -7,10 +7,11 @@
  * lesson picks one deterministically from its id, so the same lesson always
  * asks the same questions — retakes stay comparable.
  */
-import type { TFunction } from 'i18next';
+
 import type tr from '@/locales/tr.json';
 import { colors } from '@/theme';
 import { hashString } from '@/utils/hashString';
+import type { TFunction } from 'i18next';
 
 export type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
 

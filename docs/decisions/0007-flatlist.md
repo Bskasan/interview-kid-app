@@ -32,6 +32,9 @@ the list so `getItemLayout` offsets stay exact.
   in the Phase 4 accessibility pass.
 - At production scale (paginated content, images of varying aspect), FlashList + `estimatedItemSize`
   would be the switch, and the list would gain `onEndReached` pagination.
+- 2026-08-20: the paging prediction landed — 0041 added `onEndReached` infinite loading while
+  keeping FlatList + `getItemLayout` (FlashList was re-evaluated there and rejected again:
+  `maxPages` caps the in-memory list, so recycling never pays for the dependency).
 
 ## References
 

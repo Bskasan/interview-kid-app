@@ -45,6 +45,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0038 — File header summaries + comment policy](decisions/0038-file-header-summaries.md) — every app/src file opens with a 2–4 line what/role summary (the one sanctioned "what" comment); all other comments stay why-only; config/JSON exempt.
 - [0039 — Visual language switch](decisions/0039-visual-language-switch.md) — flag tiles with endonyms (flags-vs-languages trade-off accepted, supersedes 0031's toggle design), root-sibling overlay with timer-driven swap under full opacity, eslint-plugin-i18next adopted at defaults.
 - [0040 — Cross-platform dev + iOS gate](decisions/0040-cross-platform-ios-gate.md) — `expo export --platform all` in every gate proves the iOS bundle builds without a Mac; EAS/macOS runners rejected; explicit casing enforcement; what stays hardware-untested.
+- [0041 — Infinite lesson paging](decisions/0041-infinite-lesson-paging.md) — useInfiniteQuery over picsum pages (size 10): raw-length end detection, page-anchored "Ders N" numbering, cross-page dedupe, maxPages 5 + backward refill, offline gate, cancelRefetch:false multi-fire guard, buster lessons-v3.
 
 ## Features
 

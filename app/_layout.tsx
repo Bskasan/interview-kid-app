@@ -93,9 +93,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PersistQueryClientProvider
         client={queryClient}
-        // v2: Lesson dropped the baked title for lessonNumber/author (i18n) —
-        // the buster invalidates persisted v1 entries with the old shape.
-        persistOptions={{ persister, maxAge: DAY_MS, buster: 'lessons-v2' }}
+        // v3: the lessons query became infinite (data is now {pages, pageParams})
+        // — the buster invalidates persisted flat-array entries from v2.
+        persistOptions={{ persister, maxAge: DAY_MS, buster: 'lessons-v3' }}
       >
         <StatusBar style="dark" />
         <Stack

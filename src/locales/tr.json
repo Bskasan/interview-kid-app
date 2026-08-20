@@ -18,6 +18,7 @@
     "emptyTitle": "Henüz ders yok",
     "offlineBanner": "İnternet yok — kayıtlı dersler açık 📚",
     "offlineNoCache": "İnternete bağlanınca dersler gelecek",
+    "loadingMore": "Daha fazla ders geliyor…",
     "lessonTitle": "Ders {{number}}: {{author}}",
     "lessonCardA11y": "{{title}}. {{status}}",
     "keepGoing": "Devam et 💪",

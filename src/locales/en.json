@@ -18,6 +18,7 @@
     "emptyTitle": "No lessons yet",
     "offlineBanner": "No internet — saved lessons ready 📚",
     "offlineNoCache": "Lessons will load when you're online",
+    "loadingMore": "More lessons coming…",
     "lessonTitle": "Lesson {{number}}: {{author}}",
     "lessonCardA11y": "{{title}}. {{status}}",
     "keepGoing": "Keep going 💪",
