@@ -1,8 +1,3 @@
-import type { TFunction } from 'i18next';
-import type tr from '@/locales/tr.json';
-import { colors } from '@/theme';
-import { hashString } from '@/utils/hashString';
-
 /**
  * Local mock quiz content (the brief allows local data for the exercise).
  * Ages 5–8, pre-readers first: every option is a big visual (emoji, drawn shape
@@ -12,6 +7,11 @@ import { hashString } from '@/utils/hashString';
  * lesson picks one deterministically from its id, so the same lesson always
  * asks the same questions — retakes stay comparable.
  */
+import type { TFunction } from 'i18next';
+import type tr from '@/locales/tr.json';
+import { colors } from '@/theme';
+import { hashString } from '@/utils/hashString';
+
 export type ShapeName = 'circle' | 'square' | 'triangle' | 'star';
 
 type QuestionsResource = (typeof tr)['questions'];

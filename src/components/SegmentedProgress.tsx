@@ -1,3 +1,8 @@
+/**
+ * Quiz progress header: one colored segment per question (done = green,
+ * current = blue, ahead = beige) plus a "Soru 2/3" label, exposed to screen
+ * readers as a single label.
+ */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -8,7 +13,6 @@ type Props = {
   total: number;
 };
 
-/** "Soru 2/3" + one segment per question: done = green, current = blue, ahead = beige. */
 export function SegmentedProgress({ current, total }: Props) {
   const { t } = useTranslation('exercise');
   const label = t('question', { current, total });

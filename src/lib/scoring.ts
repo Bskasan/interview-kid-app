@@ -1,3 +1,8 @@
+/**
+ * Pure pass/badge rules for a finished attempt, plus the best-result merge
+ * policy for retakes. Input-clamped so garbage route params can't corrupt
+ * progress; unit-tested exhaustively.
+ */
 import { clamp } from '@/utils/clamp';
 import type { Badge, LessonResult } from '@/types/progress';
 

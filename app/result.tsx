@@ -1,3 +1,8 @@
+/**
+ * Result screen: pass/fail celebration with the animated badge reveal and
+ * retry/home actions. Records the attempt into the progress store exactly
+ * once; retakes keep the best result.
+ */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';

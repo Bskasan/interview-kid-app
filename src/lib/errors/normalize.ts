@@ -1,10 +1,10 @@
-import { createAppError, isAppError, type AppError, type AppErrorCode } from './types';
-
 /**
  * Turns any thrown value into an AppError. An explicit code from the call site
  * wins (it knows what it was doing); otherwise a couple of well-known runtime
  * shapes are recognized, and everything else lands on the fallback.
  */
+import { createAppError, isAppError, type AppError, type AppErrorCode } from './types';
+
 export function normalizeError(cause: unknown, code?: AppErrorCode): AppError {
   if (isAppError(cause)) {
     return cause;

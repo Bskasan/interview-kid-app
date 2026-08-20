@@ -9,7 +9,7 @@ export const colors = {
   surface: '#FFFFFF', // cards, bubbles
   ink: '#3A3A3A', // primary text — soft, not pure black
   muted: '#6E6E6E', // secondary text — dark enough for 4.5:1 on cream AND white
-  primary: '#3DC35B', // green — CTA / success
+  primary: '#3DC35B', // CTA / success
   primaryDark: '#2E9E47', // chunky button bottom edge
   sky: '#2FB5F0', // secondary accent
   skyDark: '#1E8FC4', // sky button bottom edge (derived, same role as primaryDark)

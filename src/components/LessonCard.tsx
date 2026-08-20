@@ -1,3 +1,8 @@
+/**
+ * One Home-list lesson row: thumbnail, render-time translated title, a star
+ * row for the best score and a status pill derived from the persisted
+ * progress store. Exports its fixed dimensions for FlatList's getItemLayout.
+ */
 import { Image } from 'expo-image';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';

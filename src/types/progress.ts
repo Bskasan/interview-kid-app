@@ -1,3 +1,7 @@
+/**
+ * Progress vocabulary shared by scoring, the progress store and the Home
+ * cards: badge levels and the stored best-attempt shape.
+ */
 export type Badge = 'none' | 'earned' | 'perfect';
 
 /** Best completed attempt for one lesson. Only completed attempts are recorded. */

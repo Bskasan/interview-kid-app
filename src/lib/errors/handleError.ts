@@ -1,3 +1,8 @@
+/**
+ * The single funnel for every runtime failure: normalize → log (always) →
+ * global banner (unless the call site is silent because it renders its own
+ * failure UI). Everything that can fail calls this.
+ */
 import { logger } from '@/lib/logger';
 import { useErrorStore } from '@/store/errorStore';
 import { normalizeError } from './normalize';
@@ -18,11 +23,7 @@ export type HandleErrorOptions = {
   retry?: () => void;
 };
 
-/**
- * The single funnel for every runtime failure: normalize → log (always) →
- * banner (unless silent). Returns the normalized error for callers that keep
- * their own failure UI.
- */
+/** Returns the normalized error for callers that keep their own failure UI. */
 export function handleError(cause: unknown, options: HandleErrorOptions): AppError {
   const normalized = normalizeError(cause, options.code);
   const appError: AppError = options.retry ? { ...normalized, retry: options.retry } : normalized;

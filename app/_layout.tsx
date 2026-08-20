@@ -1,3 +1,8 @@
+/**
+ * Root layout: global providers (safe area, React Query persisted to
+ * AsyncStorage, i18n side-effect init), the navigation Stack, the error-banner
+ * overlay, and the kid-friendly root error boundary.
+ */
 // Side-effect import: initializes i18next synchronously before any screen
 // (or the module-scope wiring below) can render user-facing text.
 import '@/i18n';
@@ -47,7 +52,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// reportingStorage: AsyncStorage with STORAGE failures routed to handleError.
 const persister = createAsyncStoragePersister({ storage: reportingStorage });
 
 /**

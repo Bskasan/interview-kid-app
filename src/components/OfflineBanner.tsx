@@ -1,3 +1,7 @@
+/**
+ * Slim "you're offline" banner shown above the Home list while the device has
+ * no connection; announced politely to screen readers.
+ */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';

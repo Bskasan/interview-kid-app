@@ -42,6 +42,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0035 — Video failure: the child decides](decisions/0035-video-failure-child-decides.md) — explicit loading/ready/ended/error machine, 12 s watchdog + offline-on-entry, retry-by-remount, continue-without-video (supersedes 0012's unlock-on-error).
 - [0036 — Shared utils layout](decisions/0036-shared-utils-layout.md) — React-free helpers in src/utils (clamp, hashString, routeParams), useNavigationLock hook, haptics wrapper; no barrel exports; what was deliberately not extracted.
 - [0037 — Categorized constants](decisions/0037-constants-extraction.md) — src/constants (timing/layout/api/media/quiz), no barrel; constants = cross-cutting config vs theme = visual tokens; pass ratio and derived values deliberately stay beside their logic.
+- [0038 — File header summaries + comment policy](decisions/0038-file-header-summaries.md) — every app/src file opens with a 2–4 line what/role summary (the one sanctioned "what" comment); all other comments stay why-only; config/JSON exempt.
 
 ## Features
 

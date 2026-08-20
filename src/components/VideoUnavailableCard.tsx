@@ -1,3 +1,8 @@
+/**
+ * Replaces the video area when the video can't play (error, load timeout, or
+ * offline on entry): the child decides — retry, or continue to the quiz
+ * without the video — instead of the flow silently skipping ahead.
+ */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ChunkyButton } from '@/components/ChunkyButton';
@@ -11,12 +16,6 @@ type Props = {
   onContinue: () => void;
 };
 
-/**
- * Replaces the video area when the video can't play (error, load timeout, or
- * offline on entry). The child decides what happens next — retry or continue
- * without the video — instead of the flow silently skipping ahead. The copy
- * says the questions are about this video, so the choice is informed.
- */
 export function VideoUnavailableCard({ onRetry, onContinue }: Props) {
   const { t } = useTranslation(['exercise', 'common']);
 

@@ -1,3 +1,8 @@
+/**
+ * Exercise screen: a lesson's video stage (explicit loading/ready/ended/error
+ * machine) followed by a timed multiple-choice quiz on visual answer tiles.
+ * Every exit path routes through one confirm sheet; finishing replaces to Result.
+ */
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
@@ -88,7 +93,6 @@ export default function ExerciseScreen() {
     onExpire: handleExpire,
   });
 
-  // Every question starts with a full timer.
   useEffect(() => {
     reset();
   }, [quiz.index, reset]);

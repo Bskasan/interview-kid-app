@@ -1,9 +1,9 @@
-import type { TextStyle } from 'react-native';
-
 /**
  * Type scale (system font). Early readers: body never below 18, titles 28–34,
  * bold weights for anything tappable or shouting-with-joy.
  */
+import type { TextStyle } from 'react-native';
+
 export const typography = {
   title: { fontSize: 32, fontWeight: '800', lineHeight: 38 },
   subtitle: { fontSize: 24, fontWeight: '700', lineHeight: 30 },

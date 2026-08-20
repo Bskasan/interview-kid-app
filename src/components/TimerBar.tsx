@@ -1,3 +1,7 @@
+/**
+ * Per-question countdown display: a shrinking bar that shifts green → sun →
+ * coral as time runs low, with the remaining seconds shown beside it.
+ */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
@@ -9,7 +13,6 @@ type Props = {
   remainingSeconds: number;
 };
 
-/** Shrinking time bar + seconds. Color shifts to sun then coral as time runs low. */
 export function TimerBar({ progress, remainingSeconds }: Props) {
   const { t } = useTranslation('exercise');
   const urgent = remainingSeconds <= 5;

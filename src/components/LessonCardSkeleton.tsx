@@ -1,3 +1,7 @@
+/**
+ * Placeholder card shown while the lesson list loads: matches LessonCard's
+ * fixed dimensions and pulses gently unless reduced motion is on.
+ */
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
@@ -10,7 +14,6 @@ import Animated, {
 import { colors, radius, spacing } from '@/theme';
 import { LESSON_CARD_HEIGHT, LESSON_CARD_THUMB_SIZE } from './LessonCard';
 
-/** Placeholder card shown while the lesson list loads. Pulses unless reduced motion. */
 export function LessonCardSkeleton() {
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(1);

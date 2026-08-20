@@ -1,3 +1,8 @@
+/**
+ * Question countdown hook: timestamp-based remaining time with pause/resume on
+ * answer feedback and app backgrounding, single-fire expiry, and a reset for
+ * the next question.
+ */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { COUNTDOWN_TICK_MS } from '@/constants/timing';
 import { useAppActive } from '@/hooks/useAppActive';

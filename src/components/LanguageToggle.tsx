@@ -1,3 +1,9 @@
+/**
+ * Two-segment language pill for the Home header. Each language is shown in its
+ * own name so a child (or parent) who can't read the current language still
+ * finds their own. Selection is never color-alone: the active segment is
+ * filled and bold, and the radio a11y state carries it for screen readers.
+ */
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { TOUCH_TARGET } from '@/constants/layout';
@@ -5,12 +11,6 @@ import { SUPPORTED_LANGUAGES, isAppLanguage } from '@/i18n';
 import { useSettingsStore } from '@/store/settingsStore';
 import { colors, radius, typography } from '@/theme';
 
-/**
- * Two-segment language pill for the Home header. Each language is shown in its
- * own name so a child (or parent) who can't read the current language still
- * finds their own. Selection is never color-alone: the active segment is filled
- * and bold, and the radio a11y state carries it for screen readers.
- */
 export function LanguageToggle() {
   const { t, i18n } = useTranslation();
   const setLanguage = useSettingsStore((state) => state.setLanguage);

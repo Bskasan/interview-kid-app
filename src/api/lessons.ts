@@ -1,3 +1,8 @@
+/**
+ * The Home list's data layer: fetches the picsum listing (with an abort
+ * timeout), defensively maps unknown JSON to language-neutral Lessons, and
+ * derives thumbnail URLs from lesson ids.
+ */
 import {
   LESSON_THUMBNAIL_SIZE,
   LESSONS_PAGE,

@@ -1,3 +1,9 @@
+/**
+ * Bottom sheet confirming exit-to-home for the exercise flow — one surface for
+ * the 🏠 button, the hardware back button and the back gesture. Staying is the
+ * safe default: the primary tile, the backdrop tap and the system back all
+ * continue the lesson; only the explicit second tile discards the attempt.
+ */
 import { Image } from 'expo-image';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,13 +32,6 @@ type Props = {
   onLeave: () => void;
 };
 
-/**
- * Bottom sheet confirming exit-to-home for the exercise flow — one component
- * for the 🏠 button, the hardware back button and the back gesture. Staying is
- * the safe default: the primary tile, the backdrop tap and the system back
- * (Modal onRequestClose) all continue the lesson; only the explicit second
- * tile leaves and discards the attempt.
- */
 export function ExitConfirmSheet({ visible, thumbnailUrl, onStay, onLeave }: Props) {
   const { t } = useTranslation('exercise');
 

@@ -1,3 +1,8 @@
+/**
+ * The app's friendly guide: a fox emoji in a bordered circle with an optional
+ * speech bubble, shown on every screen. Screen readers get one image whose
+ * label is the speech line.
+ */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, radius, spacing, typography } from '@/theme';
