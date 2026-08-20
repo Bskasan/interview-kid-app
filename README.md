@@ -4,7 +4,7 @@ A small gamified learning flow for children (~5–8) built with React Native + E
 Expo Router, TypeScript strict). Three connected screens: **Home** (lesson list from a public
 API with progress badges) → **Exercise** (short video, then a timed 3-question quiz on big
 visual answer tiles) → **Result** (pass/fail celebration with an animated badge). Fully
-bilingual (Türkçe/English) with an in-app toggle. Server data goes through TanStack Query
+bilingual (Türkçe/English) with an in-app language switch. Server data goes through TanStack Query
 persisted to AsyncStorage; progress and settings live in persisted zustand stores; animations
 are Reanimated; runtime failures funnel through one central, kid-friendly error path.
 
@@ -58,13 +58,17 @@ the moment the plan allows — until then the pre-push hook is the enforced gate
 ## Languages
 
 Turkish and English. First launch follows the device language (anything else falls back to
-Turkish); the pill toggle in the Home header switches the whole app instantly — including
-question content and screen-reader labels — and the explicit choice is persisted across
-restarts. All copy lives in `src/locales/tr.json` / `en.json`; translation keys are
-compile-checked (an unknown key fails `tsc`) and a test suite enforces that both files have
-identical keys, no empty values and matching placeholders. Question data is language-neutral
-(visuals and correct answers shared, text per language). The one plural-sensitive string
-uses `Intl.PluralRules`, polyfilled at runtime on engines without it (Hermes).
+Turkish). The Home header shows two flag tiles, each language written in its own name
+(🇹🇷 Türkçe / 🇬🇧 English) so a pre-reader can find theirs; tapping the other tile plays a
+short (~0.85 s) full-screen transition — the mascot bounces while the whole app, question
+content and screen-reader labels included, switches underneath — and the choice is
+persisted across restarts. Reduced motion swaps instantly with no overlay. All copy lives
+in `src/locales/tr.json` / `en.json`; translation keys are compile-checked (an unknown key
+fails `tsc`), an ESLint rule (`i18next/no-literal-string`) blocks hardcoded UI text, and a
+test suite enforces that both files have identical keys, no empty values and matching
+placeholders. Question data is language-neutral (visuals and correct answers shared, text
+per language). The one plural-sensitive string uses `Intl.PluralRules`, polyfilled at
+runtime on engines without it (Hermes).
 
 ## Architecture overview
 
@@ -85,14 +89,16 @@ src/
   api/               # picsum fetcher + defensive mapper → Lesson[]
   components/        # AnswerGrid/AnswerTile, ChunkyButton, Mascot, LessonCard, ExerciseVideo,
                      # ExitConfirmSheet, VideoUnavailableCard, GlobalErrorBanner, LanguageSwitch,
-                     # TimerBar, SegmentedProgress, BadgeReveal…
-  data/              # question bank (5 visual sets; text via i18n), sample video url
+                     # LanguageTransitionOverlay, TimerBar, SegmentedProgress, BadgeReveal…
+  constants/         # cross-cutting config: timing, touch targets, api values, media url, quiz shape
+  data/              # question bank (5 visual sets; text via i18n)
   hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive,
                      # usePressFeedback, useNavigationLock
   i18n/              # i18next singleton (synchronous init, typed keys)
   lib/               # scoring, quiz state machine, error funnel + logger, haptics, storage
   locales/           # tr.json / en.json resources (namespaced per screen)
-  store/             # zustand stores: progress + settings (persisted), error banner (in-memory)
+  store/             # zustand stores: progress + settings (persisted), error banner +
+                     # language transition (in-memory)
   theme/             # design tokens: colors, spacing, radius, typography, motion
   utils/             # React-free helpers: clamp, hashString, routeParams
 __tests__/           # mirrors src/ and app/
@@ -132,13 +138,28 @@ Where the brief was open, I decided and implemented as follows:
    spirit, with no third-party assets, names or brand colors; one primary action per screen,
    ≥56dp touch targets, text ≥18sp always paired with an icon, contrast ≥4.5:1, reduced
    motion respected everywhere.
+9. **The language switch is visual and deliberate.** Flag tiles with each language's own
+   name (recognizable to a pre-reader), and changing language plays a short mascot
+   transition instead of an instant reskin — the child sees a moment happen, and the swap
+   lands while the screen is covered so no half-translated frame ever shows. Reduced motion
+   skips the ceremony entirely.
 
 ## Not production-ready / trade-offs
 
 - **picsum.photos as "lessons"** and one sample video for all lessons; quiz content is a
   local mock bank (5 sets shared by 20 lessons).
 - **No backend, no auth, no analytics** — progress lives only on-device (AsyncStorage).
-- **iOS untested** (Windows development machine).
+- **iOS is device-untested.** Every gate builds the iOS bundle (so it compiles) and the
+  code uses only cross-platform Expo SDK modules, but I develop on Windows and had no
+  Apple hardware: real-device rendering, haptics, video playback and VoiceOver on iOS are
+  unverified.
+- **Flags stand for languages** on the switch — semantically imprecise (flags denote
+  countries; 🇬🇧 for English is an arbitrary pick among anglophone flags). Accepted for a
+  two-language kids' app because a pre-reader recognizes a flag faster than a word; each
+  tile also carries the language's own name.
+- **Changing language takes ~0.85 s by design** — the transition is deliberate ceremony,
+  not lag; reduced-motion users get an instant swap. The delay is a knob
+  (`LANGUAGE_TRANSITION` constants) if it ever feels wrong on slower devices.
 - **Branch protection is deferred** — private repo on GitHub Free, where rulesets can't be
   enforced server-side; the committed ruleset applies later, the pre-push gate enforces now.
 - **No crash reporter wired** — every failure already funnels through one logger with an
@@ -148,7 +169,7 @@ Where the brief was open, I decided and implemented as follows:
   in one tap); a real product would move it behind the parental gate.
 - **JS timers** — the countdown is timestamp-based (drift-resistant) but display granularity
   is ~100 ms; fine for a kids quiz, not precision-critical use.
-- **No E2E tests** — 100 unit/component tests cover logic and screen decision points; full
+- **No E2E tests** — 108 unit/component tests cover logic and screen decision points; full
   flows were verified manually on device.
 - **No parental gate** — a real kids product needs one (app-store family policies); out of
   scope here by design.
@@ -173,4 +194,5 @@ In priority order:
    funnel's production hook point is where the reporter plugs in.
 6. **Performance pass** — FlashList for longer lists, image prefetch for the quiz's photo
    question.
-7. **iOS verification** and a parental gate.
+7. **iOS device verification** (the bundle already builds in every gate) and a parental
+   gate.
