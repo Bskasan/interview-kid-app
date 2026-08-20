@@ -203,3 +203,93 @@ describe('Exercise screen — back guard lifecycle', () => {
     expect(screen.getAllByText(t('question', { current: 2, total: 3 })).length).toBeGreaterThan(0);
   });
 });
+
+describe('Exercise screen — per-question countdown', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    mockVideoProps = undefined;
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  const timeLeft = (count: number) => t('timeLeft', { count });
+  const answerFirstCorrectly = async () => {
+    const first = getQuestionSet(LESSON_ID)[0]!;
+    await fireEvent.press(
+      screen.getByLabelText(optionA11yLabel(first.options[first.correctIndex], tq)),
+    );
+  };
+
+  it('starts the next question with the full time after an in-time answer', async () => {
+    await render(<ExerciseScreen />);
+    await startQuiz();
+
+    await act(() => {
+      jest.advanceTimersByTime(7000);
+    });
+    expect(screen.getByLabelText(timeLeft(8))).toBeTruthy();
+
+    await answerFirstCorrectly();
+    await act(() => {
+      jest.advanceTimersByTime(FEEDBACK_MS);
+    });
+    expect(screen.getAllByText(t('question', { current: 2, total: 3 })).length).toBeGreaterThan(0);
+
+    // Load-bearing extra second: right after the advance even a broken reset
+    // shows 15 for one frame — the carry-over only surfaces on the next tick.
+    await act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(screen.getByLabelText(timeLeft(14))).toBeTruthy();
+  });
+
+  it('starts the next question with the full time after a timeout', async () => {
+    await render(<ExerciseScreen />);
+    await startQuiz();
+
+    await act(() => {
+      jest.advanceTimersByTime(15_000);
+    });
+    expect(screen.getByText(t('timeUp'), { exact: false })).toBeTruthy();
+
+    await act(() => {
+      jest.advanceTimersByTime(FEEDBACK_MS);
+    });
+    await act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    // Still question 2 (one timeout advanced exactly one question), fresh clock.
+    expect(screen.getAllByText(t('question', { current: 2, total: 3 })).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(timeLeft(14))).toBeTruthy();
+  });
+
+  it('keeps the remaining time across an exit-sheet pause — pause is not reset', async () => {
+    await render(<ExerciseScreen />);
+    await startQuiz();
+
+    await act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+    expect(screen.getByLabelText(timeLeft(10))).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText(t('exitButton')));
+    await act(() => {
+      jest.advanceTimersByTime(60_000);
+    });
+    // Frozen underneath the sheet: same question, same clock, no timeout.
+    expect(screen.getAllByText(t('question', { current: 1, total: 3 })).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(timeLeft(10))).toBeTruthy();
+    expect(screen.queryByText(t('timeUp'), { exact: false })).toBeNull();
+
+    await fireEvent.press(screen.getByLabelText(t('exitStay')));
+    await act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(screen.getByLabelText(timeLeft(9))).toBeTruthy();
+  });
+});

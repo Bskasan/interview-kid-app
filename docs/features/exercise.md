@@ -89,8 +89,10 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 - **Timer** — `src/hooks/useCountdown.ts` (ADR 0013): timestamp-deadline based, ticks every
   100 ms for display only; active only while `running` (no locked answer, quiz stage) **and**
   the app is foregrounded (`useAppActive` on AppState); pausing snapshots remaining time.
-  `onExpire` → `timeoutQuestion`, once per question (`reset()` on index change re-arms).
-  `TimerBar` renders progress + seconds; `SegmentedProgress` renders "Soru n/3".
+  One hook instance covers exactly one question: the screen renders a `QuestionTimer`
+  (hook + `TimerBar`) keyed by the question index, so advancing remounts it with a fresh
+  15 s — there is no imperative reset to race the armed interval (ADR 0052). `onExpire` →
+  `timeoutQuestion`, once per instance. `SegmentedProgress` renders "Soru n/3".
 - **Exit flow** — `usePreventRemove` from `expo-router/react-navigation` (Expo Router vendors
   React Navigation since SDK 56; standalone `@react-navigation/*` imports fail the bundle),
   armed on both stages while `!finished && !leaving` (ADR 0034, superseding 0014's quiz-only
@@ -154,14 +156,17 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 2. Let the video end → CTA turns green; tap → quiz starts, timer counts from 15.
 3. Check the quiz layout: 2×2 tiles, no scrolling, progress/timer/prompt/mascot all visible.
 4. Answer correctly → light green wash + green border + ✓ badge + haptic + cheering mascot,
-   auto-advance ~1.4 s; the tapped visual stays fully visible on its white chip.
+   auto-advance ~1.4 s; the tapped visual stays fully visible on its white chip. The next
+   question's timer starts back at a green 15 — answer at ~8 s left and verify it does not
+   continue from 8.
 5. Answer wrong → light coral wash + coral border + ✗ badge + gentle shake + green wash ✓ on
    the right tile.
    5b. Tint worst cases: in the colors set answer "Yeşil olan hangisi?" correctly → the green
    star must stay clearly visible (white chip) inside the green-washed tile; in the shapes
    set tap the coral triangle when it's wrong → the triangle must not blend into the coral
    wash/border; a counting question's digits stay ink-on-white in every state.
-6. Let the timer expire → "Süre doldu ⏰", correct answer revealed, counts as wrong.
+6. Let the timer expire → "Süre doldu ⏰", correct answer revealed, counts as wrong; the next
+   question again starts at 15.
 7. During a question, background the app 10 s → return: timer resumed where it stopped.
 8. Tap 🏠 (or press Android back) on either stage → the sheet slides up with the lesson
    thumbnail; the timer/video freeze. "Devam et" (or tapping outside, or back again)
@@ -189,6 +194,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 ## e) References
 
 - expo-video (SDK 57): https://docs.expo.dev/versions/v57.0.0/sdk/video/
+- Preserving and resetting state (keyed remount): https://react.dev/learn/preserving-and-resetting-state
 - `useEventListener` (expo package): https://docs.expo.dev/versions/v57.0.0/sdk/expo/
 - AppState: https://reactnative.dev/docs/appstate
 - usePreventRemove: https://reactnavigation.org/docs/use-prevent-remove/

@@ -57,6 +57,18 @@ type VideoState = 'loading' | 'ready' | 'ended' | 'error';
 type PreventRemoveEvent = Parameters<Parameters<typeof usePreventRemove>[1]>[0];
 type PendingAction = PreventRemoveEvent['data']['action'];
 
+// Remounted per question (key = quiz.index at the call site): one countdown
+// instance covers exactly one question, so a fresh 15 s can never race an
+// interval armed with the previous question's deadline — the same reset idiom
+// as the playerKey remount of the video stage.
+function QuestionTimer({ running, onExpire }: { running: boolean; onExpire: () => void }) {
+  const { remainingSeconds, progress } = useCountdown(SECONDS_PER_QUESTION, {
+    running,
+    onExpire,
+  });
+  return <TimerBar progress={progress} remainingSeconds={remainingSeconds} />;
+}
+
 export default function ExerciseScreen() {
   const { t } = useTranslation('exercise');
   const { t: tq } = useTranslation('questions');
@@ -89,14 +101,6 @@ export default function ExerciseScreen() {
   const handleExpire = useCallback(() => {
     setQuiz((state) => timeoutQuestion(state));
   }, []);
-  const { remainingSeconds, progress, reset } = useCountdown(SECONDS_PER_QUESTION, {
-    running: timerRunning,
-    onExpire: handleExpire,
-  });
-
-  useEffect(() => {
-    reset();
-  }, [quiz.index, reset]);
 
   // Let the child see the feedback, then move on (also after a timeout) —
   // never behind the open exit sheet, so nothing changes while they decide.
@@ -297,7 +301,7 @@ export default function ExerciseScreen() {
           />
         </View>
       </View>
-      <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
+      <QuestionTimer key={quiz.index} running={timerRunning} onExpire={handleExpire} />
       <View style={styles.promptRow}>
         {/* Capped: numberOfLines is hard, so uncapped scaling would ellipsize
             the very question the child has to answer. */}

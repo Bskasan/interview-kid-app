@@ -56,6 +56,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0049 — Quiz outcome history](decisions/0049-quiz-outcome-history.md) — QuizState records each question's outcome at lock-in time; the segmented bar shows ✓/✗ per segment (timeout renders as wrong but is announced distinctly); pushed-at-lock-in vs at-advance vs screen-side state.
 - [0050 — Speech stub](decisions/0050-speech-stub.md) — SpeakButton ships the read-aloud affordance with honest press feedback while `speak(text, language)` stays a no-op byte-compatible with expo-speech; placement rule, deliberate non-placements, and the no-double-announce label choice.
 - [0051 — Layout invariants for inline controls](decisions/0051-layout-invariants-inline-controls.md) — rows pairing flexible content with a fixed control need a definite width and exactly one shrinkable child (the bug that hid the 🔊 button); font caps on shared rows; 48dp floor; narrow-viewport verification because jest has no layout engine.
+- [0052 — Per-question countdown via keyed remount](decisions/0052-per-question-countdown-remount.md) — the timer carry-over bug: reset() raced the effect-armed interval (timeout path worked by accident); fix scopes one hook instance per question via a keyed QuestionTimer, deleting the imperative reset instead of guarding it.
 
 ## Features
 

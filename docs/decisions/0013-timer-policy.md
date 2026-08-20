@@ -1,6 +1,6 @@
 # 0013 — Countdown timer: timestamp-based with AppState pause
 
-Status: accepted
+Status: accepted (reset-on-advance mechanism superseded by 0052 — keyed remount instead of `reset()`)
 Date: 2026-08-19
 
 ## Context

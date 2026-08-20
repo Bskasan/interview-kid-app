@@ -23,13 +23,6 @@ describe('SegmentedProgress — per-question outcomes', () => {
     mockReduceMotion = false;
   });
 
-  it('shows a ✓ per correct and an ✗ per wrong or timed-out question', async () => {
-    await render(<SegmentedProgress current={3} total={3} outcomes={['correct', 'timeout']} />);
-
-    expect(screen.getAllByText('✓')).toHaveLength(1);
-    expect(screen.getAllByText('✗')).toHaveLength(1);
-  });
-
   it('speaks the counter plus every recorded outcome, timeout announced honestly', async () => {
     await render(<SegmentedProgress current={3} total={3} outcomes={['correct', 'timeout']} />);
 

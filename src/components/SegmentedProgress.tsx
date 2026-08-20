@@ -4,6 +4,8 @@
  * current question, beige for upcoming — plus a "Soru 2/3" label. Meaning is
  * carried by the glyphs and the spoken per-question summary, never color alone.
  */
+import { type QuestionOutcome } from '@/lib/quiz';
+import { colors, radius, spacing, typography } from '@/theme';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
@@ -16,12 +18,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { type QuestionOutcome } from '@/lib/quiz';
-import { colors, radius, spacing, typography } from '@/theme';
-
-// Language-neutral glyphs (AnswerTile badge pattern), not copy — no t() needed.
-const CHECK_GLYPH = '✓';
-const CROSS_GLYPH = '✗';
 
 type Props = {
   /** 1-based index of the question on screen. */
@@ -71,13 +67,7 @@ export function SegmentedProgress({ current, total, outcomes }: Props) {
                   styles.segment,
                   { backgroundColor: isCorrect ? colors.primary : colors.coral },
                 ]}
-              >
-                <View style={styles.glyphDisc}>
-                  <Text style={styles.glyph} maxFontSizeMultiplier={1}>
-                    {isCorrect ? CHECK_GLYPH : CROSS_GLYPH}
-                  </Text>
-                </View>
-              </View>
+              ></View>
             );
           }
           if (index === current - 1) {

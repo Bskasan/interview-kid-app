@@ -67,20 +67,26 @@ describe('useCountdown — per-question countdown timer', () => {
     expect(onExpire).toHaveBeenCalledTimes(1);
   });
 
-  it('reset restores the full duration and re-arms onExpire', async () => {
-    const { result, onExpire } = await setup(2);
+  // One instance = one question: the next question's fresh clock comes from a
+  // keyed remount, so a new instance must be fully independent of an expired one.
+  it('a fresh instance after remount starts full and expires exactly once again', async () => {
+    const onExpire = jest.fn();
+    const first = await renderHook(() => useCountdown(2, { running: true, onExpire }));
     await act(() => {
       jest.advanceTimersByTime(2000);
     });
     expect(onExpire).toHaveBeenCalledTimes(1);
+    await first.unmount();
 
-    await act(() => {
-      result.current.reset();
-    });
-    expect(result.current.remainingSeconds).toBe(2);
-
+    const second = await renderHook(() => useCountdown(2, { running: true, onExpire }));
+    expect(second.result.current.remainingSeconds).toBe(2);
     await act(() => {
       jest.advanceTimersByTime(2000);
+    });
+    expect(onExpire).toHaveBeenCalledTimes(2);
+
+    await act(() => {
+      jest.advanceTimersByTime(1000);
     });
     expect(onExpire).toHaveBeenCalledTimes(2);
   });
