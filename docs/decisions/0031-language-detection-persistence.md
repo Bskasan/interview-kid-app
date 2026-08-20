@@ -1,6 +1,6 @@
 # 0031 — Language detection and persisted override
 
-Status: accepted
+Status: accepted (toggle design superseded by 0039; detection/persistence unchanged)
 Date: 2026-08-19
 
 ## Context
