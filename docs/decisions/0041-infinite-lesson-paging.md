@@ -5,12 +5,13 @@ Date: 2026-08-20
 
 ## Context
 
-The Home list fetched exactly one page (`?page=1&limit=20`) in a single request. FlatList's
-virtualization bounds _rendering_, but nothing bounded network or image loading, and the app
-could never show more than 20 lessons. Round 5 asks the list to scale to hundreds of lessons,
-loading incrementally as the child scrolls, while keeping every existing guarantee: defensive
-parsing (0009), offline cache + banner (0008), locale-neutral cached data (0029) and stable
-"Ders N" numbering.
+The Home list fetched exactly one page (`?page=1&limit=20`) in a single request: the whole
+catalog's network and image loading started up front (FlatList's virtualization bounds
+_rendering_ only). The course itself stays a **fixed 20-lesson catalog** — the brief asks for
+15–20 items, and the round-5 level map builds a finite, sequentially unlocked lesson path on top
+of it — but loading should become incremental: fetch 10 first, fetch the remaining 10 only when
+the child scrolls, while keeping every existing guarantee: defensive parsing (0009), offline
+cache + banner (0008), locale-neutral cached data (0029) and stable "Ders N" numbering.
 
 ## Decision
 
@@ -27,11 +28,10 @@ paging, with a page size of **10** and these rules:
   is possible and accepted — disclosed here rather than renumbering the whole list client-side).
 - **Cross-page dedupe** in a `select`-level flatten (`flattenLessonPages`): picsum can repeat an
   id at page boundaries; the first occurrence wins so FlatList keys stay unique.
-- **`maxPages: 5`** caps memory and the persisted cache at 50 lessons. Justification: AsyncStorage
-  persistence (0008) would otherwise grow unbounded; 50 lessons is far beyond what a child clears
-  in a session. Consequence: loading page 6 drops page 1 from the window. Mitigation:
-  `getPreviousPageParam` (required by React Query when `maxPages` is set) plus FlatList
-  `onStartReached → fetchPreviousPage` refills dropped front pages when scrolling back up.
+- **Hard catalog cap** (`LESSONS_TOTAL_LIMIT = 20` → at most 2 pages): `getNextPageParam` never
+  returns a page past the cap, even though picsum could serve hundreds. The cap — not React
+  Query's `maxPages` windowing — is what bounds memory and AsyncStorage (≤ 20 items), so no
+  window ever drops pages and no backward refill machinery is needed.
 - **Multi-fire guard** for FlatList's known repeated `onEndReached` firing is two independent
   layers: a pure `canLoadMoreLessons({hasNextPage, isFetchingNextPage, isOffline})` gate, and
   `fetchNextPage({ cancelRefetch: false })` so a duplicate call while a page request is in
@@ -57,9 +57,13 @@ paging, with a page size of **10** and these rules:
 - **Manual page state (useState + useQuery per page)** — reimplements what `useInfiniteQuery`
   ships tested: page-param bookkeeping, in-flight dedupe, persisted `InfiniteData`, `maxPages`
   windowing. More code, more edge cases, no benefit.
+- **Unbounded paging over picsum's full catalog** (`maxPages` windowing + `getPreviousPageParam`
+  backward refill) — built first, then removed on the product ruling that the app is a 20-lesson
+  course, not an endless feed: under a 2-page cap the windowing can never trigger, and the
+  page-drop/refill machinery (plus its "list shrinks at the top" edge case) is pure dead weight.
 - **FlashList** — re-evaluated from 0007: recycling would help at hundreds of _rendered_ rows,
-  but rows are fixed-height (`getItemLayout` already skips measurement) and `maxPages` caps the
-  in-memory list at 50 items, so the recycling win never materializes; still not worth a new
+  but rows are fixed-height (`getItemLayout` already skips measurement) and the catalog caps the
+  in-memory list at 20 items, so the recycling win never materializes; still not worth a new
   dependency.
 - **`onEndReached` momentum-flag guard** (ref reset in `onMomentumScrollBegin`) — the classic
   workaround; rejected because it adds mutable UI state for what the query layer already
@@ -68,22 +72,23 @@ paging, with a page size of **10** and these rules:
 
 ## Consequences
 
-- The list now scales to picsum's full catalog; initial load shrinks from 20 to 10 items.
-- Two more query round-trips per 20 lessons compared to the old single fetch — the price of
-  bounded loading.
-- Scrolling past 50 lessons drops the earliest pages from the window; scrolling back refills
-  them via `onStartReached` (a brief skeleton-free gap is possible on very fast upward flings).
-- The persisted cache now restores up to 5 pages; the buster bump discards every pre-round-5
+- Initial load shrinks from 20 to 10 items; the second (and last) page loads only when the
+  child actually scrolls — two requests total instead of one bigger one.
+- Raising the catalog later is a one-constant change (`LESSONS_TOTAL_LIMIT`); the pager, mapper
+  numbering, dedupe and offline behaviour already handle any page count. At a truly unbounded
+  scale, React Query's `maxPages` windowing (+ `getPreviousPageParam` refill) is the documented
+  next step — deliberately not carried as dead code under the cap.
+- The persisted cache now restores both pages; the buster bump discards every pre-round-5
   cache once.
 - The exercise flow is untouched: it reads only the route id (0034), and progress is keyed by
   lesson id, so pagination cannot corrupt recorded results.
 
 ## References
 
-- Infinite queries (maxPages, getNextPageParam, cancelRefetch):
+- Infinite queries (getNextPageParam, cancelRefetch, maxPages):
   https://tanstack.com/query/latest/docs/framework/react/guides/infinite-queries
 - useInfiniteQuery reference:
   https://tanstack.com/query/latest/docs/framework/react/reference/useInfiniteQuery
-- FlatList (onEndReached, onStartReached, getItemLayout): https://reactnative.dev/docs/flatlist
+- FlatList (onEndReached, getItemLayout): https://reactnative.dev/docs/flatlist
 - persistQueryClient (buster): https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient
 - picsum.photos API (paging): https://picsum.photos/

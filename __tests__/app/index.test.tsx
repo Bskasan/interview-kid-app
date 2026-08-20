@@ -36,9 +36,6 @@ const lessonsResult = (overrides: Record<string, unknown> = {}) => ({
   fetchNextPage,
   hasNextPage: true,
   isFetchingNextPage: false,
-  fetchPreviousPage: jest.fn(),
-  hasPreviousPage: false,
-  isFetchingPreviousPage: false,
   ...overrides,
 });
 

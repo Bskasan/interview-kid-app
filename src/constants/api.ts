@@ -12,11 +12,11 @@ export const LESSONS_FIRST_PAGE = 1;
 export const LESSONS_PAGE_SIZE = 10;
 
 /**
- * Pages React Query keeps in memory and in the persisted cache (maxPages).
- * 5 × LESSONS_PAGE_SIZE items bounds AsyncStorage growth while holding more
- * lessons than a child can pass in one sitting; older pages refill on demand.
+ * The course is a fixed catalog, not an endless feed: the brief asks for
+ * 15–20 items and the level map (round 5) assumes a finite lesson sequence.
+ * Paging stops here even though picsum could serve more.
  */
-export const LESSONS_MAX_PAGES = 5;
+export const LESSONS_TOTAL_LIMIT = 20;
 
 /** Square edge (px) requested from picsum for lesson thumbnails. */
 export const LESSON_THUMBNAIL_SIZE = 200;

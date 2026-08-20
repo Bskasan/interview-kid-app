@@ -1,11 +1,16 @@
 /**
  * The lesson list's data layer: fetches picsum pages (with an abort timeout),
  * defensively maps unknown JSON to language-neutral Lessons with globally
- * sequential numbering, and provides the pure pagination helpers (next/prev
- * page params, cross-page flatten + dedupe, load-more guard) for useLessons.
+ * sequential numbering, and provides the pure pagination helpers (capped
+ * next-page param, cross-page flatten + dedupe, load-more guard) for useLessons.
  */
 import type { InfiniteData } from '@tanstack/react-query';
-import { LESSON_THUMBNAIL_SIZE, LESSONS_PAGE_SIZE, PICSUM_BASE_URL } from '@/constants/api';
+import {
+  LESSON_THUMBNAIL_SIZE,
+  LESSONS_PAGE_SIZE,
+  LESSONS_TOTAL_LIMIT,
+  PICSUM_BASE_URL,
+} from '@/constants/api';
 import { REQUEST_TIMEOUT_MS } from '@/constants/timing';
 import type { Lesson } from '@/types/lesson';
 
@@ -76,17 +81,19 @@ export function lessonThumbnailUrl(lessonId: string): string {
   return `${PICSUM_BASE_URL}/id/${lessonId}/${LESSON_THUMBNAIL_SIZE}/${LESSON_THUMBNAIL_SIZE}`;
 }
 
-/** getNextPageParam: keep paging while pages come back full. */
-export function nextLessonsPageParam(lastPage: LessonsPage): number | undefined {
-  return lastPage.isLastPage ? undefined : lastPage.page + 1;
-}
+/** Last page the app will ever request — the catalog is capped, not endless. */
+const LESSONS_LAST_PAGE = Math.ceil(LESSONS_TOTAL_LIMIT / LESSONS_PAGE_SIZE);
 
 /**
- * getPreviousPageParam: required alongside maxPages — lets React Query refill
- * a page it dropped from the front of the window when the child scrolls back.
+ * getNextPageParam: keep paging while pages come back full, but never past the
+ * fixed 20-lesson catalog (the short-page rule stays as a safety net should
+ * picsum ever return less than asked).
  */
-export function previousLessonsPageParam(firstPage: LessonsPage): number | undefined {
-  return firstPage.page > 1 ? firstPage.page - 1 : undefined;
+export function nextLessonsPageParam(lastPage: LessonsPage): number | undefined {
+  if (lastPage.isLastPage || lastPage.page >= LESSONS_LAST_PAGE) {
+    return undefined;
+  }
+  return lastPage.page + 1;
 }
 
 /**

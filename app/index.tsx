@@ -39,9 +39,6 @@ export default function HomeScreen() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    fetchPreviousPage,
-    hasPreviousPage,
-    isFetchingPreviousPage,
   } = useLessons();
   const { isOffline } = useNetworkStatus();
 
@@ -61,13 +58,6 @@ export default function HomeScreen() {
       void fetchNextPage({ cancelRefetch: false });
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, isOffline]);
-
-  // Refill pages maxPages dropped from the front when the child scrolls back up.
-  const handleStartReached = useCallback(() => {
-    if (hasPreviousPage && !isFetchingPreviousPage && !isOffline) {
-      void fetchPreviousPage({ cancelRefetch: false });
-    }
-  }, [fetchPreviousPage, hasPreviousPage, isFetchingPreviousPage, isOffline]);
 
   const renderItem = useCallback(
     ({ item }: { item: Lesson }) => (
@@ -103,7 +93,6 @@ export default function HomeScreen() {
         })}
         onEndReached={handleEndReached}
         onEndReachedThreshold={END_REACHED_THRESHOLD}
-        onStartReached={handleStartReached}
         testID="lesson-list"
         ListFooterComponent={
           isFetchingNextPage ? (
@@ -119,7 +108,7 @@ export default function HomeScreen() {
           <RefreshControl
             // isRefetching is also true while a next page loads; only a real
             // pull-to-refresh should show the top spinner.
-            refreshing={isRefetching && !isFetchingNextPage && !isFetchingPreviousPage}
+            refreshing={isRefetching && !isFetchingNextPage}
             onRefresh={() => refetch()}
             colors={[colors.primary]}
             tintColor={colors.primary}

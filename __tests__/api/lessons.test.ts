@@ -5,10 +5,9 @@ import {
   flattenLessonPages,
   mapLessons,
   nextLessonsPageParam,
-  previousLessonsPageParam,
   type LessonsPage,
 } from '../../src/api/lessons';
-import { LESSONS_PAGE_SIZE } from '../../src/constants/api';
+import { LESSONS_PAGE_SIZE, LESSONS_TOTAL_LIMIT } from '../../src/constants/api';
 import type { Lesson } from '../../src/types/lesson';
 
 const rawItems = (count: number, offset = 0) =>
@@ -98,14 +97,17 @@ describe('mapLessons — picsum payload to Lesson[] mapping', () => {
 });
 
 describe('pagination helpers', () => {
+  const lastCataloguePage = Math.ceil(LESSONS_TOTAL_LIMIT / LESSONS_PAGE_SIZE);
+
   it('requests the next page while pages come back full, stops at a short page', () => {
-    expect(nextLessonsPageParam(page({ page: 3, isLastPage: false }))).toBe(4);
-    expect(nextLessonsPageParam(page({ page: 3, isLastPage: true }))).toBeUndefined();
+    expect(nextLessonsPageParam(page({ page: 1, isLastPage: false }))).toBe(2);
+    expect(nextLessonsPageParam(page({ page: 1, isLastPage: true }))).toBeUndefined();
   });
 
-  it('refills backwards only when a page before the window exists', () => {
-    expect(previousLessonsPageParam(page({ page: 1 }))).toBeUndefined();
-    expect(previousLessonsPageParam(page({ page: 4 }))).toBe(3);
+  it('never pages past the fixed lesson catalog, even when picsum has more', () => {
+    expect(
+      nextLessonsPageParam(page({ page: lastCataloguePage, isLastPage: false })),
+    ).toBeUndefined();
   });
 
   it('flattens pages in order and drops duplicate ids across page boundaries', () => {
