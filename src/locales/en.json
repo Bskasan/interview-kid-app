@@ -5,27 +5,52 @@
     "errorTitle": "Something went wrong",
     "mascotA11y": "Friendly fox mascot",
     "mascotSays": "The fox says: {{text}}",
-    "languagePickerA11y": "Language choice",
+    "speakA11y": "Read aloud",
     "languageChanging": "Changing language…",
-    "language": {
-      "tr": "Türkçe",
-      "en": "English"
+    "languageToggleA11y": {
+      "tr": "Language: Turkish. Tap to switch to English.",
+      "en": "Language: English. Tap to switch to Turkish."
+    },
+    "tabs": {
+      "home": "Home",
+      "exercises": "Exercises",
+      "settings": "Settings"
     }
   },
+  "welcome": {
+    "appName": "Little Lessons",
+    "intro": "Watch, solve, collect stars!",
+    "start": "Start"
+  },
+  "dashboard": {
+    "greeting": "Hi! What are we learning today?",
+    "streak_one": "{{count}} day in a row",
+    "streak_other": "{{count}} days in a row",
+    "starsA11y_one": "{{count}} star collected",
+    "starsA11y_other": "{{count}} stars collected",
+    "cta": "Go to Exercises"
+  },
+  "settings": {
+    "title": "Settings",
+    "languageLabel": "Language",
+    "versionLabel": "Version"
+  },
+  "map": {
+    "start": "Start",
+    "lockedHint": "Finish the previous exercise first! 💪",
+    "stateLocked": "locked",
+    "stateOpen": "open",
+    "stateStars": "stars {{stars}}/{{total}}",
+    "nodeA11y": "{{title}}. {{state}}",
+    "closeA11y": "Close"
+  },
   "home": {
-    "title": "Lessons",
-    "greeting": "Hi! Let's learn 🚀",
     "emptyTitle": "No lessons yet",
     "offlineBanner": "No internet — saved lessons ready 📚",
     "offlineNoCache": "Lessons will load when you're online",
+    "loadingMore": "More lessons coming…",
     "lessonTitle": "Lesson {{number}}: {{author}}",
-    "lessonCardA11y": "{{title}}. {{status}}",
-    "keepGoing": "Keep going 💪",
-    "badgeEarned": "Badge 🏅",
-    "badgePerfect": "Super 🌟",
     "lessonStatus": {
-      "none": "Not tried yet",
-      "attempted": "Tried, no badge yet",
       "earned": "Badge earned",
       "perfect": "Perfect badge earned"
     }
@@ -37,15 +62,20 @@
     "videoUnavailable": "The video won't play right now. The questions are about this video.",
     "videoSkip": "Continue without video",
     "question": "Question {{current}}/{{total}}",
+    "outcome": {
+      "correct": "Question {{number}}: correct",
+      "wrong": "Question {{number}}: wrong",
+      "timeout": "Question {{number}}: time ran out"
+    },
     "correct": "Great job! 🎉",
     "wrong": "That's okay, keep going! 💪",
     "timeUp": "Time's up ⏰",
     "timeLeft_one": "{{count}} second left",
     "timeLeft_other": "{{count}} seconds left",
     "exitButton": "Exit",
-    "exitPrompt": "Do you want to stop and go home?",
+    "exitPrompt": "Do you want to leave the exercise?",
     "exitStay": "Keep going",
-    "exitLeave": "Home"
+    "exitLeave": "Back to exercises"
   },
   "result": {
     "passTitle": "Bravo! 🎉",
@@ -56,7 +86,9 @@
     "goHome": "Home",
     "mascotPass": "I'm proud of you!",
     "mascotPerfect": "Wow! You got them all!",
-    "mascotFail": "It's okay, we'll do it together!"
+    "mascotFail": "It's okay, we'll do it together!",
+    "starsA11y_one": "You earned {{count}} star",
+    "starsA11y_other": "You earned {{count}} stars"
   },
   "errors": {
     "network": "The internet isn't working right now",

@@ -1,103 +1,133 @@
 /**
- * Home-header language picker: one big square tile per language with a flag
- * and the language's own name, so a child who can't read the current language
- * still finds theirs. Tapping the other tile starts the animated transition;
- * selection is border + check badge, never color alone.
+ * Language toggle: one pill track flanked by fixed TR/EN code labels, with a
+ * sliding knob that shows the current language's flag. Tapping anywhere on the
+ * control toggles and starts the animated transition; the current side's label
+ * is bold ink, and state is spoken via the label — never color alone.
  */
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { useReducedMotion } from 'react-native-reanimated';
-import { TOUCH_TARGET } from '@/constants/layout';
-import { SUPPORTED_LANGUAGES, isAppLanguage, type AppLanguage } from '@/i18n';
+import Animated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { isAppLanguage, type AppLanguage } from '@/i18n';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { useLanguageTransitionStore } from '@/store/languageTransitionStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { colors, radius, spacing, typography } from '@/theme';
+import { colors, motion, radius, spacing, typography } from '@/theme';
 
 // Flag emoji denote countries, not languages — accepted for a two-language
 // kids' app because recognizability wins over precision at this age.
 const FLAGS: Record<AppLanguage, string> = { tr: '🇹🇷', en: '🇬🇧' };
 
-// Language-neutral glyph (AnswerTile badge pattern), not copy — no t() needed.
-const CHECK_GLYPH = '✓';
+// The knob overhangs the track like a physical switch cap; the track area is
+// knob-sized so the overhang needs no overflow tricks.
+const TRACK_WIDTH = 110;
+const TRACK_HEIGHT = 52;
+const KNOB_SIZE = 60;
+const KNOB_TRAVEL = TRACK_WIDTH - KNOB_SIZE;
+// The knob's flag crossfades to the target language around mid-slide.
+const FLAG_SWAP_START = 0.42;
+const FLAG_SWAP_END = 0.58;
 
 export function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   const reduceMotion = useReducedMotion();
-  const transitioning = useLanguageTransitionStore((state) => state.pending !== null);
+  const pending = useLanguageTransitionStore((state) => state.pending);
   const active = isAppLanguage(i18n.resolvedLanguage) ? i18n.resolvedLanguage : 'tr';
+  // pending ?? active: the knob starts sliding on the tap itself, before the
+  // transition overlay fades in above it.
+  const shown = pending ?? active;
+  const transitioning = pending !== null;
+  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled: transitioning });
 
-  const choose = (language: AppLanguage) => {
-    if (language === active || transitioning) {
+  const progress = useSharedValue(shown === 'en' ? 1 : 0);
+  useEffect(() => {
+    const target = shown === 'en' ? 1 : 0;
+    progress.value = reduceMotion ? target : withSpring(target, motion.spring);
+  }, [shown, reduceMotion, progress]);
+
+  const knobStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: interpolate(progress.value, [0, 1], [0, KNOB_TRAVEL]) }],
+  }));
+  const trFlagStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      progress.value,
+      [FLAG_SWAP_START, FLAG_SWAP_END],
+      [1, 0],
+      Extrapolation.CLAMP,
+    ),
+  }));
+  const enFlagStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      progress.value,
+      [FLAG_SWAP_START, FLAG_SWAP_END],
+      [0, 1],
+      Extrapolation.CLAMP,
+    ),
+  }));
+
+  const toggle = () => {
+    // `pending` is set synchronously and `begin` is idempotent, so the second
+    // tap of a rapid double-tap lands here as a no-op — one toggle per ceremony.
+    if (transitioning) {
       return;
     }
+    const next: AppLanguage = shown === 'tr' ? 'en' : 'tr';
     if (reduceMotion) {
       // Instant swap, no overlay — the transition is decoration, not flow.
-      useSettingsStore.getState().setLanguage(language);
+      useSettingsStore.getState().setLanguage(next);
       return;
     }
-    useLanguageTransitionStore.getState().begin(language);
+    useLanguageTransitionStore.getState().begin(next);
   };
 
   return (
-    <View
-      style={styles.row}
-      accessibilityRole="radiogroup"
-      accessibilityLabel={t('languagePickerA11y')}
-    >
-      {SUPPORTED_LANGUAGES.map((language) => (
-        <Tile
-          key={language}
-          language={language}
-          label={t(`language.${language}`)}
-          selected={language === active}
-          disabled={transitioning}
-          onPress={() => choose(language)}
-        />
-      ))}
-    </View>
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        onPress={toggle}
+        onPressIn={onPressIn}
+        onPressOut={onPressOut}
+        disabled={transitioning}
+        // Not a "switch": that role announces on/off, and neither language is
+        // an off state. A button with an explicit label says exactly what a
+        // tap does.
+        accessibilityRole="button"
+        accessibilityLabel={t(`languageToggleA11y.${shown}`)}
+        accessibilityState={{ disabled: transitioning, busy: transitioning }}
+        style={styles.row}
+      >
+        <SideLabel language="tr" active={shown === 'tr'} />
+        <View style={styles.trackArea}>
+          <View style={styles.track} />
+          <Animated.View style={[styles.knob, knobStyle]}>
+            <Animated.View style={trFlagStyle}>
+              <Flag language="tr" />
+            </Animated.View>
+            <Animated.View style={[styles.flagOverlay, enFlagStyle]}>
+              <Flag language="en" />
+            </Animated.View>
+          </Animated.View>
+        </View>
+        <SideLabel language="en" active={shown === 'en'} />
+      </Pressable>
+    </Animated.View>
   );
 }
 
-type TileProps = {
-  language: AppLanguage;
-  label: string;
-  selected: boolean;
-  disabled: boolean;
-  onPress: () => void;
-};
-
-function Tile({ language, label, selected, disabled, onPress }: TileProps) {
-  const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled });
+function SideLabel({ language, active }: { language: AppLanguage; active: boolean }) {
   return (
-    <Animated.View style={animatedStyle}>
-      <Pressable
-        onPress={onPress}
-        onPressIn={onPressIn}
-        onPressOut={onPressOut}
-        disabled={disabled}
-        accessibilityRole="radio"
-        accessibilityState={{ checked: selected, selected, disabled }}
-        accessibilityLabel={label}
-        style={({ pressed }) => [
-          styles.tile,
-          selected && styles.tileSelected,
-          pressed && !disabled && styles.tilePressed,
-        ]}
-      >
-        <Flag language={language} />
-        <Text style={styles.label} numberOfLines={1} maxFontSizeMultiplier={1.2}>
-          {label}
-        </Text>
-        {selected ? (
-          <View style={styles.check}>
-            <Text style={styles.checkGlyph} maxFontSizeMultiplier={1}>
-              {CHECK_GLYPH}
-            </Text>
-          </View>
-        ) : null}
-      </Pressable>
-    </Animated.View>
+    <Text
+      style={[styles.sideLabel, active ? styles.sideLabelActive : null]}
+      maxFontSizeMultiplier={1.2}
+    >
+      {language.toUpperCase()}
+    </Text>
   );
 }
 
@@ -114,51 +144,55 @@ function Flag({ language }: { language: AppLanguage }) {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.sm,
   },
-  // Border width is identical in both states so selection never shifts layout.
-  tile: {
-    minWidth: TOUCH_TARGET.primary + 8,
-    minHeight: TOUCH_TARGET.primary + 8,
-    borderWidth: 3,
+  // Fixed width so the bold/regular swap never nudges the track sideways.
+  sideLabel: {
+    ...typography.caption,
+    color: colors.muted,
+    width: 28,
+    textAlign: 'center',
+  },
+  sideLabelActive: {
+    color: colors.ink,
+    fontWeight: '800',
+  },
+  trackArea: {
+    width: TRACK_WIDTH,
+    height: KNOB_SIZE,
+    justifyContent: 'center',
+  },
+  track: {
+    height: TRACK_HEIGHT,
+    borderRadius: radius.pill,
+    borderWidth: 2,
     borderColor: colors.border,
-    borderRadius: radius.button,
     backgroundColor: colors.surface,
+  },
+  knob: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: KNOB_SIZE,
+    height: KNOB_SIZE,
+    borderRadius: KNOB_SIZE / 2,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    gap: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
-  tileSelected: {
-    borderColor: colors.primary,
-  },
-  tilePressed: {
-    backgroundColor: colors.background,
+  flagOverlay: {
+    position: 'absolute',
   },
   flag: {
-    fontSize: 24,
-    lineHeight: 30,
-  },
-  label: {
-    ...typography.caption,
-    color: colors.ink,
-  },
-  check: {
-    position: 'absolute',
-    top: -spacing.sm,
-    right: -spacing.sm,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  // Ink on primary keeps the contrast policy; the disc itself marks selection.
-  checkGlyph: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: colors.ink,
+    fontSize: 26,
+    lineHeight: 32,
   },
 });

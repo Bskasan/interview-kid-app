@@ -1,6 +1,6 @@
 /**
- * Slim "you're offline" banner shown above the Home list while the device has
- * no connection; announced politely to screen readers.
+ * Slim "you're offline" banner shown above the exercises map while the device
+ * has no connection; announced politely to screen readers.
  */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
@@ -10,7 +10,11 @@ export function OfflineBanner() {
   const { t } = useTranslation('home');
   return (
     <View style={styles.banner} accessibilityLiveRegion="polite">
-      <Text style={styles.text}>{t('offlineBanner')}</Text>
+      {/* Capped: the banner sits above the map and every line it grows by
+          shortens the viewport the lesson bubble is placed against. */}
+      <Text style={styles.text} maxFontSizeMultiplier={1.4}>
+        {t('offlineBanner')}
+      </Text>
     </View>
   );
 }

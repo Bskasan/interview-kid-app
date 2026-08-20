@@ -16,7 +16,9 @@ Three cooperating pieces:
 
 1. **Cache persistence** — the React Query cache is persisted to AsyncStorage via
    `PersistQueryClientProvider` + `createAsyncStoragePersister` (`maxAge` 24 h, `buster`
-   `lessons-v1` — later bumped to `lessons-v2` by 0029, query `gcTime` ≥ `maxAge`). A cold start offline rehydrates the last good list.
+   `lessons-v1` — bumped to `lessons-v2` by 0029 and to `lessons-v3` by 0041's infinite-pages
+   shape, query `gcTime` ≥ `maxAge`). A cold start offline rehydrates the last good list — since
+   0041, every previously loaded page.
 2. **Connectivity awareness** — React Query's `onlineManager` is driven by NetInfo (per the
    official React Native guide), so a stale list refetches automatically on reconnect.
 3. **Honest banner** — `useNetworkStatus` reports offline only on a _definite_ negative

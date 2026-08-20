@@ -44,9 +44,14 @@ explain and defend every decision in a follow-up interview — so every decision
 
 ```
 app/                 # routes only — thin screens that compose components/hooks
-  _layout.tsx        # providers (QueryClient + persistence, SafeArea), Stack
-  index.tsx          # Home
-  exercise/[id].tsx  # Exercise
+  _layout.tsx        # providers (QueryClient + persistence, SafeArea), Stack, streak tracker
+  index.tsx          # Welcome (every launch; replaces into the tab shell)
+  (tabs)/            # bottom-tab shell
+    _layout.tsx      # Tabs: Ana Sayfa / Alıştırmalar / Ayarlar
+    home.tsx         # Dashboard (greeting, streak, total stars, CTA)
+    exercises.tsx    # Lesson list
+    settings.tsx     # Language toggle + app version
+  exercise/[id].tsx  # Exercise (outside the tabs — no tab bar mid-quiz)
   result.tsx         # Result (params: lessonId, correct, total)
 src/
   api/               # fetchers + mappers (picsum → Lesson)
@@ -78,7 +83,8 @@ are roughly 5–8 years old: early readers, so text is minimal and always paired
 Principles (apply on every screen):
 
 1. **One primary action per screen**, bottom-anchored, full-width, impossible to miss. Minimal elements
-   on screen; no clutter, no secondary navigation chrome.
+   on screen; no clutter. The only navigation chrome is the shell's bottom tab bar (Ana Sayfa /
+   Alıştırmalar / Ayarlar); full-screen flows (exercise, result) hide it entirely.
 2. **Big everything.** Touch targets ≥ 56dp for primary controls (48dp absolute minimum), body text
    ≥ 18sp, titles 28–34sp, generous spacing. Small hands, imprecise taps.
 3. **Immediate multimodal feedback.** Every tap: color change + small scale bounce + haptic. Correct
@@ -187,6 +193,10 @@ re-litigate:
    allowed. Retaking a lesson keeps the **best** result.
 4. Leaving the exercise mid-way (back gesture/button) asks for confirmation; progress of that attempt is
    discarded. Home progress reflects only completed attempts.
-5. Home list: 20 items from `https://picsum.photos/v2/list?page=1&limit=20`; title is generated
-   ("Ders N: {author}"); thumbnail `https://picsum.photos/id/{id}/200/200`. Cached for offline; when
-   offline with cache → show list + banner; offline without cache → error state with retry.
+5. Home list: a fixed catalog of 20 lessons, loaded incrementally from
+   `https://picsum.photos/v2/list?page=N&limit=10` — 10 on entry, the last 10 as the child
+   scrolls (never more than 20; a short or empty page ends the list early); title is generated
+   ("Ders N: {author}", N globally sequential across pages); thumbnail
+   `https://picsum.photos/id/{id}/200/200`. Loaded pages cached for offline; when offline with
+   cache → show cached pages + banner, no further page loads; offline without cache → error state
+   with retry.

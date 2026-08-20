@@ -1,7 +1,8 @@
 /**
  * One quiz answer tile: a big visual (emoji, drawn SVG shape, or photo with
- * emoji fallback) plus optional caption, with press feedback, a wrong-answer
- * shake, and ✓/✗ feedback states that never rely on color alone.
+ * emoji fallback) plus optional caption on a constant white chip, with press
+ * feedback, a wrong-answer shake, and tint + border + ✓/✗ feedback states
+ * that never rely on color alone and never obscure the visual.
  */
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
@@ -27,11 +28,14 @@ import { type AnswerFeedback } from '@/lib/quiz';
 import { colors, radius, spacing, typography } from '@/theme';
 
 // Feedback is never color-alone: the ✓/✗ badge + border shapes carry the meaning.
+// Feedback colors only the ring AROUND the white visual chip (light tint fill +
+// full-strength border), so a full-strength fill can never swallow same-colored
+// artwork (e.g. the green star answering "Yeşil olan hangisi?").
 const feedbackStyles = {
   idle: { backgroundColor: colors.surface, borderColor: colors.border },
-  correct: { backgroundColor: colors.primary, borderColor: colors.primaryDark },
-  wrongChoice: { backgroundColor: colors.surface, borderColor: colors.coral },
-  revealCorrect: { backgroundColor: colors.surface, borderColor: colors.primary },
+  correct: { backgroundColor: colors.successTint, borderColor: colors.primary },
+  wrongChoice: { backgroundColor: colors.dangerTint, borderColor: colors.coral },
+  revealCorrect: { backgroundColor: colors.successTint, borderColor: colors.primary },
   lockedOut: { backgroundColor: colors.surface, borderColor: colors.border, opacity: 0.55 },
 } as const;
 
@@ -55,6 +59,9 @@ const badges: Partial<Record<AnswerFeedback, { glyph: string; borderColor: strin
 const STAR_POINTS =
   '50,4 61.8,33.8 93.7,35.8 69,56.2 77,87.2 50,70 23,87.2 31,56.2 6.3,35.8 38.2,33.8';
 const TRIANGLE_POINTS = '50,8 92,88 8,88';
+
+// Visual share of the tile's short side; the rest is chip padding + borders.
+const VISUAL_RATIO = 0.55;
 
 type Props = {
   option: AnswerOptionData;
@@ -87,8 +94,9 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
   const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shakeX.value }] }));
 
   // The tile never shrinks below the touch floor; only the visual scales down,
-  // so cramped screens cost artwork size, not tap accuracy.
-  const visualSize = Math.round(Math.min(width, height) * 0.6);
+  // so cramped screens cost artwork size, not tap accuracy. The ratio leaves
+  // room for the chip's own padding and border inside the tile.
+  const visualSize = Math.round(Math.min(width, height) * VISUAL_RATIO);
   const badge = badges[feedback];
   const label = optionLabel(option, t);
 
@@ -112,31 +120,32 @@ export function AnswerTile({ option, feedback, onPress, width, height }: Props) 
           pressed && !locked && styles.pressed,
         ]}
       >
-        {option.visual ? (
-          <View style={styles.content} accessible={false}>
-            <TileVisual visual={option.visual} size={visualSize} />
-            {label !== undefined ? (
-              <Text
-                style={styles.caption}
-                numberOfLines={1}
-                adjustsFontSizeToFit
-                maxFontSizeMultiplier={1.2}
-              >
-                {label}
-              </Text>
-            ) : null}
-          </View>
-        ) : (
-          <Text
-            style={styles.textOnly}
-            numberOfLines={2}
-            adjustsFontSizeToFit
-            maxFontSizeMultiplier={1.4}
-            accessible={false}
-          >
-            {label}
-          </Text>
-        )}
+        <View style={[styles.visualChip, { minWidth: visualSize + spacing.lg }]} accessible={false}>
+          {option.visual ? (
+            <View style={styles.content}>
+              <TileVisual visual={option.visual} size={visualSize} />
+              {label !== undefined ? (
+                <Text
+                  style={styles.caption}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  maxFontSizeMultiplier={1.2}
+                >
+                  {label}
+                </Text>
+              ) : null}
+            </View>
+          ) : (
+            <Text
+              style={styles.textOnly}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              maxFontSizeMultiplier={1.4}
+            >
+              {label}
+            </Text>
+          )}
+        </View>
         {badge ? (
           <View style={[styles.badge, { borderColor: badge.borderColor }]}>
             <Text style={styles.badgeGlyph} maxFontSizeMultiplier={1}>
@@ -204,13 +213,24 @@ function TileVisual({ visual, size }: { visual: OptionVisual; size: number }) {
 const styles = StyleSheet.create({
   base: {
     borderRadius: radius.button,
-    borderWidth: 3,
+    // Same width in every state (thick enough to read as feedback on its own),
+    // so a state change never shifts layout.
+    borderWidth: 4,
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.sm,
   },
   pressed: {
     backgroundColor: colors.background,
+  },
+  visualChip: {
+    backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: radius.button - 6,
+    padding: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   content: {
     alignItems: 'center',

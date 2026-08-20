@@ -1,13 +1,19 @@
 /**
- * The Home list's server state: a React Query wrapper around fetchLessons,
- * cached (and offline-restored) under the 'lessons' key by the root provider.
+ * The lesson catalog's server state: an infinite React Query over picsum pages
+ * (capped at the fixed 20-lesson catalog), cached (and offline-restored) under
+ * the 'lessons' key by the root provider. The map receives a flat, deduped,
+ * globally numbered Lesson[] via select.
  */
-import { useQuery } from '@tanstack/react-query';
-import { fetchLessons } from '@/api/lessons';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import { fetchLessonsPage, flattenLessonPages, nextLessonsPageParam } from '@/api/lessons';
+import { LESSONS_FIRST_PAGE } from '@/constants/api';
 
 export function useLessons() {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: ['lessons'],
-    queryFn: fetchLessons,
+    queryFn: ({ pageParam }) => fetchLessonsPage(pageParam),
+    initialPageParam: LESSONS_FIRST_PAGE,
+    getNextPageParam: nextLessonsPageParam,
+    select: flattenLessonPages,
   });
 }

@@ -1,6 +1,8 @@
 # 0039 — Visual language switch: flag tiles + animated transition + lint enforcement
 
-Status: accepted (supersedes 0031's toggle design; detection/persistence in 0031 stand)
+Status: superseded by 0043 (the flag-tile control; the transition ceremony, flag-emoji stance
+and lint enforcement decided here stand — 0043 replaces only the tiles with a single toggle.
+This record had superseded 0031's toggle design; detection/persistence in 0031 still stand)
 Date: 2026-08-20
 
 ## Context

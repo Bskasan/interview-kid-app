@@ -1,4 +1,4 @@
-import { computeOutcome, mergeResult } from '../../src/lib/scoring';
+import { computeOutcome, mergeResult, totalStars } from '../../src/lib/scoring';
 import type { LessonResult } from '../../src/types/progress';
 
 describe('computeOutcome — pass threshold and badge rules', () => {
@@ -50,5 +50,32 @@ describe('mergeResult — best-attempt policy for retakes', () => {
   // empty record, never a crash or a badge from garbage input.
   it('falls back to a neutral empty record when there is no previous result', () => {
     expect(mergeResult(undefined, 3, 0)).toEqual({ best: 0, total: 0, badge: 'none' });
+  });
+});
+
+describe('totalStars — dashboard sum of best attempts', () => {
+  it('sums best correct answers across lessons', () => {
+    expect(
+      totalStars({
+        a: { best: 3, total: 3, badge: 'perfect' },
+        b: { best: 2, total: 3, badge: 'earned' },
+        c: { best: 1, total: 3, badge: 'none' },
+      }),
+    ).toBe(6);
+  });
+
+  it('is zero with no recorded lessons', () => {
+    expect(totalStars({})).toBe(0);
+  });
+
+  it('clamps corrupt records instead of inflating or crashing the sum', () => {
+    expect(
+      totalStars({
+        inflated: { best: 99, total: 3, badge: 'perfect' },
+        negative: { best: -4, total: 3, badge: 'none' },
+        emptyTotal: { best: 3, total: 0, badge: 'none' },
+        fractional: { best: 1.9, total: 3, badge: 'none' },
+      }),
+    ).toBe(4); // 3 + 0 + 0 + 1
   });
 });

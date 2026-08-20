@@ -22,9 +22,16 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 2. The mascot is supportive ("Sorun değil, birlikte başarırız!").
 3. "🔄 Tekrar Dene" is the green primary; "🏠 Ana Sayfa" the blue secondary.
 
-Reduced motion (system setting): the badge appears statically — no confetti, no glow, no spring.
-Back (button/gesture) goes Home — never back into the finished quiz. Returning Home shows the
-lesson card's updated stars/badge immediately.
+The mascot's message carries a 🔊 read-aloud button (visual affordance, ADR 0050).
+Above the badge, the earned stars pop in one by one (⭐ with a spring, ~0.35 s apart); slots
+not earned stay hollow (☆) — 2/3 shows ⭐⭐☆. The row announces "2 yıldız kazandın" to screen
+readers (`StarReveal`, `result:starsA11y`).
+
+Reduced motion (system setting): the badge appears statically and the stars show without the
+pop — no confetti, no glow, no spring.
+Back (button/gesture) returns to the exercises tab — never back into the finished quiz.
+"🏠 Ana Sayfa" lands on the dashboard (updated star total); the lesson card on the exercises
+tab shows the updated stars/badge immediately.
 
 ## b) How it works in code
 
@@ -43,9 +50,10 @@ lesson card's updated stars/badge immediately.
   confetti pieces (index-derived offsets/delays); `useReducedMotion` short-circuits to a static
   badge. Colors follow ADR 0010: sun ring = earned, grape ring = perfect.
 - **Navigation** — both buttons use `router.replace` ("Tekrar Dene" →
-  `/exercise/[id]`, "Ana Sayfa" → `/`) through `useNavigationLock()`, so a double-tap
+  `/exercise/[id]`, "Ana Sayfa" → `/(tabs)/home`) through `useNavigationLock()`, so a double-tap
   replaces exactly once and the history never contains a finished quiz or a stale result.
-  Home updates live because `LessonCard` subscribes to the zustand store.
+  The map updates live because the exercises screen subscribes to the zustand store — earning
+  2⭐ visibly unlocks the next node on return.
 - Primary/secondary button variants swap with the outcome so the _likely_ next action is the
   big green one (design principle: one primary action).
 
@@ -55,23 +63,27 @@ lesson card's updated stars/badge immediately.
   (ref guard + idempotent merge).
 - Garbage or missing params (bad deep link): nothing is recorded (`total <= 0` or empty
   `lessonId`), outcome renders as failed-safe, and without a `lessonId` the retry button is
-  hidden — Home remains reachable.
-- Back from Result → Home (the quiz was `replace`d away); retry also `replace`s, so stacking
+  hidden — the dashboard remains reachable.
+- Back from Result → the exercises tab (the quiz was `replace`d away); retry also `replace`s, so stacking
   Result→Exercise→Result… never grows history.
 - A better earlier attempt is never overwritten by a worse retake (store policy, unit-tested).
 - Reduced motion: full celebration downgrade, content identical.
 
 ## d) Manual test steps
 
-1. Score 2/3 → "Bravo! 🎉", gold 🏅 badge pops with confetti + haptic; Home afterwards shows
-   ⭐⭐☆ and the "Rozet 🏅" pill on that lesson.
-2. Score 3/3 → perfect title, purple 🌟 badge; Home shows ⭐⭐⭐ + "Süper 🌟".
-3. Score 0–1/3 → encouraging copy, no badge; Home shows "Devam et 💪" with the star count.
-4. Retake a passed lesson and score worse → Home badge/stars unchanged (best kept).
-5. Retake a failed lesson and pass → badge upgrades on Home.
-6. On Result, press Android back → lands on Home (not the quiz).
-7. Kill and reopen the app → earned badges still on Home (persisted store).
-8. Enable "Remove animations" (Android accessibility) → badge appears without motion/confetti.
+1. Score 2/3 → "Bravo! 🎉", gold 🏅 badge pops with confetti + haptic; the map node afterwards
+   shows ⭐⭐☆ and the next node is unlocked.
+2. Score 3/3 → perfect title, purple 🌟 badge; the map node shows ⭐⭐⭐.
+3. Score 0–1/3 → encouraging copy, no badge; the node keeps ⭐☆☆ and stays current (locked
+   successor).
+4. Retake a passed lesson and score worse → node stars unchanged (best kept).
+5. Retake a failed lesson and pass → badge upgrades on the lesson list.
+6. On Result, press Android back → lands on the exercises tab (not the quiz).
+7. Kill and reopen the app → earned badges still on the lesson list (persisted store).
+8. Narrow screen + large font: the 🔊 beside the mascot message stays fully on screen for all
+   three result messages (the failure line is the longest), and the title/score/stars still fit
+   without the badge being pushed out.
+9. Enable "Remove animations" (Android accessibility) → badge appears without motion/confetti.
 
 ## e) References
 

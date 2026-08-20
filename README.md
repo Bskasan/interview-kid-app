@@ -1,12 +1,16 @@
 # Kids Learning App — Mini Flow
 
-A small gamified learning flow for children (~5–8) built with React Native + Expo (SDK 57,
-Expo Router, TypeScript strict). Three connected screens: **Home** (lesson list from a public
-API with progress badges) → **Exercise** (short video, then a timed 3-question quiz on big
-visual answer tiles) → **Result** (pass/fail celebration with an animated badge). Fully
-bilingual (Türkçe/English) with an in-app language switch. Server data goes through TanStack Query
-persisted to AsyncStorage; progress and settings live in persisted zustand stores; animations
-are Reanimated; runtime failures funnel through one central, kid-friendly error path.
+A small gamified learning app for children (~5–8) built with React Native + Expo (SDK 57,
+Expo Router, TypeScript strict). A short **welcome** screen leads into a three-tab shell:
+**Ana Sayfa** (dashboard with a day streak and the total star count), **Alıştırmalar** (a
+winding progress map over a lesson catalog fetched from a public API — lessons unlock
+sequentially by earning stars) and **Ayarlar** (language + version). Tapping an unlocked map
+node opens the full-screen **Exercise** flow (short video, then a timed 3-question quiz on
+big visual answer tiles) and ends on the **Result** screen (star reveal + animated badge).
+Fully bilingual (Türkçe/English) with an in-app language toggle. Server data goes through
+TanStack Query persisted to AsyncStorage; progress, streak and settings live in persisted
+zustand stores; animations are Reanimated; runtime failures funnel through one central,
+kid-friendly error path.
 
 ## How to run
 
@@ -33,7 +37,7 @@ platform-specific syntax or paths.
 
 Checks: `npm run check` runs the whole gate suite in order — typecheck (which first
 regenerates Expo Router's gitignored typed routes, so it works on a fresh clone), ESLint,
-Prettier check, Jest (108 tests) and a bundle export for **Android, iOS and web** in one
+Prettier check, Jest (165 tests) and a bundle export for **Android, iOS and web** in one
 pass. Individual scripts: `npm run typecheck` · `npm run lint` / `lint:fix` ·
 `npm run format` / `format:check` · `npm test` · `npm run build`. `npx expo-doctor` for
 environment sanity.
@@ -58,8 +62,9 @@ the moment the plan allows — until then the pre-push hook is the enforced gate
 ## Languages
 
 Turkish and English. First launch follows the device language (anything else falls back to
-Turkish). The Home header shows two flag tiles, each language written in its own name
-(🇹🇷 Türkçe / 🇬🇧 English) so a pre-reader can find theirs; tapping the other tile plays a
+Turkish). The Settings tab holds one toggle: a pill track with fixed TR/EN labels and a
+sliding knob showing the current language's flag (🇹🇷/🇬🇧) so a pre-reader can see at a
+glance which is active; tapping it slides the knob (the flag swaps mid-slide) and plays a
 short (~0.85 s) full-screen transition — the mascot bounces while the whole app, question
 content and screen-reader labels included, switches underneath — and the choice is
 persisted across restarts. Reduced motion swaps instantly with no overlay. All copy lives
@@ -73,9 +78,11 @@ runtime on engines without it (Hermes).
 ## Architecture overview
 
 Routes under `app/` are thin screens that compose everything from `src/`. The main data
-flows: picsum list → React Query (persisted to AsyncStorage for offline) → Home; local
-question bank + i18n resources → Exercise (pure quiz state machine + countdown hook); quiz
-result → zustand (persisted) → Home badges. Runtime failures — network, media, storage,
+flows: picsum pages → React Query infinite query (persisted to AsyncStorage for offline) →
+the exercises map, whose unlock states derive purely from the progress store; local question
+bank + i18n resources → Exercise (pure quiz state machine + countdown hook); quiz result →
+zustand (persisted, versioned with migration) → map stars, dashboard total and the streak
+card (its own store fed from AppState). Runtime failures — network, media, storage,
 crashes — go through one funnel (`handleError`): always logged (dev-only logger with a
 crash-reporter hook point), surfaced to the child only as a calm translated banner or a
 full-screen fallback, never as codes or stack traces. All pure logic (scoring, quiz
@@ -84,21 +91,25 @@ transitions, feedback mapping, defensive API parsing, tile sizing, generic helpe
 no UI kit.
 
 ```
-app/                 # routes: _layout (providers, error boundary), index (Home), exercise/[id], result
+app/                 # routes: _layout (providers, error boundary, streak tracker),
+                     # index (welcome), (tabs)/{home,exercises,settings}, exercise/[id], result
 src/
-  api/               # picsum fetcher + defensive mapper → Lesson[]
-  components/        # AnswerGrid/AnswerTile, ChunkyButton, Mascot, LessonCard, ExerciseVideo,
-                     # ExitConfirmSheet, VideoUnavailableCard, GlobalErrorBanner, LanguageSwitch,
+  api/               # picsum paged fetcher + defensive mapper + pagination helpers → Lesson[]
+  components/        # AnswerGrid/AnswerTile, MapNodeRow, LessonBubble, StarRow, StarReveal,
+                     # ChunkyButton, Mascot, SpeakButton, ExerciseVideo, ExitConfirmSheet,
+                     # VideoUnavailableCard, GlobalErrorBanner, LanguageSwitch,
                      # LanguageTransitionOverlay, TimerBar, SegmentedProgress, BadgeReveal…
-  constants/         # cross-cutting config: timing, touch targets, api values, media url, quiz shape
+  constants/         # cross-cutting config: timing, touch targets, api values, media url,
+                     # quiz shape, map layout
   data/              # question bank (5 visual sets; text via i18n)
-  hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive,
-                     # usePressFeedback, useNavigationLock
+  hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive, useCountUp,
+                     # usePressFeedback, useNavigationLock, useStreakTracker
   i18n/              # i18next singleton (synchronous init, typed keys)
-  lib/               # scoring, quiz state machine, error funnel + logger, haptics, storage
+  lib/               # scoring, quiz state machine, unlock rules, map geometry, streak rules,
+                     # speech stub, error funnel + logger, haptics, storage
   locales/           # tr.json / en.json resources (namespaced per screen)
-  store/             # zustand stores: progress + settings (persisted), error banner +
-                     # language transition (in-memory)
+  store/             # zustand stores: progress (versioned) + settings + streak (persisted),
+                     # error banner + language transition (in-memory)
   theme/             # design tokens: colors, spacing, radius, typography, motion
   utils/             # React-free helpers: clamp, hashString, routeParams
 __tests__/           # mirrors src/ and app/
@@ -123,9 +134,9 @@ Where the brief was open, I decided and implemented as follows:
    mascot, "keep going" as the safe default — while the video and the question timer pause
    underneath. Confirming discards that attempt; nothing is recorded until the Result
    screen, which records exactly once.
-5. **"Progress/badge indicator" on Home** means: stars for the best score (⭐⭐☆ of 3) plus a
-   status pill — not tried / keep going / badge / perfect badge — driven by completed
-   attempts only.
+5. **"Progress/badge indicator" = stars.** One ⭐ per correct answer of the best completed
+   attempt (⭐⭐☆ of 3), shown under each map node and summed on the dashboard; badges remain
+   the Result screen's celebration. Driven by completed attempts only.
 6. **Offline policy**: the lesson list is cached; offline with cache shows the list plus an
    offline banner, offline without cache shows an error state with retry. The quiz itself is
    fully offline (local data; the single photo question falls back to an emoji).
@@ -138,25 +149,48 @@ Where the brief was open, I decided and implemented as follows:
    spirit, with no third-party assets, names or brand colors; one primary action per screen,
    ≥56dp touch targets, text ≥18sp always paired with an icon, contrast ≥4.5:1, reduced
    motion respected everywhere.
-9. **The language switch is visual and deliberate.** Flag tiles with each language's own
-   name (recognizable to a pre-reader), and changing language plays a short mascot
-   transition instead of an instant reskin — the child sees a moment happen, and the swap
-   lands while the screen is covered so no half-translated frame ever shows. Reduced motion
-   skips the ceremony entirely.
+9. **The language switch is visual and deliberate.** One toggle (fixed TR/EN labels, a
+   sliding knob showing the current language's flag — recognizable to a pre-reader), and
+   changing language plays a short mascot transition instead of an instant reskin — the
+   child sees a moment happen, and the swap lands while the screen is covered so no
+   half-translated frame ever shows. Reduced motion skips the ceremony entirely.
+10. **Deliberate deviation from the brief: lessons unlock sequentially, and tapping a lesson
+    opens a bubble, not the exercise.** The brief says tapping a list item opens the Exercise
+    screen; the exercises tab is instead a progress path where lesson N+1 unlocks once lesson
+    N has ≥2⭐, and tapping a node opens a small bubble (thumbnail, title, stars, "Başla").
+    Rationale: the gamified path gives visible progression and a reason to master a lesson,
+    a locked map needs a place to explain "why not this one", and the confirm step protects
+    against accidental taps at this age. The open path stays two taps (node → Başla).
+11. **The welcome screen shows on every launch** — a deliberate ritual (mascot, app name, one
+    line, Başla), not first-run onboarding. It can mildly annoy returning users; mitigated by
+    being one immediate tap to dismiss (<2 s, the button is live from the first frame).
+12. **Read-aloud is shipped as an affordance first.** 🔊 buttons sit next to every sentence a
+    child must understand alone; they give honest press feedback while the audio itself waits
+    for a TTS engine behind the existing `speak(text, language)` interface.
 
 ## Not production-ready / trade-offs
 
 - **picsum.photos as "lessons"** and one sample video for all lessons; quiz content is a
   local mock bank (5 sets shared by 20 lessons).
 - **No backend, no auth, no analytics** — progress lives only on-device (AsyncStorage).
+- **Read-aloud is a visual affordance pending TTS.** The 🔊 buttons next to child-facing text
+  give honest press feedback but play no audio yet; a text-to-speech engine (expo-speech)
+  drops into the existing `speak(text, language)` interface.
 - **iOS is device-untested.** Every gate builds the iOS bundle (so it compiles) and the
   code uses only cross-platform Expo SDK modules, but I develop on Windows and had no
   Apple hardware: real-device rendering, haptics, video playback and VoiceOver on iOS are
   unverified.
 - **Flags stand for languages** on the switch — semantically imprecise (flags denote
   countries; 🇬🇧 for English is an arbitrary pick among anglophone flags). Accepted for a
-  two-language kids' app because a pre-reader recognizes a flag faster than a word; each
-  tile also carries the language's own name.
+  two-language kids' app because a pre-reader recognizes a flag faster than a word; the
+  toggle's fixed TR/EN labels and its spoken description carry the exact state for readers.
+- **The progress map is more machinery than the brief asked for** — a flat tappable list
+  would have met the requirement with a fraction of the code (geometry, unlock rules, bubble,
+  store migration). Chosen deliberately for the gamified-feel goal; the cost is complexity
+  that a follow-up interview should be able to defend line by line.
+- **The streak is local-only and cheatable** — it reads the device clock, so setting the date
+  forward inflates it (backwards deliberately does not reset it). Acceptable for an on-device
+  reward with no backend; a real product would validate activity server-side.
 - **Changing language takes ~0.85 s by design** — the transition is deliberate ceremony,
   not lag; reduced-motion users get an instant swap. The delay is a knob
   (`LANGUAGE_TRANSITION` constants) if it ever feels wrong on slower devices.
@@ -169,8 +203,15 @@ Where the brief was open, I decided and implemented as follows:
   in one tap); a real product would move it behind the parental gate.
 - **JS timers** — the countdown is timestamp-based (drift-resistant) but display granularity
   is ~100 ms; fine for a kids quiz, not precision-critical use.
-- **No E2E tests** — 108 unit/component tests cover logic and screen decision points; full
-  flows were verified manually on device.
+- **No E2E tests, and no layout coverage at all** — 165 unit/component tests cover logic and
+  screen decision points, but the renderer used in tests has no layout engine: an element that
+  is rendered off-screen still passes a "is it there?" assertion. One shipped bug (a button
+  pushed outside its row) proved that gap, so narrow-screen checks are part of the manual pass
+  and every inline control now follows one written layout rule. Making it catchable in CI needs
+  a device-based runner (Maestro/Detox).
+- **Large fonts are hardened to ~1.4×, not to the maximum** — text that shares a row with a
+  control is capped and yields correctly, but the fixed-height screens do not scroll, so at the
+  very largest system font sizes content gets tight rather than reflowing.
 - **No parental gate** — a real kids product needs one (app-store family policies); out of
   scope here by design.
 - **Public sample video** — Google's classic sample bucket started returning 403 mid-project
@@ -186,7 +227,8 @@ In priority order:
 1. **Real content model + backend** — per-lesson videos and authored question banks instead
    of picsum + shared mock sets.
 2. **E2E tests with Maestro** for the three flows (happy path, timeout, abandon-and-retry).
-3. **Audio narration of questions** — the honest fix for pre-readers; text alone excludes
+3. **Real TTS behind the shipped 🔊 buttons** (expo-speech drops into the existing
+   `speak(text, language)` interface) — the honest fix for pre-readers; text alone excludes
    part of the target age.
 4. **Sound effects and proper illustrations/mascot** from an owned asset set (development
    build would also unlock Lottie).

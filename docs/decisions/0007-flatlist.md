@@ -1,6 +1,8 @@
 # 0007 — FlatList for the Home lesson list
 
-Status: accepted
+Status: superseded by 0047 (the flat card-list presentation; FlatList itself — keyExtractor,
+getItemLayout, RefreshControl — still underpins the round-5 progress map, and 0041's paging
+stands)
 Date: 2026-08-19
 
 ## Context
@@ -32,6 +34,10 @@ the list so `getItemLayout` offsets stay exact.
   in the Phase 4 accessibility pass.
 - At production scale (paginated content, images of varying aspect), FlashList + `estimatedItemSize`
   would be the switch, and the list would gain `onEndReached` pagination.
+- 2026-08-20: the paging prediction landed — 0041 added `onEndReached` incremental loading
+  (2 × 10 within the fixed 20-lesson catalog) while keeping FlatList + `getItemLayout`
+  (FlashList was re-evaluated there and rejected again: the catalog caps the in-memory list at
+  20 items, so recycling never pays for the dependency).
 
 ## References
 

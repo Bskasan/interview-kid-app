@@ -1,6 +1,7 @@
 /**
- * Progress vocabulary shared by scoring, the progress store and the Home
- * cards: badge levels and the stored best-attempt shape.
+ * Progress vocabulary shared by scoring, the progress store, the map's star
+ * and unlock rules and the dashboard total: badge levels and the stored
+ * best-attempt shape.
  */
 export type Badge = 'none' | 'earned' | 'perfect';
 

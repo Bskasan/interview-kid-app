@@ -1,112 +1,45 @@
 /**
- * Home screen: scrollable lesson list from picsum (cached for offline) with
- * per-lesson progress on each card, pull-to-refresh, offline banner, and
- * loading/error/empty states. Tapping a card opens the Exercise screen.
+ * Welcome screen ('/'): a short intro shown on every cold start — app name,
+ * mascot with the read-aloud intro line, and a Start button that replaces into
+ * the tab shell so back can never return here. Never blocks: the button is
+ * live from the first frame; only the hero animates in.
  */
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp, ReduceMotion } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FullScreenMessage } from '@/components/FullScreenMessage';
-import { LanguageSwitch } from '@/components/LanguageSwitch';
-import { LESSON_CARD_GAP, LESSON_CARD_HEIGHT, LessonCard } from '@/components/LessonCard';
-import { LessonCardSkeleton } from '@/components/LessonCardSkeleton';
+import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
-import { OfflineBanner } from '@/components/OfflineBanner';
-import { useLessons } from '@/hooks/useLessons';
 import { useNavigationLock } from '@/hooks/useNavigationLock';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { colors, spacing, typography } from '@/theme';
-import type { Lesson } from '@/types/lesson';
 
-const SKELETON_COUNT = 5;
-
-const ListGap = () => <View style={{ height: LESSON_CARD_GAP }} />;
-
-export default function HomeScreen() {
-  const { t } = useTranslation(['home', 'common']);
+export default function WelcomeScreen() {
+  const { t } = useTranslation('welcome');
   const router = useRouter();
-  const { data: lessons, isPending, isError, refetch, isRefetching } = useLessons();
-  const { isOffline } = useNetworkStatus();
-
-  // A fast double-tap on a card must not push two exercise screens; the lock
-  // re-opens whenever Home regains focus.
-  const navigateOnce = useNavigationLock({ resetOnFocus: true });
-  const openLesson = useCallback(
-    (lessonId: string) => navigateOnce(() => router.push(`/exercise/${lessonId}`)),
-    [navigateOnce, router],
-  );
-
-  const renderItem = useCallback(
-    ({ item }: { item: Lesson }) => (
-      <LessonCard lesson={item} onPress={() => openLesson(item.id)} />
-    ),
-    [openLesson],
-  );
-
-  const hasLessons = !!lessons && lessons.length > 0;
-
-  let content;
-  if (isPending) {
-    content = (
-      <View style={styles.skeletons} accessibilityLabel={t('common:loading')}>
-        {Array.from({ length: SKELETON_COUNT }, (_, i) => (
-          <LessonCardSkeleton key={i} />
-        ))}
-      </View>
-    );
-  } else if (hasLessons) {
-    // A failed background refetch keeps showing cached data (list stays up).
-    content = (
-      <FlatList
-        data={lessons}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        ItemSeparatorComponent={ListGap}
-        contentContainerStyle={styles.listContent}
-        getItemLayout={(_, index) => ({
-          length: LESSON_CARD_HEIGHT,
-          offset: (LESSON_CARD_HEIGHT + LESSON_CARD_GAP) * index,
-          index,
-        })}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={() => refetch()}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
-            progressBackgroundColor={colors.surface}
-          />
-        }
-        showsVerticalScrollIndicator={false}
-      />
-    );
-  } else {
-    // No data at all: network error (offline gets a friendlier line) or a
-    // technically-successful-but-empty payload.
-    content = (
-      <FullScreenMessage
-        speech={
-          isError ? (isOffline ? t('offlineNoCache') : t('common:errorTitle')) : t('emptyTitle')
-        }
-        actionLabel={t('common:retry')}
-        onAction={() => refetch()}
-      />
-    );
-  }
+  const navigateOnce = useNavigationLock();
 
   return (
-    <SafeAreaView style={styles.screen} edges={['top']}>
-      <View style={styles.header}>
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{t('title')}</Text>
-          <LanguageSwitch />
-        </View>
-        <Mascot size={48} speech={t('greeting')} />
+    <SafeAreaView style={styles.screen}>
+      <View style={styles.hero}>
+        <Animated.Text
+          entering={FadeInDown.duration(350).reduceMotion(ReduceMotion.System)}
+          style={styles.appName}
+          maxFontSizeMultiplier={1.4}
+        >
+          {t('appName')}
+        </Animated.Text>
+        <Animated.View
+          entering={FadeInUp.delay(150).duration(350).reduceMotion(ReduceMotion.System)}
+        >
+          <Mascot size={96} speech={t('intro')} readAloud />
+        </Animated.View>
       </View>
-      {isOffline ? <OfflineBanner /> : null}
-      {content}
+      <ChunkyButton
+        label={t('start')}
+        icon="▶️"
+        onPress={() => navigateOnce(() => router.replace('/(tabs)/home'))}
+      />
     </SafeAreaView>
   );
 }
@@ -115,28 +48,17 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.background,
+    padding: spacing.xl,
   },
-  header: {
-    padding: spacing.lg,
-    gap: spacing.md,
-  },
-  titleRow: {
-    flexDirection: 'row',
+  hero: {
+    flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
+    justifyContent: 'center',
+    gap: spacing.xl,
   },
-  title: {
+  appName: {
     ...typography.title,
     color: colors.ink,
-    flexShrink: 1,
-  },
-  listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
-  },
-  skeletons: {
-    paddingHorizontal: spacing.lg,
-    gap: LESSON_CARD_GAP,
+    textAlign: 'center',
   },
 });

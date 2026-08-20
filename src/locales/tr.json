@@ -5,27 +5,52 @@
     "errorTitle": "Bir şeyler ters gitti",
     "mascotA11y": "Sevimli tilki maskot",
     "mascotSays": "Tilki diyor ki: {{text}}",
-    "languagePickerA11y": "Dil seçimi",
+    "speakA11y": "Sesli oku",
     "languageChanging": "Dil değişiyor…",
-    "language": {
-      "tr": "Türkçe",
-      "en": "English"
+    "languageToggleA11y": {
+      "tr": "Dil: Türkçe. İngilizceye geçmek için dokun.",
+      "en": "Dil: İngilizce. Türkçeye geçmek için dokun."
+    },
+    "tabs": {
+      "home": "Ana Sayfa",
+      "exercises": "Alıştırmalar",
+      "settings": "Ayarlar"
     }
   },
+  "welcome": {
+    "appName": "Minik Dersler",
+    "intro": "İzle, çöz, yıldız topla!",
+    "start": "Başla"
+  },
+  "dashboard": {
+    "greeting": "Merhaba! Bugün ne öğreniyoruz?",
+    "streak_one": "{{count}} gün üst üste",
+    "streak_other": "{{count}} gün üst üste",
+    "starsA11y_one": "Toplam {{count}} yıldız",
+    "starsA11y_other": "Toplam {{count}} yıldız",
+    "cta": "Alıştırmalara Git"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "languageLabel": "Dil",
+    "versionLabel": "Sürüm"
+  },
+  "map": {
+    "start": "Başla",
+    "lockedHint": "Önce bir önceki alıştırmayı bitir! 💪",
+    "stateLocked": "kilitli",
+    "stateOpen": "açık",
+    "stateStars": "yıldız {{stars}}/{{total}}",
+    "nodeA11y": "{{title}}. {{state}}",
+    "closeA11y": "Kapat"
+  },
   "home": {
-    "title": "Dersler",
-    "greeting": "Merhaba! Hadi öğrenelim 🚀",
     "emptyTitle": "Henüz ders yok",
     "offlineBanner": "İnternet yok — kayıtlı dersler açık 📚",
     "offlineNoCache": "İnternete bağlanınca dersler gelecek",
+    "loadingMore": "Daha fazla ders geliyor…",
     "lessonTitle": "Ders {{number}}: {{author}}",
-    "lessonCardA11y": "{{title}}. {{status}}",
-    "keepGoing": "Devam et 💪",
-    "badgeEarned": "Rozet 🏅",
-    "badgePerfect": "Süper 🌟",
     "lessonStatus": {
-      "none": "Henüz denenmedi",
-      "attempted": "Denendi, henüz rozet yok",
       "earned": "Rozet kazanıldı",
       "perfect": "Mükemmel rozet kazanıldı"
     }
@@ -37,15 +62,20 @@
     "videoUnavailable": "Video şu an açılmıyor. Sorular bu videoyla ilgili.",
     "videoSkip": "Videosuz devam et",
     "question": "Soru {{current}}/{{total}}",
+    "outcome": {
+      "correct": "Soru {{number}}: doğru",
+      "wrong": "Soru {{number}}: yanlış",
+      "timeout": "Soru {{number}}: süre doldu"
+    },
     "correct": "Harika! 🎉",
     "wrong": "Olsun, devam! 💪",
     "timeUp": "Süre doldu ⏰",
     "timeLeft_one": "Kalan süre {{count}} saniye",
     "timeLeft_other": "Kalan süre {{count}} saniye",
     "exitButton": "Çıkış",
-    "exitPrompt": "Bırakıp ana sayfaya dönmek istiyor musun?",
+    "exitPrompt": "Alıştırmayı bırakmak istiyor musun?",
     "exitStay": "Devam et",
-    "exitLeave": "Ana sayfa"
+    "exitLeave": "Alıştırmalara dön"
   },
   "result": {
     "passTitle": "Bravo! 🎉",
@@ -56,7 +86,9 @@
     "goHome": "Ana Sayfa",
     "mascotPass": "Seninle gurur duyuyorum!",
     "mascotPerfect": "Vay! Hepsini bildin!",
-    "mascotFail": "Sorun değil, birlikte başarırız!"
+    "mascotFail": "Sorun değil, birlikte başarırız!",
+    "starsA11y_one": "{{count}} yıldız kazandın",
+    "starsA11y_other": "{{count}} yıldız kazandın"
   },
   "errors": {
     "network": "İnternet şu an çalışmıyor",

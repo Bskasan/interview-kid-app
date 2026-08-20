@@ -20,6 +20,7 @@ import { ExitButton } from '@/components/ExitButton';
 import { ExitConfirmSheet } from '@/components/ExitConfirmSheet';
 import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
+import { SpeakButton } from '@/components/SpeakButton';
 import { TimerBar } from '@/components/TimerBar';
 import { VideoUnavailableCard } from '@/components/VideoUnavailableCard';
 import { LESSON_VIDEO_URL } from '@/constants/media';
@@ -131,7 +132,9 @@ export default function ExerciseScreen() {
     if (pendingAction) {
       navigation.dispatch(pendingAction);
     } else {
-      router.replace('/');
+      // The 🏠 button has no intercepted action to replay; land where the
+      // hardware-back path also ends up — the exercises tab.
+      router.replace('/(tabs)/exercises');
     }
   }, [leaving, pendingAction, navigation, router]);
 
@@ -287,13 +290,22 @@ export default function ExerciseScreen() {
       <View style={styles.topRow}>
         <ExitButton onPress={openExitSheet} />
         <View style={styles.topRowFill}>
-          <SegmentedProgress current={quiz.index + 1} total={questions.length} />
+          <SegmentedProgress
+            current={quiz.index + 1}
+            total={questions.length}
+            outcomes={quiz.outcomes}
+          />
         </View>
       </View>
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
-      <Text style={styles.prompt} numberOfLines={2}>
-        {tq(question.promptKey)}
-      </Text>
+      <View style={styles.promptRow}>
+        {/* Capped: numberOfLines is hard, so uncapped scaling would ellipsize
+            the very question the child has to answer. */}
+        <Text style={styles.prompt} numberOfLines={2} maxFontSizeMultiplier={1.4}>
+          {tq(question.promptKey)}
+        </Text>
+        <SpeakButton text={tq(question.promptKey)} />
+      </View>
       <AnswerGrid
         key={quiz.index}
         options={question.options}
@@ -329,11 +341,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
   },
+  promptRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginVertical: spacing.md,
+  },
   prompt: {
     ...typography.subtitle,
     color: colors.ink,
     textAlign: 'center',
-    marginVertical: spacing.md,
+    flexShrink: 1,
   },
   mascotRow: {
     flex: 1,
