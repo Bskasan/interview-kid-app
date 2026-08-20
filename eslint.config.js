@@ -1,6 +1,7 @@
 const { defineConfig } = require('eslint/config');
 const expoConfig = require('eslint-config-expo/flat');
 const prettierConfig = require('eslint-config-prettier/flat');
+const i18nextPlugin = require('eslint-plugin-i18next');
 
 module.exports = defineConfig([
   // 1. Base configs
@@ -40,7 +41,13 @@ module.exports = defineConfig([
     },
   },
 
-  // 5. Global ignores
+  // 5. i18n enforcement: user-visible literals must go through t().
+  {
+    ...i18nextPlugin.configs['flat/recommended'],
+    files: ['app/**/*.{ts,tsx}', 'src/**/*.{ts,tsx}'],
+  },
+
+  // 6. Global ignores
   {
     ignores: ['dist/*', '.expo-export/*'],
   },
