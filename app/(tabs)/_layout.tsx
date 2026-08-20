@@ -41,6 +41,9 @@ export default function TabsLayout() {
           paddingBottom: insets.bottom + spacing.xs,
         },
         tabBarLabelStyle: { fontSize: 13, fontWeight: '800' },
+        // The bar is a fixed box and the label is single-line; on Android font
+        // scaling defaults to on, which clips it against the icon at 2×.
+        tabBarAllowFontScaling: false,
       }}
     >
       <Tabs.Screen

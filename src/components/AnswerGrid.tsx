@@ -14,10 +14,10 @@ export const MIN_TILE_HEIGHT = 120;
 
 // Vertical space the quiz screen spends outside the grid, from the measured
 // styles: screen padding 32 + four column gaps 64 + top row (48dp exit button
-// with the progress bar beside it) + timer ~30 + one-line prompt with margins
-// ~54 + mascot row 48 ≈ 276, padded to absorb the status-bar inset. Keeps a
-// 360×640 screen scroll-free.
-const RESERVED_VERTICAL = 292;
+// with the progress bar beside it) + timer ~30 + prompt row (48dp read-aloud
+// button with the question beside it) + margins 24 + mascot row 48 ≈ 294,
+// padded to absorb the status-bar inset. Keeps a 360×640 screen scroll-free.
+const RESERVED_VERTICAL = 310;
 
 /**
  * Pure so the 2×2 sizing is unit-testable: width fills two columns; height is

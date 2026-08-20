@@ -1,7 +1,8 @@
 /**
  * Result screen: pass/fail celebration with the one-by-one star reveal, the
- * animated badge and retry/home actions. Records the attempt into the
- * progress store exactly once; retakes keep the best result.
+ * animated badge, a read-aloud mascot message and retry/home actions. Records
+ * the attempt into the progress store exactly once; retakes keep the best
+ * result.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -57,7 +58,9 @@ export default function ResultScreen() {
   return (
     <SafeAreaView style={styles.screen}>
       <View style={styles.celebration}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} maxFontSizeMultiplier={1.4}>
+          {title}
+        </Text>
         <Text style={styles.score}>{t('score', { correct, total })}</Text>
         {total > 0 ? <StarReveal earned={correct} total={total} /> : null}
         {badge !== 'none' ? <BadgeReveal badge={badge} /> : null}

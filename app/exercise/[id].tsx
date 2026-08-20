@@ -299,7 +299,9 @@ export default function ExerciseScreen() {
       </View>
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
       <View style={styles.promptRow}>
-        <Text style={styles.prompt} numberOfLines={2}>
+        {/* Capped: numberOfLines is hard, so uncapped scaling would ellipsize
+            the very question the child has to answer. */}
+        <Text style={styles.prompt} numberOfLines={2} maxFontSizeMultiplier={1.4}>
           {tq(question.promptKey)}
         </Text>
         <SpeakButton text={tq(question.promptKey)} />

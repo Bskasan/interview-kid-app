@@ -13,12 +13,13 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { TOUCH_TARGET } from '@/constants/layout';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { isAppLanguage } from '@/i18n';
 import { speak } from '@/lib/speech';
 import { colors } from '@/theme';
 
-const SIZE = 44;
+const SIZE = TOUCH_TARGET.compact;
 const SPEAKER_GLYPH = '🔊';
 
 type Props = {
@@ -48,7 +49,8 @@ export function SpeakButton({ text }: Props) {
   };
 
   return (
-    <Animated.View style={animatedStyle}>
+    // Never squeeze the target: neighbouring text yields width instead.
+    <Animated.View style={[animatedStyle, styles.wrapper]}>
       <Pressable
         onPress={handlePress}
         onPressIn={onPressIn}
@@ -68,6 +70,9 @@ export function SpeakButton({ text }: Props) {
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flexShrink: 0,
+  },
   button: {
     width: SIZE,
     height: SIZE,

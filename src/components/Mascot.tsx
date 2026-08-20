@@ -25,25 +25,33 @@ type Props = {
 
 export function Mascot({ size = 64, speech, readAloud = false }: Props) {
   const { t } = useTranslation();
+  const withButton = !!speech && readAloud;
   const figure = (
     <View
-      style={styles.row}
+      // Only the read-aloud row needs the figure to yield width; on the plain
+      // path the parent is a column, where flexShrink would govern HEIGHT.
+      style={[styles.row, withButton ? styles.figureFlexible : null]}
       accessible
       accessibilityRole="image"
       accessibilityLabel={speech ? t('mascotSays', { text: speech }) : t('mascotA11y')}
     >
       <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-        <Text style={{ fontSize: size * 0.55 }}>{MASCOT_FACE}</Text>
+        {/* Emoji must not scale with the system font or it bursts the circle. */}
+        <Text style={{ fontSize: size * 0.55 }} maxFontSizeMultiplier={1}>
+          {MASCOT_FACE}
+        </Text>
       </View>
       {speech ? (
         <View style={styles.bubble}>
-          <Text style={styles.speech}>{speech}</Text>
+          <Text style={styles.speech} maxFontSizeMultiplier={1.4}>
+            {speech}
+          </Text>
         </View>
       ) : null}
     </View>
   );
 
-  if (!speech || !readAloud) {
+  if (!withButton) {
     return figure;
   }
   return (
@@ -63,7 +71,14 @@ const styles = StyleSheet.create({
   readAloudRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: spacing.sm,
+    // Stretch gives the row a definite width even inside the centering parents
+    // (welcome, result, sheets); without it the row is measured at-most and the
+    // figure's shrink factor never engages, pushing the button off-screen.
+    alignSelf: 'stretch',
+  },
+  figureFlexible: {
     flexShrink: 1,
   },
   circle: {

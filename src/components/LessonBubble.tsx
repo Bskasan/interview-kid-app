@@ -20,8 +20,15 @@ import type { Lesson } from '@/types/lesson';
 
 const BUBBLE_MAX_WIDTH = 340;
 const POINTER_SIZE = 16;
-/** Rough bubble height used only to decide above/below placement. */
-const PLACEMENT_ESTIMATE = 200;
+/**
+ * Worst-case bubble height, used to decide above/below placement and to keep
+ * the Start button inside the viewport: 2×16 padding + 52 header (thumbnail /
+ * two-line title / stars) + 12 gap + 60 button, plus slack for the capped
+ * font growth. Over-estimating only flips the bubble upwards a little sooner;
+ * under-estimating puts the primary action off-screen with no way to scroll
+ * to it (a scroll closes the bubble).
+ */
+const PLACEMENT_ESTIMATE = 240;
 
 type Props = {
   lesson: Lesson;
@@ -54,11 +61,20 @@ export function LessonBubble({
     Math.max(spacing.lg, anchor.x - width / 2),
     Math.max(spacing.lg, containerWidth - spacing.lg - width),
   );
-  // Below the node by default; flip above when the node sits in the lower
-  // part of the viewport (unknown viewport in tests → below + clamped).
+  // Below the node by default; flip above when the node sits low enough that a
+  // worst-case card would not fit under it.
   const nodeBottom = anchor.y + MAP_NODE_SIZE / 2;
   const nodeTop = anchor.y - MAP_NODE_SIZE / 2;
-  const below = containerHeight === 0 || nodeBottom + PLACEMENT_ESTIMATE < containerHeight;
+  const below = nodeBottom + PLACEMENT_ESTIMATE < containerHeight;
+  // Whichever way it opens, the offset is clamped so a worst-case card still
+  // ends inside the viewport — the Start button must never be unreachable
+  // (scrolling to it is impossible: a scroll closes the bubble).
+  const maxOffset = Math.max(spacing.sm, containerHeight - PLACEMENT_ESTIMATE - spacing.sm);
+  const topWhenBelow = Math.min(Math.max(spacing.sm, nodeBottom + POINTER_SIZE / 2 + 2), maxOffset);
+  const bottomWhenAbove = Math.min(
+    Math.max(spacing.sm, containerHeight - nodeTop + POINTER_SIZE / 2 + 2),
+    maxOffset,
+  );
   const pointerX = Math.min(
     Math.max(anchor.x - POINTER_SIZE / 2, left + radius.card),
     left + width - radius.card - POINTER_SIZE,
@@ -78,10 +94,14 @@ export function LessonBubble({
         onStartShouldSetResponder={() => true}
         style={[
           styles.bubble,
-          { width, left },
-          below
-            ? { top: Math.max(spacing.sm, nodeBottom + POINTER_SIZE / 2 + 2) }
-            : { bottom: Math.max(spacing.sm, containerHeight - nodeTop + POINTER_SIZE / 2 + 2) },
+          // maxHeight is the backstop for the estimate being wrong: the card
+          // can never be taller than the map it sits in.
+          {
+            width,
+            left,
+            maxHeight: Math.max(PLACEMENT_ESTIMATE, containerHeight - 2 * spacing.sm),
+          },
+          below ? { top: topWhenBelow } : { bottom: bottomWhenAbove },
         ]}
       >
         <View

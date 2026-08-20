@@ -29,16 +29,13 @@ import { MAP_ROW_HEIGHT } from '@/constants/map';
 import { useLessons } from '@/hooks/useLessons';
 import { useNavigationLock } from '@/hooks/useNavigationLock';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { NODE_CENTER_Y, nodeCenterX } from '@/lib/mapPath';
+import { nodeAnchor } from '@/lib/mapPath';
 import { lessonStars, mapNodeStates, type MapNodeState } from '@/lib/unlock';
-import { useProgressStore } from '@/store/progressStore';
+import { EMPTY_RESULTS, useProgressStore } from '@/store/progressStore';
 import { colors, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
-import type { LessonResult } from '@/types/progress';
 
 const END_REACHED_THRESHOLD = 0.5;
-// Stable reference: a fresh {} per render would defeat the store selector.
-const EMPTY_RESULTS: Record<string, LessonResult> = {};
 
 type OpenBubble = {
   lesson: Lesson;
@@ -63,7 +60,7 @@ export default function ExercisesScreen() {
   } = useLessons();
   const { isOffline } = useNetworkStatus();
   const results = useProgressStore((state) => (state.hasHydrated ? state.results : EMPTY_RESULTS));
-  const { width: windowWidth } = useWindowDimensions();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const mapWidth = windowWidth - 2 * spacing.lg;
 
   // Unlock states derive purely from the ordered star counts, so a result
@@ -78,7 +75,12 @@ export default function ExercisesScreen() {
   // no native measurement, so virtualization can never hand out a stale frame.
   const [bubble, setBubble] = useState<OpenBubble | null>(null);
   const scrollOffsetRef = useRef(0);
-  const [viewportHeight, setViewportHeight] = useState(0);
+  // The map's own height, used to keep an open bubble on screen. onLayout is
+  // the exact value; the window height is the standing over-estimate until it
+  // arrives (and if a platform never reports one), so the bubble is always
+  // clamped against *something* rather than not at all.
+  const [measuredViewportHeight, setMeasuredViewportHeight] = useState(0);
+  const viewportHeight = measuredViewportHeight > 0 ? measuredViewportHeight : windowHeight;
 
   const navigateOnce = useNavigationLock({ resetOnFocus: true });
   const startLesson = useCallback(
@@ -100,7 +102,7 @@ export default function ExercisesScreen() {
   }, []);
   const closeBubble = useCallback(() => setBubble(null), []);
   const handleViewportLayout = useCallback((event: LayoutChangeEvent) => {
-    setViewportHeight(event.nativeEvent.layout.height);
+    setMeasuredViewportHeight(event.nativeEvent.layout.height);
   }, []);
 
   const lessonCount = lessons?.length ?? 0;
@@ -120,10 +122,12 @@ export default function ExercisesScreen() {
             lesson: item,
             state: nodeStates[index] ?? 'locked',
             stars: starsInOrder[index] ?? 0,
-            anchor: {
-              x: spacing.lg + nodeCenterX(index, mapWidth),
-              y: index * MAP_ROW_HEIGHT + NODE_CENTER_Y - scrollOffsetRef.current,
-            },
+            anchor: nodeAnchor({
+              index,
+              width: mapWidth,
+              padding: spacing.lg,
+              scrollOffset: scrollOffsetRef.current,
+            }),
           })
         }
       />
@@ -215,7 +219,9 @@ export default function ExercisesScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t('common:tabs.exercises')}</Text>
+        <Text style={styles.title} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+          {t('common:tabs.exercises')}
+        </Text>
       </View>
       {isOffline ? <OfflineBanner /> : null}
       {content}

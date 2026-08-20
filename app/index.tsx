@@ -1,8 +1,8 @@
 /**
- * Welcome screen ('/'): a short intro shown on every cold start — mascot with
- * the intro line, app name, and a single Start button that replaces into the
- * tab shell so back can never return here. Never blocks: the button is live
- * from the first frame; only the hero animates in.
+ * Welcome screen ('/'): a short intro shown on every cold start — app name,
+ * mascot with the read-aloud intro line, and a Start button that replaces into
+ * the tab shell so back can never return here. Never blocks: the button is
+ * live from the first frame; only the hero animates in.
  */
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';

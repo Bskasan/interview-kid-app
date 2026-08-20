@@ -23,7 +23,7 @@ import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { entryPath, exitPath, NODE_CENTER_Y, nodeCenterX } from '@/lib/mapPath';
 import { type MapNodeState } from '@/lib/unlock';
-import { colors, typography } from '@/theme';
+import { colors, radius, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
 
 const nodeStyles: Record<MapNodeState, { backgroundColor: string; borderColor: string }> = {
@@ -162,10 +162,14 @@ const styles = StyleSheet.create({
     ...typography.subtitle,
     color: colors.ink,
   },
+  // The connector's exit stub runs down this exact column, so the stars sit on
+  // a background chip instead of having the path line cross the glyphs.
   starsSlot: {
     position: 'absolute',
     top: NODE_CENTER_Y + MAP_NODE_SIZE / 2 + 2,
     width: MAP_NODE_SIZE,
     alignItems: 'center',
+    backgroundColor: colors.background,
+    borderRadius: radius.pill,
   },
 });

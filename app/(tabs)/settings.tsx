@@ -1,6 +1,6 @@
 /**
- * Settings tab: the language toggle (moved here from the lesson list header)
- * and the app version. Deliberately tiny — nothing fake, no dead toggles.
+ * Settings tab: the app's only language toggle and the app version.
+ * Deliberately tiny — nothing fake, no dead toggles.
  */
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
@@ -15,9 +15,11 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <Text style={styles.title}>{t('title')}</Text>
+      <Text style={styles.title} numberOfLines={1} maxFontSizeMultiplier={1.4}>
+        {t('title')}
+      </Text>
       <View style={styles.row}>
-        <Text style={styles.rowLabel} maxFontSizeMultiplier={1.4}>
+        <Text style={styles.rowLabel} numberOfLines={1} maxFontSizeMultiplier={1.4}>
           {t('languageLabel')}
         </Text>
         <LanguageSwitch />
@@ -58,9 +60,11 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     gap: spacing.md,
   },
+  // The toggle beside it is a fixed 182dp; the label is what yields.
   rowLabel: {
     ...typography.bodyBold,
     color: colors.ink,
+    flexShrink: 1,
   },
   rowValue: {
     ...typography.body,
