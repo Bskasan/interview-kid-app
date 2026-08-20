@@ -1,16 +1,16 @@
 /**
  * Question countdown hook: timestamp-based remaining time with pause/resume on
- * answer feedback and app backgrounding, single-fire expiry, and a reset for
- * the next question.
+ * answer feedback and app backgrounding, and single-fire expiry. One instance
+ * covers one question; the consumer keys its subtree to start the next fresh.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { COUNTDOWN_TICK_MS } from '@/constants/timing';
 import { useAppActive } from '@/hooks/useAppActive';
 
 type Options = {
   /** The countdown only consumes time while true (and the app is foregrounded). */
   running: boolean;
-  /** Called exactly once when the countdown reaches zero (until reset()). */
+  /** Called exactly once per hook instance, when the countdown reaches zero. */
   onExpire: () => void;
 };
 
@@ -20,6 +20,11 @@ type Options = {
  * the timer run slow; ticks only refresh the display. Pausing (answer feedback,
  * app backgrounded via AppState) snapshots the remaining time; resuming sets a new
  * deadline from that snapshot — backgrounded time is never counted.
+ *
+ * Deliberately no reset(): an armed interval has already captured its deadline,
+ * and a consumer's reset effect runs after this hook's arming effect, so the
+ * stale deadline would win on the next tick. Remounting via `key` is the one
+ * reset React sequences safely (cleanup before the fresh mount's arm).
  */
 export function useCountdown(totalSeconds: number, { running, onExpire }: Options) {
   const totalMs = totalSeconds * 1000;
@@ -62,17 +67,10 @@ export function useCountdown(totalSeconds: number, { running, onExpire }: Option
     };
   }, [active]);
 
-  const reset = useCallback(() => {
-    remainingRef.current = totalMs;
-    expiredRef.current = false;
-    setRemainingMs(totalMs);
-  }, [totalMs]);
-
   return {
     /** Whole seconds left, rounded up (15 → … → 1 → 0). */
     remainingSeconds: Math.ceil(remainingMs / 1000),
     /** 1 → 0 as time runs out; drives the shrinking bar. */
     progress: totalMs === 0 ? 0 : remainingMs / totalMs,
-    reset,
   };
 }

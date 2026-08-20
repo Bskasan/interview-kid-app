@@ -28,7 +28,12 @@ type PersistedProgress = { results: Record<string, LessonResult> };
  * Pre-hydration stand-in for `results`. A stable reference: returning a fresh
  * `{}` from a selector would make every store update look like a change.
  */
-export const EMPTY_RESULTS: Record<string, LessonResult> = {};
+const EMPTY_RESULTS: Record<string, LessonResult> = {};
+
+/** Results gated on hydration: the neutral empty map until AsyncStorage loads. */
+export function useHydratedResults(): Record<string, LessonResult> {
+  return useProgressStore((state) => (state.hasHydrated ? state.results : EMPTY_RESULTS));
+}
 
 /** Current persisted-schema version (see migrateProgress). */
 export const PROGRESS_VERSION = 1;

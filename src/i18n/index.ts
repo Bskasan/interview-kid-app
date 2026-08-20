@@ -19,7 +19,7 @@ if (typeof Intl === 'undefined' || typeof Intl.PluralRules === 'undefined') {
   require('intl-pluralrules');
 }
 
-export const SUPPORTED_LANGUAGES = ['tr', 'en'] as const;
+const SUPPORTED_LANGUAGES = ['tr', 'en'] as const;
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export function isAppLanguage(value: unknown): value is AppLanguage {
@@ -27,7 +27,7 @@ export function isAppLanguage(value: unknown): value is AppLanguage {
 }
 
 /** Device locale mapped to a supported language; Turkish is the product default. */
-export function resolveDeviceLanguage(): AppLanguage {
+function resolveDeviceLanguage(): AppLanguage {
   const code = getLocales()[0]?.languageCode;
   return isAppLanguage(code) ? code : 'tr';
 }

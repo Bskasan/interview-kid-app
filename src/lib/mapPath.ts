@@ -5,7 +5,7 @@
  */
 import { MAP_COLUMN_X, MAP_NODE_SIZE, MAP_ROW_HEIGHT } from '@/constants/map';
 
-export type MapColumn = keyof typeof MAP_COLUMN_X;
+type MapColumn = keyof typeof MAP_COLUMN_X;
 
 // left → center → right → center → left …: consecutive nodes always sit in
 // adjacent columns, so no connector ever has to cross the full width.

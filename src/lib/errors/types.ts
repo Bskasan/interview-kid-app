@@ -7,7 +7,7 @@ import type tr from '@/locales/tr.json';
 export type AppErrorCode = 'NETWORK' | 'MEDIA' | 'STORAGE' | 'UNKNOWN';
 
 /** Keys under the `errors` namespace that are user-facing messages. */
-export type ErrorMessageKey = Exclude<keyof (typeof tr)['errors'], 'ok'>;
+type ErrorMessageKey = Exclude<keyof (typeof tr)['errors'], 'ok'>;
 
 /**
  * The app's normalized error shape. A plain object rather than an Error

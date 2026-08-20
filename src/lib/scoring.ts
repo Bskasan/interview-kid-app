@@ -6,7 +6,7 @@
 import { clamp } from '@/utils/clamp';
 import type { Badge, LessonResult } from '@/types/progress';
 
-export type Outcome = {
+type Outcome = {
   passed: boolean;
   badge: Badge;
 };

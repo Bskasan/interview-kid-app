@@ -3,9 +3,9 @@
  * makes the double-answer lock, timeout handling and finish condition unit-testable
  * without rendering anything.
  */
-export type AnswerChoice = number | 'timeout';
+type AnswerChoice = number | 'timeout';
 
-export type QuizAnswer = {
+type QuizAnswer = {
   choice: AnswerChoice;
   isCorrect: boolean;
 };

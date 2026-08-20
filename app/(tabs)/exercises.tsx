@@ -4,6 +4,20 @@
  * the list behaviors it replaced: incremental page loading, offline banner,
  * pull-to-refresh, loading/error/empty states.
  */
+import { canLoadMoreLessons } from '@/api/lessons';
+import { FullScreenMessage } from '@/components/FullScreenMessage';
+import { LessonBubble } from '@/components/LessonBubble';
+import { MapNodeRow } from '@/components/MapNodeRow';
+import { OfflineBanner } from '@/components/OfflineBanner';
+import { MAP_ROW_HEIGHT } from '@/constants/map';
+import { useLessons } from '@/hooks/useLessons';
+import { useNavigationLock } from '@/hooks/useNavigationLock';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
+import { nodeAnchor } from '@/lib/mapPath';
+import { lessonStars, mapNodeStates, type MapNodeState } from '@/lib/unlock';
+import { useHydratedResults } from '@/store/progressStore';
+import { colors, spacing, typography } from '@/theme';
+import type { Lesson } from '@/types/lesson';
 import { useRouter } from 'expo-router';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,20 +34,6 @@ import {
   type NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { canLoadMoreLessons } from '@/api/lessons';
-import { FullScreenMessage } from '@/components/FullScreenMessage';
-import { LessonBubble } from '@/components/LessonBubble';
-import { MapNodeRow } from '@/components/MapNodeRow';
-import { OfflineBanner } from '@/components/OfflineBanner';
-import { MAP_ROW_HEIGHT } from '@/constants/map';
-import { useLessons } from '@/hooks/useLessons';
-import { useNavigationLock } from '@/hooks/useNavigationLock';
-import { useNetworkStatus } from '@/hooks/useNetworkStatus';
-import { nodeAnchor } from '@/lib/mapPath';
-import { lessonStars, mapNodeStates, type MapNodeState } from '@/lib/unlock';
-import { EMPTY_RESULTS, useProgressStore } from '@/store/progressStore';
-import { colors, spacing, typography } from '@/theme';
-import type { Lesson } from '@/types/lesson';
 
 const END_REACHED_THRESHOLD = 0.5;
 
@@ -59,7 +59,7 @@ export default function ExercisesScreen() {
     isFetchingNextPage,
   } = useLessons();
   const { isOffline } = useNetworkStatus();
-  const results = useProgressStore((state) => (state.hasHydrated ? state.results : EMPTY_RESULTS));
+  const results = useHydratedResults();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   const mapWidth = windowWidth - 2 * spacing.lg;
 
@@ -100,6 +100,7 @@ export default function ExercisesScreen() {
   const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     scrollOffsetRef.current = event.nativeEvent.contentOffset.y;
   }, []);
+
   const closeBubble = useCallback(() => setBubble(null), []);
   const handleViewportLayout = useCallback((event: LayoutChangeEvent) => {
     setMeasuredViewportHeight(event.nativeEvent.layout.height);

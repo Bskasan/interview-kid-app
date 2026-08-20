@@ -151,18 +151,11 @@
       }
     },
     "color": {
-      "background": "Krem",
-      "surface": "Beyaz",
-      "ink": "Siyah",
-      "muted": "Gri",
       "primary": "Yeşil",
-      "primaryDark": "Koyu yeşil",
       "sky": "Mavi",
-      "skyDark": "Koyu mavi",
       "sun": "Sarı",
       "coral": "Kırmızı",
-      "grape": "Mor",
-      "border": "Bej"
+      "grape": "Mor"
     },
     "shape": {
       "circle": "daire",

@@ -1,14 +1,15 @@
 /**
  * The single funnel for every runtime failure: normalize → log (always) →
  * global banner (unless the call site is silent because it renders its own
- * failure UI). Everything that can fail calls this.
+ * failure UI). Everything that can fail calls this; decorative image loads
+ * report through the reportImageError convenience.
  */
 import { logger } from '@/lib/logger';
 import { useErrorStore } from '@/store/errorStore';
 import { normalizeError } from './normalize';
 import type { AppError, AppErrorCode } from './types';
 
-export type HandleErrorOptions = {
+type HandleErrorOptions = {
   /** Where it happened, for the log line — e.g. "query.lessons". */
   context: string;
   /**
@@ -34,4 +35,13 @@ export function handleError(cause: unknown, options: HandleErrorOptions): AppErr
     useErrorStore.getState().show(appError);
   }
   return appError;
+}
+
+/**
+ * The one way a decorative/fallback-backed image reports a load failure:
+ * always silent (the call site renders its own placeholder or emoji), always
+ * logged. Accepts expo-image's error event or any thrown value.
+ */
+export function reportImageError(event: { error?: unknown } | null | undefined, context: string) {
+  handleError(event?.error ?? event, { context, code: 'MEDIA', severity: 'silent' });
 }

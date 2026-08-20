@@ -56,6 +56,8 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0049 — Quiz outcome history](decisions/0049-quiz-outcome-history.md) — QuizState records each question's outcome at lock-in time; the segmented bar shows ✓/✗ per segment (timeout renders as wrong but is announced distinctly); pushed-at-lock-in vs at-advance vs screen-side state.
 - [0050 — Speech stub](decisions/0050-speech-stub.md) — SpeakButton ships the read-aloud affordance with honest press feedback while `speak(text, language)` stays a no-op byte-compatible with expo-speech; placement rule, deliberate non-placements, and the no-double-announce label choice.
 - [0051 — Layout invariants for inline controls](decisions/0051-layout-invariants-inline-controls.md) — rows pairing flexible content with a fixed control need a definite width and exactly one shrinkable child (the bug that hid the 🔊 button); font caps on shared rows; 48dp floor; narrow-viewport verification because jest has no layout engine.
+- [0052 — Per-question countdown via keyed remount](decisions/0052-per-question-countdown-remount.md) — the timer carry-over bug: reset() raced the effect-armed interval (timeout path worked by accident); fix scopes one hook instance per question via a keyed QuestionTimer, deleting the imperative reset instead of guarding it.
+- [0053 — Cleanup policy](decisions/0053-cleanup-policy.md) — final sweep rules: logic duplication extracted (stars, usePulse, reportImageError, useHydratedResults, clamp), style repetition stays; evidence-based dead-code and dependency triage (typescript-eslint removed, Expo false positives kept); dead-key detection with closed dynamic unions (7 color keys deleted); same-text-different-context keys never merged; raw-source duplicate-key test.
 
 ## Features
 
@@ -63,6 +65,6 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [App shell](features/shell.md) — welcome-every-launch, bottom tabs, dashboard (streak + total stars), settings; streak rules and manual tests.
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
-- [i18n](features/i18n.md) — Turkish + English: detection, persisted flag-tile switch with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.
+- [i18n](features/i18n.md) — Turkish + English: detection, the persisted single-toggle switch (sliding flag knob) with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.
 - [Error handling](features/error-handling.md) — the central funnel, banner/boundary surfaces, silent policy, storage wrapper, edge cases, manual tests.
 - [Platforms](features/platforms.md) — Windows/macOS dev with Android/iOS targets: portability guarantees, the all-platform bundle gate, what stays hardware-untested, borrowed-Mac checklist.

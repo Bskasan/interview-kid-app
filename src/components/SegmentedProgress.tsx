@@ -4,24 +4,12 @@
  * current question, beige for upcoming — plus a "Soru 2/3" label. Meaning is
  * carried by the glyphs and the spoken per-question summary, never color alone.
  */
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  cancelAnimation,
-  useAnimatedStyle,
-  useReducedMotion,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
+import { usePulse } from '@/hooks/usePulse';
 import { type QuestionOutcome } from '@/lib/quiz';
 import { colors, radius, spacing, typography } from '@/theme';
-
-// Language-neutral glyphs (AnswerTile badge pattern), not copy — no t() needed.
-const CHECK_GLYPH = '✓';
-const CROSS_GLYPH = '✗';
 
 type Props = {
   /** 1-based index of the question on screen. */
@@ -33,22 +21,9 @@ type Props = {
 
 export function SegmentedProgress({ current, total, outcomes }: Props) {
   const { t } = useTranslation('exercise');
-  const reduceMotion = useReducedMotion();
 
   // "You are here" breathes gently; a static outline under reduced motion.
-  const pulse = useSharedValue(1);
-  const hasOpenCurrent = outcomes.length < current && !reduceMotion;
-  useEffect(() => {
-    if (hasOpenCurrent) {
-      pulse.value = withRepeat(
-        withSequence(withTiming(0.55, { duration: 600 }), withTiming(1, { duration: 600 })),
-        -1,
-      );
-      return () => cancelAnimation(pulse);
-    }
-    pulse.value = 1;
-    return undefined;
-  }, [hasOpenCurrent, pulse]);
+  const pulse = usePulse(outcomes.length < current, 0.55);
   const pulseStyle = useAnimatedStyle(() => ({ opacity: pulse.value }));
 
   const counter = t('question', { current, total });
@@ -71,13 +46,7 @@ export function SegmentedProgress({ current, total, outcomes }: Props) {
                   styles.segment,
                   { backgroundColor: isCorrect ? colors.primary : colors.coral },
                 ]}
-              >
-                <View style={styles.glyphDisc}>
-                  <Text style={styles.glyph} maxFontSizeMultiplier={1}>
-                    {isCorrect ? CHECK_GLYPH : CROSS_GLYPH}
-                  </Text>
-                </View>
-              </View>
+              ></View>
             );
           }
           if (index === current - 1) {

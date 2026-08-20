@@ -23,7 +23,7 @@ import {
   type OptionVisual,
 } from '@/data/questions';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { handleError } from '@/lib/errors/handleError';
+import { reportImageError } from '@/lib/errors/handleError';
 import { type AnswerFeedback } from '@/lib/quiz';
 import { colors, radius, spacing, typography } from '@/theme';
 
@@ -177,14 +177,9 @@ function TileVisual({ visual, size }: { visual: OptionVisual; size: number }) {
         source={{ uri: visual.uri }}
         contentFit="cover"
         transition={200}
-        // Silent: the emoji fallback keeps the question answerable; the log
-        // line keeps the failure observable.
+        // The emoji fallback keeps the question answerable.
         onError={(event) => {
-          handleError(event?.error ?? event, {
-            context: 'answer-tile.image',
-            code: 'MEDIA',
-            severity: 'silent',
-          });
+          reportImageError(event, 'answer-tile.image');
           setImageFailed(true);
         }}
         style={{

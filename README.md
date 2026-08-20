@@ -1,3 +1,212 @@
+[Türkçe](#turkce) | [English](#english)
+
+<a id="turkce"></a>
+
+# Çocuklar İçin Öğrenme Uygulaması — Mini Akış
+
+React Native + Expo (SDK 57, Expo Router, strict TypeScript) ile geliştirilmiş, ~5–8 yaş
+çocuklara yönelik küçük, oyunlaştırılmış bir öğrenme uygulaması. Kısa bir **karşılama**
+ekranı üç sekmeli kabuğa açılır: **Ana Sayfa** (gün serisi ve toplam yıldız sayısını
+gösteren pano), **Alıştırmalar** (açık bir API'den çekilen ders kataloğu üzerinde kıvrılan
+bir ilerleme haritası — dersler yıldız kazandıkça sırayla açılır) ve **Ayarlar** (dil +
+sürüm). Açık bir harita düğümüne dokunmak tam ekran **Alıştırma** akışını başlatır (kısa
+video, ardından büyük görsel yanıt kartları üzerinde süreli 3 soruluk bir quiz) ve akış
+**Sonuç** ekranında biter (yıldız gösterimi + animasyonlu rozet). Uygulama içi dil
+düğmesiyle tamamen iki dilli (Türkçe/English). Sunucu verisi, AsyncStorage'a
+kalıcılaştırılan TanStack Query üzerinden gelir; ilerleme, seri ve ayarlar kalıcı zustand
+store'larında tutulur; animasyonlar Reanimated ile yapılır; çalışma zamanı hataları tek bir
+merkezî, çocuk dostu hata yolundan geçer.
+
+> ⚠️ Bilinen eksikler, teknik borç ve bilinçli takaslar ayrı bir dosyada:
+> **[KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md#turkce)**
+
+## Nasıl çalıştırılır
+
+Her şeyi **Windows + fiziksel Android telefon (Expo Go)** üzerinde geliştirip bizzat
+doğruladım. Diğer satırlar standart Expo akışlarıdır — kod yalnızca platformlar arası Expo
+SDK API'leri kullanır ve CI her push'ta iOS paketini de derler — ama bunları kendim
+çalıştıramadım; tabloda dürüstçe işaretli.
+
+Her yerde ön koşul: Node LTS (20+), ardından bir kez `npm install`. Fiziksel telefon için
+güncel **Expo Go** (Play Store / App Store — Expo Go yalnızca en yeni SDK'yı çalıştırır; bu
+proje SDK 57'de).
+
+| Geliştirme makinesi | Hedef                      | Adımlar                                                                                                                              | Doğrulandı mı?                  |
+| ------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------- |
+| Windows             | Android telefon (Expo Go)  | `npx expo start`, QR'ı Expo Go ile okut (telefon ve PC aynı Wi-Fi'da). Ağ sorunlarında (güvenlik duvarı): `npx expo start --tunnel`. | ✅ bizzat test edildi           |
+| Windows             | Android emülatörü          | Android Studio + bir AVD, `npx expo start`, `a` tuşu.                                                                                | ✅ bizzat test edildi           |
+| Windows             | iPhone (Expo Go)           | `npx expo start`, QR'ı iPhone kamerasıyla okut → Expo Go'da açılır (aynı ağ, ya da `--tunnel`). Windows'ta iOS simülatörü yoktur.    | ⚪ standart akış, test edilmedi |
+| macOS               | iOS Simülatörü             | Xcode + iOS Simulator kurulu olmalı, `npx expo start`, `i` tuşu.                                                                     | ⚪ standart akış, test edilmedi |
+| macOS               | Android (emülatör/telefon) | Android Studio + AVD, `npx expo start`, `a` — ya da fiziksel telefonda Expo Go + QR.                                                 | ⚪ standart akış, test edilmedi |
+
+`npm test` ve `npm run check` Windows ve macOS'ta birebir aynı davranır: npm script'leri ve
+git hook'ları düz POSIX sh'tır (Windows'ta Git Bash, macOS'ta zsh/bash); platforma özgü
+sözdizimi veya yol ayracı yoktur.
+
+Kontroller: `npm run check` tüm kapı zincirini sırayla çalıştırır — typecheck (önce Expo
+Router'ın gitignore'lanmış tipli rotalarını yeniden üretir, yani temiz bir klonda da
+çalışır), ESLint, Prettier kontrolü, Jest (175 test) ve tek seferde **Android, iOS ve web**
+paket dışa aktarımı. Tekil script'ler: `npm run typecheck` · `npm run lint` / `lint:fix` ·
+`npm run format` / `format:check` · `npm test` · `npm run build`. Ortam sağlığı için
+`npx expo-doctor`.
+
+Git hook'ları `npm install` ile otomatik kurulur (husky): **pre-commit** lint-staged
+(staged dosyalara ESLint + Prettier) ve tam typecheck çalıştırır, **commit-msg**
+Conventional Commits'i zorunlu kılar, **pre-push** `npm run check`'in tamamını koşar — bir
+kapıdan geçemeyen hiçbir şey makineden çıkmaz.
+
+## Kalite kapıları & CI
+
+GitHub Actions (`.github/workflows/ci.yml`), `npm run check` ile aynı zinciri — kurulum,
+typecheck, lint, format kontrolü, testler ve Android + iOS + web paket dışa aktarımı — her
+`main` pull request'inde ve her `main` push'unda tek bir hızlı-başarısız (fail-fast) iş
+olarak çalıştırır; geride kalan koşular otomatik iptal edilir ve `main` push'ları dışa
+aktarılan paketleri artifact olarak yükler (main'in iki mobil platform için de her zaman
+derlendiğinin kanıtı). Depo, GitHub Free planında özel olduğundan branch ruleset'leri henüz
+sunucu tarafında zorlanamıyor; içe aktarmaya hazır bir ruleset (PR zorunlu, yeşil `ci`
+kontrolü zorunlu, doğrusal geçmiş, force push/silme yasak) `.github/rulesets/main.json`
+içinde hazır bekliyor — o güne dek zorlayıcı kapı pre-push hook'udur.
+
+## Diller
+
+Türkçe ve İngilizce. İlk açılış cihaz dilini izler (diğer tüm diller Türkçe'ye düşer).
+Ayarlar sekmesinde tek bir düğme vardır: sabit TR/EN etiketli bir hap (pill) ray ve aktif
+dilin bayrağını (🇹🇷/🇬🇧) gösteren kayar bir top — okuma bilmeyen bir çocuk hangisinin açık
+olduğunu bir bakışta görür. Dokununca top kayar (bayrak kayma sırasında değişir) ve kısa
+(~0,85 sn) tam ekran bir geçiş oynar: maskot zıplarken tüm uygulama — soru içerikleri ve
+ekran okuyucu etiketleri dahil — altta değişir; seçim yeniden başlatmalarda korunur.
+Hareket azaltma açıksa geçiş yok, anında değişir. Tüm metinler
+`src/locales/tr.json` / `en.json` içindedir; çeviri anahtarları derleme zamanında denetlenir
+(bilinmeyen anahtar `tsc`'yi düşürür), bir ESLint kuralı (`i18next/no-literal-string`) koda
+gömülü UI metnini engeller ve bir test paketi iki dosyanın aynı anahtarlara, boş olmayan
+değerlere ve eşleşen yer tutuculara sahip olduğunu zorlar. Soru verisi dil-nötrdür
+(görseller ve doğru cevaplar ortak, metin dile göre). Çoğula duyarlı tek metin
+`Intl.PluralRules` kullanır; desteklemeyen motorlarda (Hermes) çalışma zamanında polyfill
+edilir.
+
+## Mimari genel bakış
+
+`app/` altındaki rotalar, her şeyi `src/`'den birleştiren ince ekranlardır. Ana veri
+akışları: picsum sayfaları → React Query sonsuz sorgu (çevrimdışı için AsyncStorage'a
+kalıcı) → alıştırma haritası (kilit durumları saf biçimde ilerleme store'undan türer);
+yerel soru bankası + i18n kaynakları → Alıştırma (saf quiz durum makinesi + geri sayım
+hook'u); quiz sonucu → zustand (kalıcı, migration'lı sürümleme) → harita yıldızları, pano
+toplamı ve seri kartı (AppState'ten beslenen kendi store'u). Çalışma zamanı hataları — ağ,
+medya, depolama, çökme — tek bir huniden (`handleError`) geçer: her zaman loglanır (yalnızca
+geliştirmede yazan, crash-reporter bağlantı noktalı logger), çocuğa yalnızca sakin ve
+çevrilmiş bir bant ya da tam ekran bir geri düşüş olarak gösterilir; asla kod veya stack
+trace görünmez. Tüm saf mantık (puanlama, quiz geçişleri, geri bildirim eşlemesi, savunmacı
+API ayrıştırma, kart boyutlama, genel yardımcılar) `src/lib`/`src/api`/`src/utils` içinde
+durur ve birim testlidir; arayüz tasarım token'larından elle yazılmıştır, UI kit yoktur.
+
+```
+app/                 # rotalar: _layout (sağlayıcılar, hata sınırı, seri takibi),
+                     # index (karşılama), (tabs)/{home,exercises,settings}, exercise/[id], result
+src/
+  api/               # picsum sayfalı fetcher + savunmacı mapper + sayfalama yardımcıları → Lesson[]
+  components/        # AnswerGrid/AnswerTile, MapNodeRow, LessonBubble, StarRow, StarReveal,
+                     # ChunkyButton, Mascot, SpeakButton, ExerciseVideo, ExitConfirmSheet,
+                     # VideoUnavailableCard, GlobalErrorBanner, LanguageSwitch,
+                     # LanguageTransitionOverlay, TimerBar, SegmentedProgress, BadgeReveal…
+  constants/         # kesişen yapılandırma: zamanlama, dokunma hedefleri, api değerleri,
+                     # medya url'i, quiz şekli, harita yerleşimi
+  data/              # soru bankası (5 görsel set; metinler i18n üzerinden)
+  hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive, useCountUp,
+                     # usePressFeedback, usePulse, useNavigationLock, useStreakTracker
+  i18n/              # i18next tekili (senkron init, tipli anahtarlar)
+  lib/               # puanlama, quiz durum makinesi, kilit kuralları, harita geometrisi,
+                     # seri kuralları, yıldız sözlüğü, konuşma stub'ı, hata hunisi + logger,
+                     # haptics, depolama
+  locales/           # tr.json / en.json kaynakları (ekran başına namespace)
+  store/             # zustand store'ları: progress (sürümlü) + settings + streak (kalıcı),
+                     # hata bandı + dil geçişi (bellekte)
+  theme/             # tasarım token'ları: renkler, boşluk, köşe, tipografi, hareket
+  utils/             # React'sız yardımcılar: clamp, hashString, routeParams
+__tests__/           # src/ ve app/ yapısını aynalar
+```
+
+## Varsayımlar
+
+Şartnamenin açık bıraktığı yerlerde şöyle karar verip uyguladım:
+
+1. **Quiz, video bitince açılır.** Video oynatılamazsa — oynatıcı hatası, 12 sn içinde
+   oynatılabilir hale gelmemesi ya da cihazın çevrimdışı olması — bir kart, soruların bu
+   videoyla ilgili olduğunu anlatır ve **çocuk seçer**: tekrar dene ya da videosuz devam et.
+   Medya akışı asla kilitlemez, ama sessizce de atlanmaz.
+2. **Ders başına 3 soru, soru başına 15 sn.** Görünür, daralan bir süre çubuğu; süre dolması
+   yanlış sayılır ve otomatik ilerler. Sayaç **uygulama arka plana alınınca durur** (bir
+   telefon araması ya da ana ekran tuşu çocuğun süresini yememeli) ve kaldığı yerden sürer.
+3. **Geçme = en az 2/3.** 3/3 "mükemmel" rozeti, 2/3 normal rozet kazandırır; daha azı
+   cesaretlendirme ve bariz bir tekrar dene butonu alır. **Tekrarlar en iyi sonucu korur** —
+   adildir, çünkü bir ders her zaman aynı soru setini alır (ders kimliğinden deterministik
+   türetilir).
+4. **Alıştırmadan çıkmak onay ister.** Her iki aşamada da görünür duran 🏠 butonu ile geri
+   tuşu/jesti aynı onay sayfasını açar — ders görseli, maskot, güvenli seçenek olarak "devam
+   et" — bu sırada video ve soru sayacı altta durur. Onaylamak o denemeyi siler; Sonuç
+   ekranına kadar hiçbir şey kaydedilmez, Sonuç da tam bir kez kaydeder.
+5. **"İlerleme/rozet göstergesi" = yıldızlar.** Tamamlanmış en iyi denemenin her doğru
+   cevabı için bir ⭐ (3 üzerinden ⭐⭐☆), her harita düğümünün altında gösterilir ve panoda
+   toplanır; rozetler Sonuç ekranının kutlaması olarak kalır. Yalnızca tamamlanmış denemeler
+   sayılır.
+6. **Çevrimdışı politikası**: ders listesi önbelleğe alınır; önbellek varken çevrimdışı,
+   listeyi + bir çevrimdışı bandını gösterir; önbelleksiz çevrimdışı, tekrar dene'li bir
+   hata durumu gösterir. Quiz'in kendisi tamamen çevrimdışı çalışır (yerel veri; tek
+   fotoğraflı soru emojiye düşer).
+7. **Cevaplar görsel-öncelikli kartlardır** (çizili şekiller, emoji, rakamlar ve bir
+   fotoğraftan oluşan 2×2 ızgara) çünkü hedef yaş okuma öncesini de kapsar; yine de her kart
+   betimleyici bir erişilebilirlik etiketi taşır ve küçük bir 360×640 ekrana kaydırmasız
+   sığacak şekilde boyutlanır.
+8. **Tasarım dili**: sıcak ve sakin — krem arka plan, tombul 3B-kenarlı butonlar, konuşma
+   balonlu özgün bir tilki-emoji maskot, başarıda kutlama, başarısızlıkta nazik
+   cesaretlendirme (sert kırmızı yok, cezalandıran ses yok). Popüler çocuk uygulamalarından
+   ruhen ilham alır; üçüncü taraf görsel, isim veya marka rengi yoktur. Ekran başına tek ana
+   eylem, ≥56dp dokunma hedefleri, her zaman ikonla eşleşen ≥18sp metin, ≥4.5:1 kontrast,
+   her yerde hareket azaltmaya saygı.
+9. **Dil düğmesi görsel ve bilinçli olarak törenseldir.** Tek düğme (sabit TR/EN etiketleri,
+   aktif dilin bayrağını gösteren kayar top — okuma öncesi bir çocuğun tanıyacağı biçimde)
+   ve dil değişimi anlık bir yeniden boyama yerine kısa bir maskot geçişi oynatır — çocuk
+   bir "an"ın yaşandığını görür ve değişim ekran kapalıyken gerçekleşir, yani yarı çevrilmiş
+   bir kare asla görünmez. Hareket azaltma töreni tamamen atlar.
+10. **Şartnameden bilinçli sapma: dersler sırayla açılır ve bir derse dokunmak alıştırmayı
+    değil bir balonu açar.** Şartname, listedeki öğeye dokununca Alıştırma ekranının
+    açılmasını söyler; alıştırmalar sekmesi bunun yerine, N. ders ≥2⭐ olunca N+1'in
+    açıldığı bir ilerleme patikasıdır ve düğüme dokunmak küçük bir balon açar (ders görseli,
+    başlık, yıldızlar, "Başla"). Bunun bir alt sonucu: **küçük görsel ve başlık, düğümün
+    üstünde değil bu balonda yaşar** — düğüm yüzü okunaklı kalsın diye ders numarası/kilit +
+    yıldızları taşır; şartnamenin öğe başına istediği üçlü, bilinçli olarak tek dokunuş
+    derinliktedir. Gerekçe: oyunlaştırılmış patika görünür bir ilerleme ve dersi hakkıyla
+    bitirme nedeni verir, kilitli bir haritanın "bu neden açılmıyor?"u anlatacak bir yere
+    ihtiyacı vardır ve onay adımı bu yaşta kazara dokunuşlara karşı korur. Açık yol iki
+    dokunuş olarak kalır (düğüm → Başla).
+11. **Karşılama ekranı her açılışta görünür** — bilinçli bir ritüel (maskot, uygulama adı,
+    tek satır, Başla); ilk-kurulum tanıtımı değildir. Dönen kullanıcıyı hafifçe yorabilir;
+    tek ve anında bir dokunuşla kapanarak dengelenir (<2 sn, buton ilk kareden canlıdır).
+12. **Sesli okuma önce bir "yer" olarak gemide.** Çocuğun tek başına anlaması gereken her
+    cümlenin yanında 🔊 butonu vardır; dürüst basma geri bildirimi verirler, sesin kendisi
+    ise mevcut `speak(text, language)` arayüzünün arkasında bir TTS motorunu bekler.
+
+## Daha fazla zamanım olsaydı
+
+Öncelik sırasıyla:
+
+1. **Gerçek içerik modeli + backend** — picsum ve ortak mock setler yerine ders başına video
+   ve yazılmış soru bankaları.
+2. **Maestro ile E2E testleri** — üç akış için (mutlu yol, süre dolması, bırak-ve-tekrar-dene).
+3. **Gemideki 🔊 butonlarının arkasına gerçek TTS** (expo-speech mevcut
+   `speak(text, language)` arayüzüne oturur) — okuma öncesi çocuklar için dürüst çözüm;
+   yalnız metin hedef yaşın bir kısmını dışarıda bırakır.
+4. **Ses efektleri ve sahip olunan bir set ile gerçek çizimler/maskot** (development build
+   Lottie'yi de açar).
+5. **Analitik + çökme raporlama**, tam-bir-kez deneme kimlikleriyle — merkezî hata hunisinin
+   üretim bağlantı noktası, raporlayıcının takılacağı yerdir.
+6. **Performans geçişi** — uzun listeler için FlashList, quiz'in fotoğraflı sorusu için
+   görsel ön-yükleme.
+7. **iOS cihaz doğrulaması** (paket zaten her kapıda derleniyor) ve ebeveyn kapısı.
+
+---
+
+<a id="english"></a>
+
 # Kids Learning App — Mini Flow
 
 A small gamified learning app for children (~5–8) built with React Native + Expo (SDK 57,
@@ -11,6 +220,9 @@ Fully bilingual (Türkçe/English) with an in-app language toggle. Server data g
 TanStack Query persisted to AsyncStorage; progress, streak and settings live in persisted
 zustand stores; animations are Reanimated; runtime failures funnel through one central,
 kid-friendly error path.
+
+> ⚠️ Known gaps, technical debt and deliberate trade-offs live in a separate file:
+> **[KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md#english)**
 
 ## How to run
 
@@ -37,7 +249,7 @@ platform-specific syntax or paths.
 
 Checks: `npm run check` runs the whole gate suite in order — typecheck (which first
 regenerates Expo Router's gitignored typed routes, so it works on a fresh clone), ESLint,
-Prettier check, Jest (165 tests) and a bundle export for **Android, iOS and web** in one
+Prettier check, Jest (175 tests) and a bundle export for **Android, iOS and web** in one
 pass. Individual scripts: `npm run typecheck` · `npm run lint` / `lint:fix` ·
 `npm run format` / `format:check` · `npm test` · `npm run build`. `npx expo-doctor` for
 environment sanity.
@@ -103,10 +315,10 @@ src/
                      # quiz shape, map layout
   data/              # question bank (5 visual sets; text via i18n)
   hooks/             # useLessons, useNetworkStatus, useCountdown, useAppActive, useCountUp,
-                     # usePressFeedback, useNavigationLock, useStreakTracker
+                     # usePressFeedback, usePulse, useNavigationLock, useStreakTracker
   i18n/              # i18next singleton (synchronous init, typed keys)
   lib/               # scoring, quiz state machine, unlock rules, map geometry, streak rules,
-                     # speech stub, error funnel + logger, haptics, storage
+                     # star vocabulary, speech stub, error funnel + logger, haptics, storage
   locales/           # tr.json / en.json resources (namespaced per screen)
   store/             # zustand stores: progress (versioned) + settings + streak (persisted),
                      # error banner + language transition (in-memory)
@@ -158,6 +370,9 @@ Where the brief was open, I decided and implemented as follows:
     opens a bubble, not the exercise.** The brief says tapping a list item opens the Exercise
     screen; the exercises tab is instead a progress path where lesson N+1 unlocks once lesson
     N has ≥2⭐, and tapping a node opens a small bubble (thumbnail, title, stars, "Başla").
+    A sub-consequence: **the thumbnail and title live in that bubble, not on the node
+    face** — the node stays legible carrying the lesson number/lock plus its stars, so the
+    brief's per-item trio (thumbnail + title + progress) is deliberately one tap deep.
     Rationale: the gamified path gives visible progression and a reason to master a lesson,
     a locked map needs a place to explain "why not this one", and the confirm step protects
     against accidental taps at this age. The open path stays two taps (node → Başla).
@@ -167,58 +382,6 @@ Where the brief was open, I decided and implemented as follows:
 12. **Read-aloud is shipped as an affordance first.** 🔊 buttons sit next to every sentence a
     child must understand alone; they give honest press feedback while the audio itself waits
     for a TTS engine behind the existing `speak(text, language)` interface.
-
-## Not production-ready / trade-offs
-
-- **picsum.photos as "lessons"** and one sample video for all lessons; quiz content is a
-  local mock bank (5 sets shared by 20 lessons).
-- **No backend, no auth, no analytics** — progress lives only on-device (AsyncStorage).
-- **Read-aloud is a visual affordance pending TTS.** The 🔊 buttons next to child-facing text
-  give honest press feedback but play no audio yet; a text-to-speech engine (expo-speech)
-  drops into the existing `speak(text, language)` interface.
-- **iOS is device-untested.** Every gate builds the iOS bundle (so it compiles) and the
-  code uses only cross-platform Expo SDK modules, but I develop on Windows and had no
-  Apple hardware: real-device rendering, haptics, video playback and VoiceOver on iOS are
-  unverified.
-- **Flags stand for languages** on the switch — semantically imprecise (flags denote
-  countries; 🇬🇧 for English is an arbitrary pick among anglophone flags). Accepted for a
-  two-language kids' app because a pre-reader recognizes a flag faster than a word; the
-  toggle's fixed TR/EN labels and its spoken description carry the exact state for readers.
-- **The progress map is more machinery than the brief asked for** — a flat tappable list
-  would have met the requirement with a fraction of the code (geometry, unlock rules, bubble,
-  store migration). Chosen deliberately for the gamified-feel goal; the cost is complexity
-  that a follow-up interview should be able to defend line by line.
-- **The streak is local-only and cheatable** — it reads the device clock, so setting the date
-  forward inflates it (backwards deliberately does not reset it). Acceptable for an on-device
-  reward with no backend; a real product would validate activity server-side.
-- **Changing language takes ~0.85 s by design** — the transition is deliberate ceremony,
-  not lag; reduced-motion users get an instant swap. The delay is a knob
-  (`LANGUAGE_TRANSITION` constants) if it ever feels wrong on slower devices.
-- **Branch protection is deferred** — private repo on GitHub Free, where rulesets can't be
-  enforced server-side; the committed ruleset applies later, the pre-push gate enforces now.
-- **No crash reporter wired** — every failure already funnels through one logger with an
-  explicit production hook point, so wiring Sentry (or similar) is a one-file change; until
-  then production failures are surfaced to the user but not collected.
-- **Language toggle is not parent-gated** — a child can flip languages (harmless, reversible
-  in one tap); a real product would move it behind the parental gate.
-- **JS timers** — the countdown is timestamp-based (drift-resistant) but display granularity
-  is ~100 ms; fine for a kids quiz, not precision-critical use.
-- **No E2E tests, and no layout coverage at all** — 165 unit/component tests cover logic and
-  screen decision points, but the renderer used in tests has no layout engine: an element that
-  is rendered off-screen still passes a "is it there?" assertion. One shipped bug (a button
-  pushed outside its row) proved that gap, so narrow-screen checks are part of the manual pass
-  and every inline control now follows one written layout rule. Making it catchable in CI needs
-  a device-based runner (Maestro/Detox).
-- **Large fonts are hardened to ~1.4×, not to the maximum** — text that shares a row with a
-  control is capped and yields correctly, but the fixed-height screens do not scroll, so at the
-  very largest system font sizes content gets tight rather than reflowing.
-- **No parental gate** — a real kids product needs one (app-store family policies); out of
-  scope here by design.
-- **Public sample video** — Google's classic sample bucket started returning 403 mid-project
-  and was replaced with test-videos.co.uk; if that dies too, the child gets the choice card
-  (retry / continue without the video) instead of a broken screen.
-- **Web is incidental** — it runs client-side only, but browsers block autoplay-with-sound
-  and it is not a supported target.
 
 ## What I would do with more time
 

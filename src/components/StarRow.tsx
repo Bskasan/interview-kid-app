@@ -4,8 +4,8 @@
  * count into their own accessibility label.
  */
 import { StyleSheet, Text } from 'react-native';
+import { EARNED_STAR, HOLLOW_STAR, starCounts } from '@/lib/stars';
 import { colors } from '@/theme';
-import { clamp } from '@/utils/clamp';
 
 type Props = {
   earned: number;
@@ -14,11 +14,10 @@ type Props = {
 };
 
 export function StarRow({ earned, total, size = 18 }: Props) {
-  const safeTotal = Math.max(0, Math.trunc(total));
-  const safeEarned = clamp(Math.trunc(earned), 0, safeTotal);
+  const safe = starCounts(earned, total);
   return (
     <Text style={[styles.stars, { fontSize: size }]} accessible={false} maxFontSizeMultiplier={1.2}>
-      {'⭐'.repeat(safeEarned) + '☆'.repeat(safeTotal - safeEarned)}
+      {EARNED_STAR.repeat(safe.earned) + HOLLOW_STAR.repeat(safe.total - safe.earned)}
     </Text>
   );
 }

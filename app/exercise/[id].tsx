@@ -7,11 +7,6 @@ import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 // Since SDK 56 expo-router vendors react-navigation; importing the standalone
 // @react-navigation/native package is a bundling error (and would use the wrong
 // navigation context). This is the supported compatibility entry.
-import { usePreventRemove } from 'expo-router/react-navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { lessonThumbnailUrl } from '@/api/lessons';
 import { AnswerGrid } from '@/components/AnswerGrid';
 import { ChunkyButton } from '@/components/ChunkyButton';
@@ -44,6 +39,11 @@ import {
 } from '@/lib/quiz';
 import { colors, spacing, typography } from '@/theme';
 import { paramString } from '@/utils/routeParams';
+import { usePreventRemove } from 'expo-router/react-navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * The video step as an explicit machine. `error` is entered from the player's
@@ -56,6 +56,18 @@ type VideoState = 'loading' | 'ready' | 'ended' | 'error';
 // standalone @react-navigation package needs importing (see comment above).
 type PreventRemoveEvent = Parameters<Parameters<typeof usePreventRemove>[1]>[0];
 type PendingAction = PreventRemoveEvent['data']['action'];
+
+// Remounted per question (key = quiz.index at the call site): one countdown
+// instance covers exactly one question, so a fresh 15 s can never race an
+// interval armed with the previous question's deadline — the same reset idiom
+// as the playerKey remount of the video stage.
+function QuestionTimer({ running, onExpire }: { running: boolean; onExpire: () => void }) {
+  const { remainingSeconds, progress } = useCountdown(SECONDS_PER_QUESTION, {
+    running,
+    onExpire,
+  });
+  return <TimerBar progress={progress} remainingSeconds={remainingSeconds} />;
+}
 
 export default function ExerciseScreen() {
   const { t } = useTranslation('exercise');
@@ -89,14 +101,6 @@ export default function ExerciseScreen() {
   const handleExpire = useCallback(() => {
     setQuiz((state) => timeoutQuestion(state));
   }, []);
-  const { remainingSeconds, progress, reset } = useCountdown(SECONDS_PER_QUESTION, {
-    running: timerRunning,
-    onExpire: handleExpire,
-  });
-
-  useEffect(() => {
-    reset();
-  }, [quiz.index, reset]);
 
   // Let the child see the feedback, then move on (also after a timeout) —
   // never behind the open exit sheet, so nothing changes while they decide.
@@ -297,7 +301,9 @@ export default function ExerciseScreen() {
           />
         </View>
       </View>
-      <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
+      {/* Prefixed keys: timer and grid are siblings, and React needs sibling
+          keys unique — both still remount when the question index changes. */}
+      <QuestionTimer key={`timer-${quiz.index}`} running={timerRunning} onExpire={handleExpire} />
       <View style={styles.promptRow}>
         {/* Capped: numberOfLines is hard, so uncapped scaling would ellipsize
             the very question the child has to answer. */}
@@ -307,7 +313,7 @@ export default function ExerciseScreen() {
         <SpeakButton text={tq(question.promptKey)} />
       </View>
       <AnswerGrid
-        key={quiz.index}
+        key={`grid-${quiz.index}`}
         options={question.options}
         feedbackFor={(index) => feedbackForOption(quiz, index, question.correctIndex)}
         onSelect={handleAnswer}
