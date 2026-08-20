@@ -5,8 +5,11 @@
     "errorTitle": "Something went wrong",
     "mascotA11y": "Friendly fox mascot",
     "mascotSays": "The fox says: {{text}}",
-    "languagePickerA11y": "Language choice",
     "languageChanging": "Changing language…",
+    "languageToggleA11y": {
+      "tr": "Language: Turkish. Tap to switch to English.",
+      "en": "Language: English. Tap to switch to Turkish."
+    },
     "language": {
       "tr": "Türkçe",
       "en": "English"

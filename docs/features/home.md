@@ -9,9 +9,10 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 1. Header: big "Dersler" title, the two language flag tiles (see i18n.md) and the fox mascot
    greeting "Merhaba! Hadi öğrenelim 🚀".
 2. While loading: five pulsing skeleton cards (static blocks if reduced motion is on).
-3. Loaded: lesson cards arrive **10 at a time as the child scrolls** (infinite loading). While
-   the next page loads, a small spinner + "Daha fazla ders geliyor…" sits under the list; at the
-   true end of the catalog nothing extra is shown. Each card shows a rounded thumbnail,
+3. Loaded: the fixed 20-lesson catalog arrives **10 at a time as the child scrolls** — 10 on
+   entry, the last 10 when scrolling near the bottom. While the second page loads, a small
+   spinner + "Daha fazla ders geliyor…" sits under the list; at the end of the catalog nothing
+   extra is shown. Each card shows a rounded thumbnail,
    "Ders N: {author}" (N continues across pages: 1–10, 11–20, …), and a progress indicator — a
    star row (⭐ per correct answer of the best attempt, ☆ otherwise) plus, after a completed
    attempt, a pill: "Devam et 💪" (tried, no badge), "Rozet 🏅" (passed) or "Süper 🌟" (perfect).
@@ -36,25 +37,23 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   unknown payload into `Lesson[]` (skip bad items, dedupe ids within the page, numbering
   anchored to the page slot: `(page−1)×10 + index + 1` — the title itself composes at render
   time from `lessonNumber` + `author`, so cached data is language-neutral). The module also
-  exports the pure pagination helpers: `nextLessonsPageParam` / `previousLessonsPageParam`,
-  `flattenLessonPages` (cross-page dedupe, first occurrence wins) and `canLoadMoreLessons` (the
-  onEndReached gate). Thumbnails use `https://picsum.photos/id/{id}/200/200`
-  (`LESSON_THUMBNAIL_SIZE`).
+  exports the pure pagination helpers: `nextLessonsPageParam` (hard-capped at
+  `LESSONS_TOTAL_LIMIT` 20 → never requests past page 2), `flattenLessonPages` (cross-page
+  dedupe, first occurrence wins) and `canLoadMoreLessons` (the onEndReached gate). Thumbnails
+  use `https://picsum.photos/id/{id}/200/200` (`LESSON_THUMBNAIL_SIZE`).
 - `src/hooks/useLessons.ts` — `useInfiniteQuery({ queryKey: ['lessons'] })` with
-  `initialPageParam: LESSONS_FIRST_PAGE`, `getNextPageParam`/`getPreviousPageParam`,
-  `maxPages: LESSONS_MAX_PAGES` (5) and `select: flattenLessonPages`, so screens receive a flat
-  deduped `Lesson[]`. Defaults set in `app/_layout.tsx`: `staleTime` 5 min, `gcTime` 24 h,
-  `retry` 2 (ADR 0041).
+  `initialPageParam: LESSONS_FIRST_PAGE`, `getNextPageParam: nextLessonsPageParam` and
+  `select: flattenLessonPages`, so screens receive a flat deduped `Lesson[]`. Defaults set in
+  `app/_layout.tsx`: `staleTime` 5 min, `gcTime` 24 h, `retry` 2 (ADR 0041).
 - `app/index.tsx` list wiring — `onEndReached` (threshold 0.5) calls
   `fetchNextPage({ cancelRefetch: false })` behind `canLoadMoreLessons` (not in flight, not at
-  the end, not offline); `onStartReached` refills pages the `maxPages` window dropped when
-  scrolling back up; `ListFooterComponent` renders the spinner row only while
+  the end, not offline); `ListFooterComponent` renders the spinner row only while
   `isFetchingNextPage`; the `RefreshControl` spinner is gated `isRefetching &&
 !isFetchingNextPage` because page appends also flip `isRefetching`.
 - `app/_layout.tsx` — `PersistQueryClientProvider` + `createAsyncStoragePersister` persist the
   query cache to AsyncStorage (24 h `maxAge`, `buster: 'lessons-v3'` — bumped for the infinite
-  `{pages, pageParams}` shape), so a cold start offline rehydrates the last-loaded pages (up to
-  5); `onlineManager` is fed by NetInfo so reconnect triggers refetch (ADR 0008).
+  `{pages, pageParams}` shape), so a cold start offline rehydrates every page loaded so far;
+  `onlineManager` is fed by NetInfo so reconnect triggers refetch (ADR 0008).
 - `src/hooks/useNetworkStatus.ts` — NetInfo subscription; offline only on definite negatives
   (`isConnected === false` or `isInternetReachable === false`), so the unknown initial state
   never flashes the banner.
@@ -86,8 +85,8 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   duplicates no-ops; VirtualizedList itself also fires once per content length.
 - Offline while scrolling → no `fetchNextPage`, no stranded footer spinner; loading resumes
   after reconnect on the next scroll.
-- Scrolling past 50 loaded lessons → the `maxPages` window drops the earliest pages;
-  `onStartReached` refills them when the child scrolls back up.
+- picsum could serve hundreds of pages → the pager is hard-capped at the 20-lesson catalog
+  (`LESSONS_TOTAL_LIMIT`); page 2 is never exceeded no matter how the API behaves.
 - A failed page request → that page errors (retry ×2), already-loaded pages stay on screen.
 - Request hangs → aborted at 10 s, standard error/retry path.
 - Offline cold start with cache → cached pages + banner; without cache → offline-specific message.

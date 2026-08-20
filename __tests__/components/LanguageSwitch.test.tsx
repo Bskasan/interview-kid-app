@@ -20,51 +20,58 @@ jest.mock('react-native-reanimated', () => {
 
 const t = i18n.getFixedT(null, 'common');
 
-describe('LanguageSwitch — flag tiles', () => {
+describe('LanguageSwitch — single flag-knob toggle', () => {
   beforeEach(async () => {
     mockReduceMotion = false;
     useLanguageTransitionStore.setState({ pending: null });
     await i18n.changeLanguage('tr');
   });
 
-  it('shows each language in its own name with radio + selected states', async () => {
+  it('is one button announcing the current language and the switch action', async () => {
     await render(<LanguageSwitch />);
 
-    const trTile = screen.getByRole('radio', { name: t('language.tr') });
-    const enTile = screen.getByRole('radio', { name: t('language.en') });
-    expect(screen.getByText('Türkçe')).toBeTruthy();
-    expect(screen.getByText('English')).toBeTruthy();
-    expect(trTile.props.accessibilityState).toMatchObject({ checked: true, selected: true });
-    expect(enTile.props.accessibilityState).toMatchObject({ checked: false, selected: false });
+    const toggle = screen.getByRole('button', { name: t('languageToggleA11y.tr') });
+    expect(toggle.props.accessibilityState).toMatchObject({ disabled: false, busy: false });
+    // Fixed code labels sit at both ends of the track.
+    expect(screen.getByText('TR')).toBeTruthy();
+    expect(screen.getByText('EN')).toBeTruthy();
   });
 
-  it('starts a transition instead of swapping the language itself', async () => {
+  it('starts a transition to the other language instead of swapping itself', async () => {
     await render(<LanguageSwitch />);
 
-    await fireEvent.press(screen.getByRole('radio', { name: t('language.en') }));
+    await fireEvent.press(screen.getByRole('button', { name: t('languageToggleA11y.tr') }));
 
     expect(useLanguageTransitionStore.getState().pending).toBe('en');
     // The actual swap belongs to the overlay, mid-transition — not to the tap.
     expect(i18n.language).toBe('tr');
   });
 
-  it('treats a tap on the already-active language as a no-op', async () => {
+  it('toggles once on a rapid double-tap', async () => {
     await render(<LanguageSwitch />);
+    const toggle = screen.getByRole('button', { name: t('languageToggleA11y.tr') });
 
-    await fireEvent.press(screen.getByRole('radio', { name: t('language.tr') }));
+    await fireEvent.press(toggle);
+    await fireEvent.press(toggle);
 
-    expect(useLanguageTransitionStore.getState().pending).toBeNull();
+    // A second toggle would bounce back toward Turkish; pending must still be
+    // the single forward switch.
+    expect(useLanguageTransitionStore.getState().pending).toBe('en');
     expect(i18n.language).toBe('tr');
   });
 
-  it('ignores taps while a transition is already running', async () => {
+  it('is disabled while a transition is already running', async () => {
     await render(<LanguageSwitch />);
     await act(() => {
       useLanguageTransitionStore.getState().begin('en');
     });
 
-    await fireEvent.press(screen.getByRole('radio', { name: t('language.en') }));
-    // The store guard is idempotent even if a call slips past the disabled tile.
+    // With pending set, the control shows the target language and goes inert.
+    const toggle = screen.getByRole('button', { name: t('languageToggleA11y.en') });
+    expect(toggle.props.accessibilityState).toMatchObject({ disabled: true, busy: true });
+
+    await fireEvent.press(toggle);
+    // The store guard is idempotent even if a call slips past the disabled state.
     useLanguageTransitionStore.getState().begin('tr');
 
     expect(useLanguageTransitionStore.getState().pending).toBe('en');
@@ -75,7 +82,7 @@ describe('LanguageSwitch — flag tiles', () => {
     mockReduceMotion = true;
     await render(<LanguageSwitch />);
 
-    await fireEvent.press(screen.getByRole('radio', { name: t('language.en') }));
+    await fireEvent.press(screen.getByRole('button', { name: t('languageToggleA11y.tr') }));
 
     expect(i18n.language).toBe('en');
     expect(useLanguageTransitionStore.getState().pending).toBeNull();

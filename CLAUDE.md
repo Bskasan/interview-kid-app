@@ -187,9 +187,10 @@ re-litigate:
    allowed. Retaking a lesson keeps the **best** result.
 4. Leaving the exercise mid-way (back gesture/button) asks for confirmation; progress of that attempt is
    discarded. Home progress reflects only completed attempts.
-5. Home list: loaded incrementally from `https://picsum.photos/v2/list?page=N&limit=10` (10 per
-   page, infinite scroll; a short or empty page ends the list); title is generated
+5. Home list: a fixed catalog of 20 lessons, loaded incrementally from
+   `https://picsum.photos/v2/list?page=N&limit=10` — 10 on entry, the last 10 as the child
+   scrolls (never more than 20; a short or empty page ends the list early); title is generated
    ("Ders N: {author}", N globally sequential across pages); thumbnail
-   `https://picsum.photos/id/{id}/200/200`. Up to 5 pages cached for offline; when offline with
+   `https://picsum.photos/id/{id}/200/200`. Loaded pages cached for offline; when offline with
    cache → show cached pages + banner, no further page loads; offline without cache → error state
    with retry.
