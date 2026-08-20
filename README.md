@@ -37,7 +37,7 @@ platform-specific syntax or paths.
 
 Checks: `npm run check` runs the whole gate suite in order — typecheck (which first
 regenerates Expo Router's gitignored typed routes, so it works on a fresh clone), ESLint,
-Prettier check, Jest (162 tests) and a bundle export for **Android, iOS and web** in one
+Prettier check, Jest (165 tests) and a bundle export for **Android, iOS and web** in one
 pass. Individual scripts: `npm run typecheck` · `npm run lint` / `lint:fix` ·
 `npm run format` / `format:check` · `npm test` · `npm run build`. `npx expo-doctor` for
 environment sanity.
@@ -203,8 +203,15 @@ Where the brief was open, I decided and implemented as follows:
   in one tap); a real product would move it behind the parental gate.
 - **JS timers** — the countdown is timestamp-based (drift-resistant) but display granularity
   is ~100 ms; fine for a kids quiz, not precision-critical use.
-- **No E2E tests** — 162 unit/component tests cover logic and screen decision points; full
-  flows were verified manually on device.
+- **No E2E tests, and no layout coverage at all** — 165 unit/component tests cover logic and
+  screen decision points, but the renderer used in tests has no layout engine: an element that
+  is rendered off-screen still passes a "is it there?" assertion. One shipped bug (a button
+  pushed outside its row) proved that gap, so narrow-screen checks are part of the manual pass
+  and every inline control now follows one written layout rule. Making it catchable in CI needs
+  a device-based runner (Maestro/Detox).
+- **Large fonts are hardened to ~1.4×, not to the maximum** — text that shares a row with a
+  control is capped and yields correctly, but the fixed-height screens do not scroll, so at the
+  very largest system font sizes content gets tight rather than reflowing.
 - **No parental gate** — a real kids product needs one (app-store family policies); out of
   scope here by design.
 - **Public sample video** — Google's classic sample bucket started returning 403 mid-project

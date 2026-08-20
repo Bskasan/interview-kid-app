@@ -20,10 +20,12 @@ AppLanguage)` as a no-op whose signature is byte-compatible with expo-speech's
 string** (not a key): it mirrors the real API exactly and keeps the speech module free of any
 i18n dependency.
 
-**Honest affordance.** `SpeakButton` (44dp round, surface + soft shadow, 🔊) gives real
+**Honest affordance.** `SpeakButton` (round, surface + soft shadow, 🔊) gives real
 feedback for what really happens — press bounce + haptic (shared `usePressFeedback`) and a
 short sound-wave wiggle on the icon (reduced motion skips it). No fake beeps, no pretend
-progress.
+progress. _(Shipped at 44dp; corrected to `TOUCH_TARGET.compact` = 48dp by 0051, which also
+fixes the row layout this button must sit in — as first shipped it was pushed off-screen on
+every mascot placement.)_
 
 **Placement rule: next to text a child must understand on their own.** Most such lines are
 mascot speech, so `Mascot` gains an opt-in `readAloud` prop that renders the button as a
