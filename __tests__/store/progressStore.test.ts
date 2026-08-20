@@ -1,4 +1,4 @@
-import { useProgressStore } from '../../src/store/progressStore';
+import { migrateProgress, PROGRESS_VERSION, useProgressStore } from '../../src/store/progressStore';
 
 describe('progressStore — persisted per-lesson results', () => {
   beforeEach(() => {
@@ -43,7 +43,52 @@ describe('progressStore — persisted per-lesson results', () => {
     const options = useProgressStore.persist.getOptions();
 
     expect(options.name).toBe('progress-v1');
+    expect(options.version).toBe(PROGRESS_VERSION);
     const persisted = options.partialize?.(useProgressStore.getState());
     expect(Object.keys(persisted ?? {})).toEqual(['results']);
+  });
+});
+
+describe('migrateProgress — v0 → v1 normalization', () => {
+  it('keeps valid legacy records byte-identical', () => {
+    const legacy = {
+      results: {
+        a: { best: 3, total: 3, badge: 'perfect' },
+        b: { best: 1, total: 3, badge: 'none' },
+      },
+    };
+
+    expect(migrateProgress(legacy, 0)).toEqual(legacy);
+  });
+
+  it('drops garbage entries and recomputes inconsistent badges', () => {
+    const legacy = {
+      results: {
+        ok: { best: 2, total: 3, badge: 'earned' },
+        wrongBadge: { best: 3, total: 3, badge: 'none' }, // stored badge lies
+        inflated: { best: 99, total: 3, badge: 'perfect' },
+        noTotal: { best: 2 },
+        junk: 'not-a-record',
+        alsoJunk: null,
+      },
+    };
+
+    expect(migrateProgress(legacy, 0)).toEqual({
+      results: {
+        ok: { best: 2, total: 3, badge: 'earned' },
+        wrongBadge: { best: 3, total: 3, badge: 'perfect' },
+        inflated: { best: 3, total: 3, badge: 'perfect' },
+      },
+    });
+  });
+
+  it('turns a fully corrupt payload into an empty result set', () => {
+    expect(migrateProgress(null, 0)).toEqual({ results: {} });
+    expect(migrateProgress({ results: 'garbage' }, 0)).toEqual({ results: {} });
+  });
+
+  it('passes current-version payloads through untouched', () => {
+    const current = { results: { a: { best: 1, total: 3, badge: 'none' } } };
+    expect(migrateProgress(current, PROGRESS_VERSION)).toBe(current);
   });
 });
