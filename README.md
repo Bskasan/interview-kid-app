@@ -1,6 +1,6 @@
 # Çocuklar İçin Öğrenme Uygulaması — Mini Akış
 
-Bu proje, React Native + Expo (SDK 57, Expo Router, strict TypeScript) ile geliştirilmiş küçük ve oyunlaştırılmış bir öğrenme uygulamasıdır. Uygulama yaklaşık 5–8 yaş aralığındaki çocukları hedefler.
+Bu proje, React Native + Expo (SDK 57, Expo Router, strict TypeScript) ile geliştirilmiş küçük ve oyunlaştırılmış bir öğrenme uygulamasıdır. Uygulama çocukları hedeflemektedir.
 
 Uygulama önce kısa bir **Karşılama** ekranı gösterir. Ardından kullanıcı üç sekmeli ana yapıya geçer:
 
