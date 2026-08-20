@@ -123,9 +123,9 @@ Where the brief was open, I decided and implemented as follows:
    mascot, "keep going" as the safe default — while the video and the question timer pause
    underneath. Confirming discards that attempt; nothing is recorded until the Result
    screen, which records exactly once.
-5. **"Progress/badge indicator" on Home** means: stars for the best score (⭐⭐☆ of 3) plus a
-   status pill — not tried / keep going / badge / perfect badge — driven by completed
-   attempts only.
+5. **"Progress/badge indicator" = stars.** One ⭐ per correct answer of the best completed
+   attempt (⭐⭐☆ of 3), shown under each map node and summed on the dashboard; badges remain
+   the Result screen's celebration. Driven by completed attempts only.
 6. **Offline policy**: the lesson list is cached; offline with cache shows the list plus an
    offline banner, offline without cache shows an error state with retry. The quiz itself is
    fully offline (local data; the single photo question falls back to an emoji).
@@ -143,6 +143,13 @@ Where the brief was open, I decided and implemented as follows:
    transition instead of an instant reskin — the child sees a moment happen, and the swap
    lands while the screen is covered so no half-translated frame ever shows. Reduced motion
    skips the ceremony entirely.
+10. **Deliberate deviation from the brief: lessons unlock sequentially, and tapping a lesson
+    opens a bubble, not the exercise.** The brief says tapping a list item opens the Exercise
+    screen; the exercises tab is instead a progress path where lesson N+1 unlocks once lesson
+    N has ≥2⭐, and tapping a node opens a small bubble (thumbnail, title, stars, "Başla").
+    Rationale: the gamified path gives visible progression and a reason to master a lesson,
+    a locked map needs a place to explain "why not this one", and the confirm step protects
+    against accidental taps at this age. The open path stays two taps (node → Başla).
 
 ## Not production-ready / trade-offs
 

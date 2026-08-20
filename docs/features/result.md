@@ -22,7 +22,12 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 2. The mascot is supportive ("Sorun değil, birlikte başarırız!").
 3. "🔄 Tekrar Dene" is the green primary; "🏠 Ana Sayfa" the blue secondary.
 
-Reduced motion (system setting): the badge appears statically — no confetti, no glow, no spring.
+Above the badge, the earned stars pop in one by one (⭐ with a spring, ~0.35 s apart); slots
+not earned stay hollow (☆) — 2/3 shows ⭐⭐☆. The row announces "2 yıldız kazandın" to screen
+readers (`StarReveal`, `result:starsA11y`).
+
+Reduced motion (system setting): the badge appears statically and the stars show without the
+pop — no confetti, no glow, no spring.
 Back (button/gesture) returns to the exercises tab — never back into the finished quiz.
 "🏠 Ana Sayfa" lands on the dashboard (updated star total); the lesson card on the exercises
 tab shows the updated stars/badge immediately.
@@ -46,7 +51,8 @@ tab shows the updated stars/badge immediately.
 - **Navigation** — both buttons use `router.replace` ("Tekrar Dene" →
   `/exercise/[id]`, "Ana Sayfa" → `/`) through `useNavigationLock()`, so a double-tap
   replaces exactly once and the history never contains a finished quiz or a stale result.
-  Home updates live because `LessonCard` subscribes to the zustand store.
+  The map updates live because the exercises screen subscribes to the zustand store — earning
+  2⭐ visibly unlocks the next node on return.
 - Primary/secondary button variants swap with the outcome so the _likely_ next action is the
   big green one (design principle: one primary action).
 

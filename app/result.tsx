@@ -1,7 +1,7 @@
 /**
- * Result screen: pass/fail celebration with the animated badge reveal and
- * retry/home actions. Records the attempt into the progress store exactly
- * once; retakes keep the best result.
+ * Result screen: pass/fail celebration with the one-by-one star reveal, the
+ * animated badge and retry/home actions. Records the attempt into the
+ * progress store exactly once; retakes keep the best result.
  */
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef } from 'react';
@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { BadgeReveal } from '@/components/BadgeReveal';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
+import { StarReveal } from '@/components/StarReveal';
 import { useNavigationLock } from '@/hooks/useNavigationLock';
 import { hapticSuccess } from '@/lib/haptics';
 import { computeOutcome } from '@/lib/scoring';
@@ -58,6 +59,7 @@ export default function ResultScreen() {
       <View style={styles.celebration}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.score}>{t('score', { correct, total })}</Text>
+        {total > 0 ? <StarReveal earned={correct} total={total} /> : null}
         {badge !== 'none' ? <BadgeReveal badge={badge} /> : null}
         <Mascot size={72} speech={mascotSpeech} />
       </View>

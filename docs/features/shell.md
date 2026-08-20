@@ -42,7 +42,7 @@ All copy resolves from `src/locales/{tr,en}.json`; Turkish quoted here.
 - `app/(tabs)/settings.tsx` — `LanguageSwitch` row + version from already-installed
   `expo-constants` (`Constants.expoConfig?.version`).
 - `app/(tabs)/exercises.tsx` — the former Home screen unchanged except the header toggle
-  removed (see home.md for the list's behavior).
+  removed (since round 5 it renders the progress map — see exercises-map.md).
 - Streak: rules in `src/lib/streak.ts` (pure; local calendar dates, DST-proof day diff,
   same-day identity no-op, rollback-safe — ADR 0046); state in `src/store/streakStore.ts`
   (`streak-v1`); fed by `src/hooks/useStreakTracker.ts`, mounted as a null-rendering

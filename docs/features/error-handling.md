@@ -46,7 +46,7 @@ ErrorBoundary({ error, retry })` (Expo Router convention) renders the crash fall
   silent (device language simply applies).
 - **Media** — `ExerciseVideo` forwards the `statusChange` error payload
   (`onError(cause)`); the exercise screen logs MEDIA silent and keeps its own failure UI.
-  `LessonCard` thumbnails, `AnswerTile` images and the `ExitConfirmSheet` thumbnail log
+  `LessonBubble` thumbnails, `AnswerTile` images and the `ExitConfirmSheet` thumbnail log
   MEDIA silent; their fallbacks (bordered placeholder / emoji) remain the visible behavior.
 
 ## Edge cases handled

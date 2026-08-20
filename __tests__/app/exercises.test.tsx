@@ -1,9 +1,17 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import ExercisesScreen from '../../app/(tabs)/exercises';
 import i18n from '../../src/i18n';
+import { useProgressStore } from '../../src/store/progressStore';
 import type { Lesson } from '../../src/types/lesson';
 
 const t = i18n.getFixedT(null, 'home');
+const tMap = i18n.getFixedT(null, 'map');
+
+const nodeLabel = (number: number, author: string, stateKey: 'stateOpen' | 'stateLocked') =>
+  tMap('nodeA11y', {
+    title: t('lessonTitle', { number, author }),
+    state: tMap(stateKey),
+  });
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn() }),
@@ -65,6 +73,7 @@ const setup = async (queryOverrides: Record<string, unknown> = {}, isOffline = f
 describe('Exercises screen — incremental loading guards', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    useProgressStore.setState({ results: {}, hasHydrated: true });
   });
 
   it('loads the next page when scrolled to the bottom, once per content length', async () => {
@@ -102,5 +111,52 @@ describe('Exercises screen — incremental loading guards', () => {
     await scrollToBottom();
     expect(fetchNextPage).not.toHaveBeenCalled();
     expect(screen.queryByText(t('loadingMore'))).toBeNull();
+  });
+});
+
+describe('Exercises screen — map nodes and the lesson bubble', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    useProgressStore.setState({ results: {}, hasHydrated: true });
+  });
+
+  it('marks only the first lesson open and later ones locked (fresh progress)', async () => {
+    await setup();
+
+    expect(screen.getByLabelText(nodeLabel(1, 'Ada', 'stateOpen'))).toBeTruthy();
+    expect(screen.getByLabelText(nodeLabel(2, 'Grace', 'stateLocked'))).toBeTruthy();
+  });
+
+  it('unlocks the next node once the previous lesson has pass-grade stars', async () => {
+    useProgressStore.setState({
+      results: { '1': { best: 2, total: 3, badge: 'earned' } },
+      hasHydrated: true,
+    });
+    await setup();
+
+    expect(screen.getByLabelText(nodeLabel(2, 'Grace', 'stateOpen'))).toBeTruthy();
+  });
+
+  it('opens one bubble at a time: an open node offers Start, a locked one only the hint', async () => {
+    await setup();
+
+    await fireEvent.press(screen.getByLabelText(nodeLabel(1, 'Ada', 'stateOpen')));
+    expect(screen.getByLabelText(tMap('start'))).toBeTruthy();
+    expect(screen.queryByText(tMap('lockedHint'))).toBeNull();
+
+    // Tapping another node replaces the bubble — never a second instance.
+    await fireEvent.press(screen.getByLabelText(nodeLabel(2, 'Grace', 'stateLocked')));
+    expect(screen.getByText(tMap('lockedHint'))).toBeTruthy();
+    expect(screen.queryByLabelText(tMap('start'))).toBeNull();
+  });
+
+  it('closes the bubble on an outside tap', async () => {
+    await setup();
+
+    await fireEvent.press(screen.getByLabelText(nodeLabel(1, 'Ada', 'stateOpen')));
+    expect(screen.getByLabelText(tMap('start'))).toBeTruthy();
+
+    await fireEvent.press(screen.getByLabelText(tMap('closeA11y')));
+    expect(screen.queryByLabelText(tMap('start'))).toBeNull();
   });
 });

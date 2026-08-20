@@ -51,10 +51,12 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0044 — Tab shell](decisions/0044-tab-shell.md) — bottom tabs (Ana Sayfa / Alıştırmalar / Ayarlar) with exercise/result kept outside the group so no tab bar can interrupt a quiz; re-pointed navigation targets; principle #1 amended.
 - [0045 — Welcome every launch](decisions/0045-welcome-every-launch.md) — welcome owns `/`, dashboard lives at `(tabs)/home` (route collision), replace-into-tabs so back exits; <2s to dismiss, button live from first frame; translated app name.
 - [0046 — Local streak rules](decisions/0046-streak-day-rules.md) — local calendar days, DST-proof diff, same-day identity no-op, clock-rollback keeps the streak, root-level AppState trigger; local-only and cheatable by design.
+- [0047 — Progress map + unlocking](decisions/0047-progress-map-unlocking.md) — winding node path replaces the flat list (supersedes 0007's presentation): stars = best correct (thresholds unchanged), unlock at PASS_RATIO stars, per-row SVG connectors (virtualization-safe), computed bubble anchors, bubble-instead-of-direct-open deviation.
+- [0048 — Versioned progress persistence](decisions/0048-progress-persist-migration.md) — zustand version+migrate on the kept `progress-v1` key (renaming would delete earned progress); legacy records normalized once; stars derived, never stored.
 
 ## Features
 
-- [Lesson list](features/home.md) — the Alıştırmalar tab's list: incremental loading, data flow, offline behavior, progress indicators, edge cases, manual tests.
+- [Exercises map](features/exercises-map.md) — the Alıştırmalar tab's winding progress path (replaces the flat list doc): star-gated unlocking, node bubbles, incremental loading, offline behavior, edge cases, manual tests.
 - [App shell](features/shell.md) — welcome-every-launch, bottom tabs, dashboard (streak + total stars), settings; streak rules and manual tests.
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.

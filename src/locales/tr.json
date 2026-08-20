@@ -38,6 +38,15 @@
     "languageLabel": "Dil",
     "versionLabel": "Sürüm"
   },
+  "map": {
+    "start": "Başla",
+    "lockedHint": "Önce bir önceki alıştırmayı bitir! 💪",
+    "stateLocked": "kilitli",
+    "stateOpen": "açık",
+    "stateStars": "yıldız {{stars}}/{{total}}",
+    "nodeA11y": "{{title}}. {{state}}",
+    "closeA11y": "Kapat"
+  },
   "home": {
     "title": "Dersler",
     "greeting": "Merhaba! Hadi öğrenelim 🚀",
@@ -83,7 +92,9 @@
     "goHome": "Ana Sayfa",
     "mascotPass": "Seninle gurur duyuyorum!",
     "mascotPerfect": "Vay! Hepsini bildin!",
-    "mascotFail": "Sorun değil, birlikte başarırız!"
+    "mascotFail": "Sorun değil, birlikte başarırız!",
+    "starsA11y_one": "{{count}} yıldız kazandın",
+    "starsA11y_other": "{{count}} yıldız kazandın"
   },
   "errors": {
     "network": "İnternet şu an çalışmıyor",

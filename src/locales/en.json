@@ -38,6 +38,15 @@
     "languageLabel": "Language",
     "versionLabel": "Version"
   },
+  "map": {
+    "start": "Start",
+    "lockedHint": "Finish the previous exercise first! 💪",
+    "stateLocked": "locked",
+    "stateOpen": "open",
+    "stateStars": "stars {{stars}}/{{total}}",
+    "nodeA11y": "{{title}}. {{state}}",
+    "closeA11y": "Close"
+  },
   "home": {
     "title": "Lessons",
     "greeting": "Hi! Let's learn 🚀",
@@ -83,7 +92,9 @@
     "goHome": "Home",
     "mascotPass": "I'm proud of you!",
     "mascotPerfect": "Wow! You got them all!",
-    "mascotFail": "It's okay, we'll do it together!"
+    "mascotFail": "It's okay, we'll do it together!",
+    "starsA11y_one": "You earned {{count}} star",
+    "starsA11y_other": "You earned {{count}} stars"
   },
   "errors": {
     "network": "The internet isn't working right now",

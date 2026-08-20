@@ -1,6 +1,8 @@
 # 0007 — FlatList for the Home lesson list
 
-Status: accepted
+Status: superseded by 0047 (the flat card-list presentation; FlatList itself — keyExtractor,
+getItemLayout, RefreshControl — still underpins the round-5 progress map, and 0041's paging
+stands)
 Date: 2026-08-19
 
 ## Context
