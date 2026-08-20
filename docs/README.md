@@ -53,6 +53,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0046 — Local streak rules](decisions/0046-streak-day-rules.md) — local calendar days, DST-proof diff, same-day identity no-op, clock-rollback keeps the streak, root-level AppState trigger; local-only and cheatable by design.
 - [0047 — Progress map + unlocking](decisions/0047-progress-map-unlocking.md) — winding node path replaces the flat list (supersedes 0007's presentation): stars = best correct (thresholds unchanged), unlock at PASS_RATIO stars, per-row SVG connectors (virtualization-safe), computed bubble anchors, bubble-instead-of-direct-open deviation.
 - [0048 — Versioned progress persistence](decisions/0048-progress-persist-migration.md) — zustand version+migrate on the kept `progress-v1` key (renaming would delete earned progress); legacy records normalized once; stars derived, never stored.
+- [0049 — Quiz outcome history](decisions/0049-quiz-outcome-history.md) — QuizState records each question's outcome at lock-in time; the segmented bar shows ✓/✗ per segment (timeout renders as wrong but is announced distinctly); pushed-at-lock-in vs at-advance vs screen-side state.
 
 ## Features
 

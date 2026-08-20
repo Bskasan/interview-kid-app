@@ -289,7 +289,11 @@ export default function ExerciseScreen() {
       <View style={styles.topRow}>
         <ExitButton onPress={openExitSheet} />
         <View style={styles.topRowFill}>
-          <SegmentedProgress current={quiz.index + 1} total={questions.length} />
+          <SegmentedProgress
+            current={quiz.index + 1}
+            total={questions.length}
+            outcomes={quiz.outcomes}
+          />
         </View>
       </View>
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />

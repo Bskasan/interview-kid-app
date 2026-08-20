@@ -23,6 +23,18 @@ describe('quiz state machine — answering', () => {
     const afterSecond = answerQuestion(afterFirst, 1, 0);
     expect(afterSecond).toBe(afterFirst);
   });
+
+  it('records one outcome per question at lock-in time, surviving the advance', () => {
+    let state = answerQuestion(createQuizState(), 1, 1); // correct
+    expect(state.outcomes).toEqual(['correct']);
+    state = answerQuestion(advanceQuiz(state, TOTAL), 0, 1); // wrong
+    expect(state.outcomes).toEqual(['correct', 'wrong']);
+    state = timeoutQuestion(advanceQuiz(state, TOTAL));
+    expect(state.outcomes).toEqual(['correct', 'wrong', 'timeout']);
+    // Guarded re-entries must never double-push.
+    expect(answerQuestion(state, 2, 2).outcomes).toEqual(['correct', 'wrong', 'timeout']);
+    expect(timeoutQuestion(state).outcomes).toEqual(['correct', 'wrong', 'timeout']);
+  });
 });
 
 describe('quiz state machine — timeout', () => {

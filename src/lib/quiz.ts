@@ -10,6 +10,9 @@ export type QuizAnswer = {
   isCorrect: boolean;
 };
 
+/** One question's recorded outcome; timeout is kept distinct for a11y honesty. */
+export type QuestionOutcome = 'correct' | 'wrong' | 'timeout';
+
 export type QuizState = {
   /** Index of the question currently on screen. */
   index: number;
@@ -17,12 +20,17 @@ export type QuizState = {
   correct: number;
   /** Non-null while the answer feedback for the current question is showing. */
   answer: QuizAnswer | null;
+  /**
+   * Outcome per answered question, appended at lock-in time — so the progress
+   * bar can flip a segment during the feedback window, before the advance.
+   */
+  outcomes: QuestionOutcome[];
   /** True once the last question's feedback has been advanced past. */
   finished: boolean;
 };
 
 export function createQuizState(): QuizState {
-  return { index: 0, correct: 0, answer: null, finished: false };
+  return { index: 0, correct: 0, answer: null, outcomes: [], finished: false };
 }
 
 /** Locks in a tapped option. Ignored while feedback is showing (rapid double-tap guard). */
@@ -31,7 +39,12 @@ export function answerQuestion(state: QuizState, choice: number, correctIndex: n
     return state;
   }
   const isCorrect = choice === correctIndex;
-  return { ...state, answer: { choice, isCorrect }, correct: state.correct + (isCorrect ? 1 : 0) };
+  return {
+    ...state,
+    answer: { choice, isCorrect },
+    correct: state.correct + (isCorrect ? 1 : 0),
+    outcomes: [...state.outcomes, isCorrect ? 'correct' : 'wrong'],
+  };
 }
 
 /** Timer expiry counts as a wrong answer. Ignored if already answered. */
@@ -39,7 +52,11 @@ export function timeoutQuestion(state: QuizState): QuizState {
   if (state.finished || state.answer !== null) {
     return state;
   }
-  return { ...state, answer: { choice: 'timeout', isCorrect: false } };
+  return {
+    ...state,
+    answer: { choice: 'timeout', isCorrect: false },
+    outcomes: [...state.outcomes, 'timeout'],
+  };
 }
 
 /** Moves past the feedback to the next question, or finishes after the last one. */

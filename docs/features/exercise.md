@@ -23,8 +23,12 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 
 **Quiz stage**
 
-1. Top: segmented progress (done = green, current = blue) with "Soru 1/3", then the shrinking
-   time bar with a seconds counter — green, turning **yellow at 10 s** and **coral at 5 s**.
+1. Top: segmented progress with "Soru 1/3" — each answered question's segment shows its
+   outcome (green with a tiny ✓, coral with a tiny ✗ for wrong AND timed-out answers; the
+   segment flips already during the feedback moment), the current question is a white segment
+   with a softly pulsing blue outline (static under reduced motion), upcoming ones are beige.
+   Then the shrinking time bar with a seconds counter — green, turning **yellow at 10 s** and
+   **coral at 5 s**.
 2. A short question ("Hangisi üçgen?") and a 2×2 grid of big square tiles. Each tile shows a
    visual — a drawn shape, an emoji with a word under it, a big digit, or (in one question) a
    photo — on a small white chip, sized so the whole screen fits a 360×640 phone without
@@ -74,9 +78,12 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   uses a network image
   (picsum id 237) and carries a `fallbackEmoji` so it stays answerable offline (ADR 0019).
 - **Quiz state** — `src/lib/quiz.ts`: pure transitions `answerQuestion` / `timeoutQuestion` /
-  `advanceQuiz` over `{index, correct, answer, finished}`; guards against double taps and the
-  timeout-vs-tap race. The screen holds this state in `useState` and schedules `advanceQuiz`
-  1.4 s after an answer locks in.
+  `advanceQuiz` over `{index, correct, answer, outcomes, finished}`; guards against double taps
+  and the timeout-vs-tap race. `outcomes` records each question at lock-in time
+  ('correct' | 'wrong' | 'timeout' — ADR 0049) and feeds `SegmentedProgress`, whose single
+  accessibility label extends to "Soru 2/3. Soru 1: doğru, Soru 2: süre doldu…" (timeout is
+  announced distinctly even though it renders like wrong). The screen holds this state in
+  `useState` and schedules `advanceQuiz` 1.4 s after an answer locks in.
 - **Timer** — `src/hooks/useCountdown.ts` (ADR 0013): timestamp-deadline based, ticks every
   100 ms for display only; active only while `running` (no locked answer, quiz stage) **and**
   the app is foregrounded (`useAppActive` on AppState); pausing snapshots remaining time.
