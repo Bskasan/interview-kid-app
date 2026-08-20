@@ -5,6 +5,7 @@
     "errorTitle": "Bir şeyler ters gitti",
     "mascotA11y": "Sevimli tilki maskot",
     "mascotSays": "Tilki diyor ki: {{text}}",
+    "speakA11y": "Sesli oku",
     "languageChanging": "Dil değişiyor…",
     "languageToggleA11y": {
       "tr": "Dil: Türkçe. İngilizceye geçmek için dokun.",

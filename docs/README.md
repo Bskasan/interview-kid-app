@@ -54,6 +54,7 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0047 — Progress map + unlocking](decisions/0047-progress-map-unlocking.md) — winding node path replaces the flat list (supersedes 0007's presentation): stars = best correct (thresholds unchanged), unlock at PASS_RATIO stars, per-row SVG connectors (virtualization-safe), computed bubble anchors, bubble-instead-of-direct-open deviation.
 - [0048 — Versioned progress persistence](decisions/0048-progress-persist-migration.md) — zustand version+migrate on the kept `progress-v1` key (renaming would delete earned progress); legacy records normalized once; stars derived, never stored.
 - [0049 — Quiz outcome history](decisions/0049-quiz-outcome-history.md) — QuizState records each question's outcome at lock-in time; the segmented bar shows ✓/✗ per segment (timeout renders as wrong but is announced distinctly); pushed-at-lock-in vs at-advance vs screen-side state.
+- [0050 — Speech stub](decisions/0050-speech-stub.md) — SpeakButton ships the read-aloud affordance with honest press feedback while `speak(text, language)` stays a no-op byte-compatible with expo-speech; placement rule, deliberate non-placements, and the no-double-announce label choice.
 
 ## Features
 

@@ -20,6 +20,7 @@ import { ExitButton } from '@/components/ExitButton';
 import { ExitConfirmSheet } from '@/components/ExitConfirmSheet';
 import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
+import { SpeakButton } from '@/components/SpeakButton';
 import { TimerBar } from '@/components/TimerBar';
 import { VideoUnavailableCard } from '@/components/VideoUnavailableCard';
 import { LESSON_VIDEO_URL } from '@/constants/media';
@@ -297,9 +298,12 @@ export default function ExerciseScreen() {
         </View>
       </View>
       <TimerBar progress={progress} remainingSeconds={remainingSeconds} />
-      <Text style={styles.prompt} numberOfLines={2}>
-        {tq(question.promptKey)}
-      </Text>
+      <View style={styles.promptRow}>
+        <Text style={styles.prompt} numberOfLines={2}>
+          {tq(question.promptKey)}
+        </Text>
+        <SpeakButton text={tq(question.promptKey)} />
+      </View>
       <AnswerGrid
         key={quiz.index}
         options={question.options}
@@ -335,11 +339,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.md,
   },
+  promptRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginVertical: spacing.md,
+  },
   prompt: {
     ...typography.subtitle,
     color: colors.ink,
     textAlign: 'center',
-    marginVertical: spacing.md,
+    flexShrink: 1,
   },
   mascotRow: {
     flex: 1,

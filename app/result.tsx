@@ -61,7 +61,7 @@ export default function ResultScreen() {
         <Text style={styles.score}>{t('score', { correct, total })}</Text>
         {total > 0 ? <StarReveal earned={correct} total={total} /> : null}
         {badge !== 'none' ? <BadgeReveal badge={badge} /> : null}
-        <Mascot size={72} speech={mascotSpeech} />
+        <Mascot size={72} speech={mascotSpeech} readAloud />
       </View>
       <View style={styles.actions}>
         {/* Primary action follows the likely next step; retakes keep the best result. */}

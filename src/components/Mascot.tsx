@@ -1,10 +1,12 @@
 /**
  * The app's friendly guide: a fox emoji in a bordered circle with an optional
  * speech bubble, shown on every screen. Screen readers get one image whose
- * label is the speech line.
+ * label is the speech line; `readAloud` adds a SpeakButton beside the bubble
+ * (outside the image node, so it stays focusable) for pre-readers.
  */
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
+import { SpeakButton } from '@/components/SpeakButton';
 import { colors, radius, spacing, typography } from '@/theme';
 
 // Original generic fox — deliberately not an owl or any existing app's character.
@@ -17,11 +19,13 @@ type Props = {
   size?: number;
   /** Optional short line shown in a speech bubble next to the face. */
   speech?: string;
+  /** Adds a read-aloud button for lines a child must understand alone. */
+  readAloud?: boolean;
 };
 
-export function Mascot({ size = 64, speech }: Props) {
+export function Mascot({ size = 64, speech, readAloud = false }: Props) {
   const { t } = useTranslation();
-  return (
+  const figure = (
     <View
       style={styles.row}
       accessible
@@ -38,6 +42,16 @@ export function Mascot({ size = 64, speech }: Props) {
       ) : null}
     </View>
   );
+
+  if (!speech || !readAloud) {
+    return figure;
+  }
+  return (
+    <View style={styles.readAloudRow}>
+      {figure}
+      <SpeakButton text={speech} />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -45,6 +59,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
+  },
+  readAloudRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flexShrink: 1,
   },
   circle: {
     backgroundColor: colors.surface,

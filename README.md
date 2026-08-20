@@ -156,6 +156,9 @@ Where the brief was open, I decided and implemented as follows:
 - **picsum.photos as "lessons"** and one sample video for all lessons; quiz content is a
   local mock bank (5 sets shared by 20 lessons).
 - **No backend, no auth, no analytics** — progress lives only on-device (AsyncStorage).
+- **Read-aloud is a visual affordance pending TTS.** The 🔊 buttons next to child-facing text
+  give honest press feedback but play no audio yet; a text-to-speech engine (expo-speech)
+  drops into the existing `speak(text, language)` interface.
 - **iOS is device-untested.** Every gate builds the iOS bundle (so it compiles) and the
   code uses only cross-platform Expo SDK modules, but I develop on Windows and had no
   Apple hardware: real-device rendering, haptics, video playback and VoiceOver on iOS are

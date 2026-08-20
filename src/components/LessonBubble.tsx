@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 import { ChunkyButton } from '@/components/ChunkyButton';
+import { SpeakButton } from '@/components/SpeakButton';
 import { StarRow } from '@/components/StarRow';
 import { MAP_NODE_SIZE } from '@/constants/map';
 import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
@@ -113,6 +114,7 @@ export function LessonBubble({
             </Text>
             <StarRow earned={stars} total={QUESTIONS_PER_ATTEMPT} />
           </View>
+          <SpeakButton text={title} />
         </View>
         {locked ? (
           <Text style={styles.lockedHint} maxFontSizeMultiplier={1.4}>

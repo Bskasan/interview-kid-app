@@ -19,7 +19,8 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
    while the next page loads, a small spinner + "Daha fazla ders geliyor…" shows under the
    path; nothing extra at the end.
 4. Tapping ANY node opens a speech bubble anchored to it (pointer at the node): thumbnail,
-   "Ders N: {author}", the star row, and — if the lesson is open — a big "▶️ Başla" button;
+   "Ders N: {author}" with a 🔊 read-aloud button (visual affordance, ADR 0050), the star
+   row, and — if the lesson is open — a big "▶️ Başla" button;
    if locked, the line "Önce bir önceki alıştırmayı bitir! 💪" instead. One bubble at a time;
    tapping elsewhere or scrolling closes it. Open path = two taps max (node → Başla).
 5. Earning ≥2⭐ on a lesson unlocks the next node immediately on return from the Result screen.

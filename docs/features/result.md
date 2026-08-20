@@ -22,6 +22,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 2. The mascot is supportive ("Sorun değil, birlikte başarırız!").
 3. "🔄 Tekrar Dene" is the green primary; "🏠 Ana Sayfa" the blue secondary.
 
+The mascot's message carries a 🔊 read-aloud button (visual affordance, ADR 0050).
 Above the badge, the earned stars pop in one by one (⭐ with a spring, ~0.35 s apart); slots
 not earned stay hollow (☆) — 2/3 shows ⭐⭐☆. The row announces "2 yıldız kazandın" to screen
 readers (`StarReveal`, `result:starsA11y`).

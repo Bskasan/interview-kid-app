@@ -22,7 +22,7 @@ export function VideoUnavailableCard({ onRetry, onContinue }: Props) {
   return (
     <View style={styles.wrap}>
       <View style={styles.card}>
-        <Mascot size={72} speech={t('videoUnavailable')} />
+        <Mascot size={72} speech={t('videoUnavailable')} readAloud />
       </View>
       <View style={styles.actions}>
         <ChunkyButton label={t('common:retry')} icon="🔄" onPress={onRetry} />

@@ -32,7 +32,7 @@ export default function WelcomeScreen() {
         <Animated.View
           entering={FadeInUp.delay(150).duration(350).reduceMotion(ReduceMotion.System)}
         >
-          <Mascot size={96} speech={t('intro')} />
+          <Mascot size={96} speech={t('intro')} readAloud />
         </Animated.View>
       </View>
       <ChunkyButton

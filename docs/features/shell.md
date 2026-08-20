@@ -8,13 +8,15 @@ Routes: `app/index.tsx` (welcome, `/`), `app/(tabs)/_layout.tsx` + `home.tsx` / 
 All copy resolves from `src/locales/{tr,en}.json`; Turkish quoted here.
 
 1. **Every cold start**: a welcome screen — app name ("Minik Dersler"), the fox mascot saying
-   "İzle, çöz, yıldız topla!", and one big "▶️ Başla" button. The hero fades in (~0.35 s,
+   "İzle, çöz, yıldız topla!" with a 🔊 read-aloud button beside the bubble (a visual
+   affordance until TTS lands — ADR 0050), and one big "▶️ Başla" button. The hero fades in (~0.35 s,
    skipped under reduced motion); the button works immediately. Tapping Başla opens the tab
    shell; pressing back afterwards exits the app, never returns to the welcome.
 2. **Tab bar** (bottom, always visible inside the shell): 🏠 Ana Sayfa, 🧩 Alıştırmalar,
    ⚙️ Ayarlar. The active tab's icon is full-strength and its label bold green; inactive tabs
    are dimmed gray. Labels switch language instantly with the rest of the app.
-3. **Ana Sayfa (dashboard)**: mascot greeting "Merhaba! Bugün ne öğreniyoruz?", two cards —
+3. **Ana Sayfa (dashboard)**: mascot greeting "Merhaba! Bugün ne öğreniyoruz?" (with its 🔊
+   button), two cards —
    🔥 streak ("3 gün üst üste") and ⭐ total stars (the number counts up from 0 each time the
    tab gains focus; static under reduced motion) — and one big "🧩 Alıştırmalara Git" button.
 4. **Ayarlar**: the language toggle (moved here from the old Home header) and the app version.

@@ -61,7 +61,7 @@ export function ExitConfirmSheet({ visible, thumbnailUrl, onStay, onLeave }: Pro
             }
           />
         ) : null}
-        <Mascot size={56} speech={t('exitPrompt')} />
+        <Mascot size={56} speech={t('exitPrompt')} readAloud />
         <View style={styles.actions}>
           <ChunkyButton label={t('exitStay')} icon="▶️" onPress={onStay} />
           <ChunkyButton label={t('exitLeave')} icon="🏠" variant="sky" onPress={onLeave} />

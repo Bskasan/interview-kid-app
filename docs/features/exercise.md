@@ -29,7 +29,9 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
    with a softly pulsing blue outline (static under reduced motion), upcoming ones are beige.
    Then the shrinking time bar with a seconds counter — green, turning **yellow at 10 s** and
    **coral at 5 s**.
-2. A short question ("Hangisi üçgen?") and a 2×2 grid of big square tiles. Each tile shows a
+2. A short question ("Hangisi üçgen?") with a 🔊 read-aloud button beside it (visual
+   affordance, ADR 0050 — also on the exit-sheet question and the video-unavailable message)
+   and a 2×2 grid of big square tiles. Each tile shows a
    visual — a drawn shape, an emoji with a word under it, a big digit, or (in one question) a
    photo — on a small white chip, sized so the whole screen fits a 360×640 phone without
    scrolling.

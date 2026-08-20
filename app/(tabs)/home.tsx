@@ -38,7 +38,7 @@ export default function DashboardScreen() {
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
       <View style={styles.content}>
-        <Mascot size={64} speech={t('greeting')} />
+        <Mascot size={64} speech={t('greeting')} readAloud />
         <View style={styles.cards}>
           <View
             style={styles.card}
