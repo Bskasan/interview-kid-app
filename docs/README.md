@@ -65,6 +65,6 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [App shell](features/shell.md) — welcome-every-launch, bottom tabs, dashboard (streak + total stars), settings; streak rules and manual tests.
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
-- [i18n](features/i18n.md) — Turkish + English: detection, persisted flag-tile switch with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.
+- [i18n](features/i18n.md) — Turkish + English: detection, the persisted single-toggle switch (sliding flag knob) with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.
 - [Error handling](features/error-handling.md) — the central funnel, banner/boundary surfaces, silent policy, storage wrapper, edge cases, manual tests.
 - [Platforms](features/platforms.md) — Windows/macOS dev with Android/iOS targets: portability guarantees, the all-platform bundle gate, what stays hardware-untested, borrowed-Mac checklist.
