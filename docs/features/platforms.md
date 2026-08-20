@@ -45,7 +45,8 @@ Mac/iPhone, this is the priority order:
 1. `npm install && npm run check` — the full gate must be green on macOS.
 2. `npx expo start` → `i` (Simulator) or QR scan with an iPhone (Expo Go): app boots to
    Home, lessons load.
-3. Safe areas: no content under the notch/home indicator on Home, Exercise, Result.
+3. Safe areas: no content under the notch/home indicator on the welcome, the tabs (including
+   the tab bar's bottom inset), Exercise, Result.
 4. Video: plays, native controls work, the quiz CTA unlocks when it ends.
 5. Haptics on a physical iPhone: gentle tap feedback on presses, success buzz on pass.
 6. Flags on the language tiles render as 🇹🇷/🇬🇧 (iOS renders flag emoji natively).

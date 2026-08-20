@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import HomeScreen from '../../app/index';
+import ExercisesScreen from '../../app/(tabs)/exercises';
 import i18n from '../../src/i18n';
 import type { Lesson } from '../../src/types/lesson';
 
@@ -59,10 +59,10 @@ const scrollToBottom = async () => {
 const setup = async (queryOverrides: Record<string, unknown> = {}, isOffline = false) => {
   mockUseLessons.mockReturnValue(lessonsResult(queryOverrides));
   mockUseNetworkStatus.mockReturnValue({ isOffline });
-  await render(<HomeScreen />);
+  await render(<ExercisesScreen />);
 };
 
-describe('Home screen — incremental loading guards', () => {
+describe('Exercises screen — incremental loading guards', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

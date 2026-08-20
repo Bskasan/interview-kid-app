@@ -131,7 +131,9 @@ export default function ExerciseScreen() {
     if (pendingAction) {
       navigation.dispatch(pendingAction);
     } else {
-      router.replace('/');
+      // The 🏠 button has no intercepted action to replay; land where the
+      // hardware-back path also ends up — the exercises tab.
+      router.replace('/(tabs)/exercises');
     }
   }, [leaving, pendingAction, navigation, router]);
 

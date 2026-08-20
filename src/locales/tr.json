@@ -13,7 +13,30 @@
     "language": {
       "tr": "Türkçe",
       "en": "English"
+    },
+    "tabs": {
+      "home": "Ana Sayfa",
+      "exercises": "Alıştırmalar",
+      "settings": "Ayarlar"
     }
+  },
+  "welcome": {
+    "appName": "Minik Dersler",
+    "intro": "İzle, çöz, yıldız topla!",
+    "start": "Başla"
+  },
+  "dashboard": {
+    "greeting": "Merhaba! Bugün ne öğreniyoruz?",
+    "streak_one": "{{count}} gün üst üste",
+    "streak_other": "{{count}} gün üst üste",
+    "starsA11y_one": "Toplam {{count}} yıldız",
+    "starsA11y_other": "Toplam {{count}} yıldız",
+    "cta": "Alıştırmalara Git"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "languageLabel": "Dil",
+    "versionLabel": "Sürüm"
   },
   "home": {
     "title": "Dersler",
@@ -47,9 +70,9 @@
     "timeLeft_one": "Kalan süre {{count}} saniye",
     "timeLeft_other": "Kalan süre {{count}} saniye",
     "exitButton": "Çıkış",
-    "exitPrompt": "Bırakıp ana sayfaya dönmek istiyor musun?",
+    "exitPrompt": "Alıştırmayı bırakmak istiyor musun?",
     "exitStay": "Devam et",
-    "exitLeave": "Ana sayfa"
+    "exitLeave": "Alıştırmalara dön"
   },
   "result": {
     "passTitle": "Bravo! 🎉",

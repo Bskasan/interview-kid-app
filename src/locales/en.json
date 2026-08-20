@@ -13,7 +13,30 @@
     "language": {
       "tr": "Türkçe",
       "en": "English"
+    },
+    "tabs": {
+      "home": "Home",
+      "exercises": "Exercises",
+      "settings": "Settings"
     }
+  },
+  "welcome": {
+    "appName": "Little Lessons",
+    "intro": "Watch, solve, collect stars!",
+    "start": "Start"
+  },
+  "dashboard": {
+    "greeting": "Hi! What are we learning today?",
+    "streak_one": "{{count}} day in a row",
+    "streak_other": "{{count}} days in a row",
+    "starsA11y_one": "{{count}} star collected",
+    "starsA11y_other": "{{count}} stars collected",
+    "cta": "Go to Exercises"
+  },
+  "settings": {
+    "title": "Settings",
+    "languageLabel": "Language",
+    "versionLabel": "Version"
   },
   "home": {
     "title": "Lessons",
@@ -47,9 +70,9 @@
     "timeLeft_one": "{{count}} second left",
     "timeLeft_other": "{{count}} seconds left",
     "exitButton": "Exit",
-    "exitPrompt": "Do you want to stop and go home?",
+    "exitPrompt": "Do you want to leave the exercise?",
     "exitStay": "Keep going",
-    "exitLeave": "Home"
+    "exitLeave": "Back to exercises"
   },
   "result": {
     "passTitle": "Bravo! 🎉",

@@ -48,10 +48,14 @@ Every non-obvious choice has a decision record; every screen/feature has a featu
 - [0041 — Infinite lesson paging](decisions/0041-infinite-lesson-paging.md) — useInfiniteQuery over picsum pages (2 × 10, hard-capped at the fixed 20-lesson catalog): raw-length end detection, page-anchored "Ders N" numbering, cross-page dedupe, offline gate, cancelRefetch:false multi-fire guard, buster lessons-v3.
 - [0042 — Tint feedback + white visual chip](decisions/0042-tint-feedback-white-chip.md) — answer feedback becomes light tint + 4dp full-strength border + ✓/✗ badge around a constant white chip, so feedback color can never swallow same-colored artwork; 18% tint tokens, ink-only-on-tints rule.
 - [0043 — Single-toggle language switch](decisions/0043-single-toggle-language-switch.md) — one pill track + sliding flag knob replaces the two tiles (supersedes 0039's tile design): knob shows the current language with fixed TR/EN end labels, worklet mid-slide flag crossfade, button role over switch, flat styling over the reference's neumorphism.
+- [0044 — Tab shell](decisions/0044-tab-shell.md) — bottom tabs (Ana Sayfa / Alıştırmalar / Ayarlar) with exercise/result kept outside the group so no tab bar can interrupt a quiz; re-pointed navigation targets; principle #1 amended.
+- [0045 — Welcome every launch](decisions/0045-welcome-every-launch.md) — welcome owns `/`, dashboard lives at `(tabs)/home` (route collision), replace-into-tabs so back exits; <2s to dismiss, button live from first frame; translated app name.
+- [0046 — Local streak rules](decisions/0046-streak-day-rules.md) — local calendar days, DST-proof diff, same-day identity no-op, clock-rollback keeps the streak, root-level AppState trigger; local-only and cheatable by design.
 
 ## Features
 
-- [Home](features/home.md) — lesson list: data flow, offline behavior, progress indicators, edge cases, manual tests.
+- [Lesson list](features/home.md) — the Alıştırmalar tab's list: incremental loading, data flow, offline behavior, progress indicators, edge cases, manual tests.
+- [App shell](features/shell.md) — welcome-every-launch, bottom tabs, dashboard (streak + total stars), settings; streak rules and manual tests.
 - [Exercise](features/exercise.md) — video stage + timed quiz with a 2×2 visual answer grid: events, timer, back guard, feedback states, edge cases, manual tests.
 - [Result](features/result.md) — celebration/encouragement, badge reveal animation, idempotent recording, edge cases, manual tests.
 - [i18n](features/i18n.md) — Turkish + English: detection, persisted flag-tile switch with animated transition, typed keys, translated question bank, plural handling, lint enforcement, manual tests.

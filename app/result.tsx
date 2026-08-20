@@ -75,7 +75,7 @@ export default function ResultScreen() {
           label={t('goHome')}
           icon="🏠"
           variant={passed ? 'primary' : 'sky'}
-          onPress={() => navigateOnce(() => router.replace('/'))}
+          onPress={() => navigateOnce(() => router.replace('/(tabs)/home'))}
         />
       </View>
     </SafeAreaView>

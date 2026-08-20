@@ -41,11 +41,11 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 5. After the third question the screen is **replaced** by the Result screen carrying
    `lessonId`, `correct`, `total` (back from Result cannot re-enter the finished quiz).
 6. Tapping 🏠 — or pressing back / swiping back on **either** stage — slides up the exit
-   sheet: the lesson thumbnail, the mascot asking "Bırakıp ana sayfaya dönmek istiyor
-   musun?", and two big tiles — "▶️ Devam et" (green, the safe default; backdrop tap and
-   the system back do the same) and "🏠 Ana sayfa". While the sheet is open the video and
-   the question timer pause and a locked-in answer does not auto-advance; staying resumes
-   everything. Confirming goes Home and the attempt is discarded.
+   sheet: the lesson thumbnail, the mascot asking "Alıştırmayı bırakmak istiyor musun?",
+   and two big tiles — "▶️ Devam et" (green, the safe default; backdrop tap and
+   the system back do the same) and "🏠 Alıştırmalara dön". While the sheet is open the video
+   and the question timer pause and a locked-in answer does not auto-advance; staying resumes
+   everything. Confirming returns to the exercises tab and the attempt is discarded.
 7. Backgrounding during a question freezes the timer; it resumes where it stopped.
 
 ## b) How it works in code
@@ -89,7 +89,8 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   `src/components/ExitConfirmSheet.tsx` (RN `Modal` + Reanimated slide/fade, reduced-motion
   instant; `onRequestClose` = stay); the 🏠 `src/components/ExitButton.tsx` opens the same
   sheet with no stashed action. Confirming flips `leaving` — the guard disarms on that
-  render — then dispatches the stashed action (back paths) or `router.replace('/')` (🏠).
+  render — then dispatches the stashed action (back paths) or
+  `router.replace('/(tabs)/exercises')` (🏠).
   While the sheet is open: `ExerciseVideo` gets `suspended` (pauses; resumes only if it was
   playing), `timerRunning` is false, and the feedback auto-advance effect is held. The
   finish effect runs with the guard already off and calls `router.replace('/result', …)`.
@@ -155,7 +156,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 7. During a question, background the app 10 s → return: timer resumed where it stopped.
 8. Tap 🏠 (or press Android back) on either stage → the sheet slides up with the lesson
    thumbnail; the timer/video freeze. "Devam et" (or tapping outside, or back again)
-   resumes with the timer where it stopped; "Ana sayfa" lands on Home with no progress
+   resumes with the timer where it stopped; "Alıştırmalara dön" lands on the exercises tab with no progress
    change for that lesson. During the ✓/✗ feedback moment, open the sheet and wait —
    the next question must not appear until after you tap "Devam et".
 9. Finish 3 questions → the Result screen shows "N/3 doğru"; Android back from Result goes

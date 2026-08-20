@@ -44,9 +44,14 @@ explain and defend every decision in a follow-up interview — so every decision
 
 ```
 app/                 # routes only — thin screens that compose components/hooks
-  _layout.tsx        # providers (QueryClient + persistence, SafeArea), Stack
-  index.tsx          # Home
-  exercise/[id].tsx  # Exercise
+  _layout.tsx        # providers (QueryClient + persistence, SafeArea), Stack, streak tracker
+  index.tsx          # Welcome (every launch; replaces into the tab shell)
+  (tabs)/            # bottom-tab shell
+    _layout.tsx      # Tabs: Ana Sayfa / Alıştırmalar / Ayarlar
+    home.tsx         # Dashboard (greeting, streak, total stars, CTA)
+    exercises.tsx    # Lesson list
+    settings.tsx     # Language toggle + app version
+  exercise/[id].tsx  # Exercise (outside the tabs — no tab bar mid-quiz)
   result.tsx         # Result (params: lessonId, correct, total)
 src/
   api/               # fetchers + mappers (picsum → Lesson)
@@ -78,7 +83,8 @@ are roughly 5–8 years old: early readers, so text is minimal and always paired
 Principles (apply on every screen):
 
 1. **One primary action per screen**, bottom-anchored, full-width, impossible to miss. Minimal elements
-   on screen; no clutter, no secondary navigation chrome.
+   on screen; no clutter. The only navigation chrome is the shell's bottom tab bar (Ana Sayfa /
+   Alıştırmalar / Ayarlar); full-screen flows (exercise, result) hide it entirely.
 2. **Big everything.** Touch targets ≥ 56dp for primary controls (48dp absolute minimum), body text
    ≥ 18sp, titles 28–34sp, generous spacing. Small hands, imprecise taps.
 3. **Immediate multimodal feedback.** Every tap: color change + small scale bounce + haptic. Correct

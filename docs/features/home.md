@@ -1,13 +1,14 @@
-# Home screen
+# Lesson list (Alıştırmalar tab)
 
-Route: `app/index.tsx` — the lesson list a child lands on.
+Route: `app/(tabs)/exercises.tsx` — the scrollable lesson list inside the tab shell (see
+shell.md for the shell itself).
 
 ## a) What the user sees
 
 All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is quoted here.
 
-1. Header: big "Dersler" title, the two language flag tiles (see i18n.md) and the fox mascot
-   greeting "Merhaba! Hadi öğrenelim 🚀".
+1. Header: big "Dersler" title and the fox mascot greeting "Merhaba! Hadi öğrenelim 🚀"
+   (the language toggle lives on the Settings tab — see i18n.md).
 2. While loading: five pulsing skeleton cards (static blocks if reduced motion is on).
 3. Loaded: the fixed 20-lesson catalog arrives **10 at a time as the child scrolls** — 10 on
    entry, the last 10 when scrolling near the bottom. While the second page loads, a small
@@ -45,7 +46,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   `initialPageParam: LESSONS_FIRST_PAGE`, `getNextPageParam: nextLessonsPageParam` and
   `select: flattenLessonPages`, so screens receive a flat deduped `Lesson[]`. Defaults set in
   `app/_layout.tsx`: `staleTime` 5 min, `gcTime` 24 h, `retry` 2 (ADR 0041).
-- `app/index.tsx` list wiring — `onEndReached` (threshold 0.5) calls
+- `app/(tabs)/exercises.tsx` list wiring — `onEndReached` (threshold 0.5) calls
   `fetchNextPage({ cancelRefetch: false })` behind `canLoadMoreLessons` (not in flight, not at
   the end, not offline); `ListFooterComponent` renders the spinner row only while
   `isFetchingNextPage`; the `RefreshControl` spinner is gated `isRefetching &&
@@ -63,7 +64,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   `LESSON_CARD_HEIGHT`/`LESSON_CARD_GAP`/`LESSON_CARD_THUMB_SIZE` so the FlatList
   `getItemLayout` never measures and the skeleton matches. Press physics come from
   `src/hooks/usePressFeedback.ts` (scale spring + haptic, reduced-motion aware).
-- `app/index.tsx` — decides between skeletons / list / full-screen message. The list renders
+- `app/(tabs)/exercises.tsx` — decides between skeletons / list / full-screen message. The list renders
   whenever data exists, even if the latest refetch failed (React Query keeps `data` on error);
   the full-screen error appears only with no data at all. `RefreshControl` maps `isRefetching` /
   `refetch`. Header sits outside the FlatList so `getItemLayout` offsets stay exact (ADR 0007).
@@ -102,7 +103,7 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
    the footer spinner + "Daha fazla ders geliyor…" and appends the next 10 ("Ders 11" continues
    the numbering). A fast fling to the bottom loads one page, not several.
 2. Tap a card → the lesson's video stage opens; 🏠 (or back) raises the exit sheet and
-   "Ana sayfa" returns to Home.
+   "Alıştırmalara dön" returns to this tab.
 3. Pull to refresh → green spinner at the top (never during a page append), list settles in
    place.
 4. Airplane mode ON after loading ~2 pages → banner appears; the loaded cards still scroll and

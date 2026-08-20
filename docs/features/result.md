@@ -23,8 +23,9 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 3. "🔄 Tekrar Dene" is the green primary; "🏠 Ana Sayfa" the blue secondary.
 
 Reduced motion (system setting): the badge appears statically — no confetti, no glow, no spring.
-Back (button/gesture) goes Home — never back into the finished quiz. Returning Home shows the
-lesson card's updated stars/badge immediately.
+Back (button/gesture) returns to the exercises tab — never back into the finished quiz.
+"🏠 Ana Sayfa" lands on the dashboard (updated star total); the lesson card on the exercises
+tab shows the updated stars/badge immediately.
 
 ## b) How it works in code
 
@@ -68,9 +69,9 @@ lesson card's updated stars/badge immediately.
 2. Score 3/3 → perfect title, purple 🌟 badge; Home shows ⭐⭐⭐ + "Süper 🌟".
 3. Score 0–1/3 → encouraging copy, no badge; Home shows "Devam et 💪" with the star count.
 4. Retake a passed lesson and score worse → Home badge/stars unchanged (best kept).
-5. Retake a failed lesson and pass → badge upgrades on Home.
-6. On Result, press Android back → lands on Home (not the quiz).
-7. Kill and reopen the app → earned badges still on Home (persisted store).
+5. Retake a failed lesson and pass → badge upgrades on the lesson list.
+6. On Result, press Android back → lands on the exercises tab (not the quiz).
+7. Kill and reopen the app → earned badges still on the lesson list (persisted store).
 8. Enable "Remove animations" (Android accessibility) → badge appears without motion/confetti.
 
 ## e) References

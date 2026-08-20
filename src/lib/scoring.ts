@@ -34,6 +34,20 @@ export function computeOutcome(correct: number, total: number): Outcome {
 }
 
 /**
+ * Total stars across all lessons — the dashboard's headline number. One star
+ * per correct answer of each lesson's best attempt (ADR 0010's semantics),
+ * clamped per record so a corrupt entry can't inflate the sum.
+ */
+export function totalStars(results: Record<string, LessonResult>): number {
+  return Object.values(results).reduce((sum, result) => {
+    if (!Number.isFinite(result.total) || result.total <= 0) {
+      return sum;
+    }
+    return sum + clamp(Math.trunc(result.best), 0, result.total);
+  }, 0);
+}
+
+/**
  * Best-result policy for retakes: a new completed attempt replaces
  * the stored one only when it is strictly better (more correct answers). Ties keep
  * the existing record.

@@ -74,7 +74,7 @@ ErrorBoundary({ error, retry })` (Expo Router convention) renders the crash fall
    `progress-v1` AsyncStorage key (or temporarily hack `getItem` to return `"{"`), launch →
    banner appears, Home still renders with neutral progress.
 4. Crash fallback (dev): throw inside a screen render → fox + "Bir şeyler ters gitti" +
-   "Ana Sayfa" instead of a red screen; the button lands on Home.
+   "Ana Sayfa" instead of a red screen; the button lands on the dashboard.
 5. Break an answer-photo URL (dev): the tile falls back to 🐶 and logs `[answer-tile.image]`;
    no banner.
 

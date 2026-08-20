@@ -128,7 +128,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it('opens the same sheet from the 🏠 button and replaces to Home on confirm', async () => {
+  it('opens the same sheet from the 🏠 button and replaces to the exercises tab on confirm', async () => {
     await render(<ExerciseScreen />);
 
     // Video stage: the exit button is already there.
@@ -136,7 +136,7 @@ describe('Exercise screen — back guard lifecycle', () => {
     expect(screen.getByText(t('exitPrompt'), { exact: false })).toBeTruthy();
 
     await fireEvent.press(screen.getByLabelText(t('exitLeave')));
-    expect(mockReplace).toHaveBeenCalledWith('/');
+    expect(mockReplace).toHaveBeenCalledWith('/(tabs)/exercises');
     expect(mockDispatch).not.toHaveBeenCalled(); // no intercepted action to replay
   });
 

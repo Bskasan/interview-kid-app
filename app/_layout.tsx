@@ -1,11 +1,22 @@
 /**
  * Root layout: global providers (safe area, React Query persisted to
- * AsyncStorage, i18n side-effect init), the navigation Stack, the error-banner
- * and language-transition overlays, and the kid-friendly root error boundary.
+ * AsyncStorage, i18n side-effect init), the navigation Stack (welcome → tab
+ * shell, with exercise/result as full-screen routes), the error-banner and
+ * language-transition overlays, the streak tracker, and the kid-friendly
+ * root error boundary.
  */
 // Side-effect import: initializes i18next synchronously before any screen
 // (or the module-scope wiring below) can render user-facing text.
+import { ChunkyButton } from '@/components/ChunkyButton';
+import { GlobalErrorBanner } from '@/components/GlobalErrorBanner';
+import { LanguageTransitionOverlay } from '@/components/LanguageTransitionOverlay';
+import { Mascot } from '@/components/Mascot';
+import { useStreakTracker } from '@/hooks/useStreakTracker';
 import '@/i18n';
+import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
+import { handleError } from '@/lib/errors/handleError';
+import { reportingStorage } from '@/lib/storage';
+import { colors, spacing } from '@/theme';
 import NetInfo from '@react-native-community/netinfo';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { onlineManager, QueryCache, QueryClient } from '@tanstack/react-query';
@@ -16,14 +27,6 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { ChunkyButton } from '@/components/ChunkyButton';
-import { GlobalErrorBanner } from '@/components/GlobalErrorBanner';
-import { LanguageTransitionOverlay } from '@/components/LanguageTransitionOverlay';
-import { Mascot } from '@/components/Mascot';
-import { handleError } from '@/lib/errors/handleError';
-import { FALLBACK_ERROR_TEXT, FALLBACK_OK_TEXT } from '@/lib/errors/fallbackText';
-import { reportingStorage } from '@/lib/storage';
-import { colors, spacing } from '@/theme';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const LESSONS_STALE_MS = 5 * 60 * 1000;
@@ -55,6 +58,13 @@ const queryClient = new QueryClient({
 
 const persister = createAsyncStoragePersister({ storage: reportingStorage });
 
+// Hook carrier: the streak must count opens on any screen (launch and every
+// foreground), so it lives beside the overlays, not inside a tab.
+function StreakTracker() {
+  useStreakTracker();
+  return null;
+}
+
 /**
  * Expo Router's root error boundary: any uncaught render/effect throw lands
  * here instead of a red screen. Kid-friendly full-screen fallback; the error
@@ -79,9 +89,9 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
         icon="🏠"
         onPress={() => {
           // Remount the crashed route first; if the crash is sticky, going
-          // Home moves the child somewhere safe either way.
+          // to the dashboard moves the child somewhere safe either way.
           void retry();
-          router.replace('/');
+          router.replace('/(tabs)/home');
         }}
       />
     </SafeAreaView>
@@ -93,8 +103,6 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PersistQueryClientProvider
         client={queryClient}
-        // v3: the lessons query became infinite (data is now {pages, pageParams})
-        // — the buster invalidates persisted flat-array entries from v2.
         persistOptions={{ persister, maxAge: DAY_MS, buster: 'lessons-v3' }}
       >
         <StatusBar style="dark" />
@@ -106,6 +114,7 @@ export default function RootLayout() {
         />
         <GlobalErrorBanner />
         <LanguageTransitionOverlay />
+        <StreakTracker />
       </PersistQueryClientProvider>
     </SafeAreaProvider>
   );
