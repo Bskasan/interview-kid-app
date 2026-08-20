@@ -2,7 +2,8 @@
  * Color tokens — roles per the design language ("playful, calm, confident").
  * Contrast policy: text is always `ink` on light fills (background, surface, primary,
  * sky, sun all pass 4.5:1 with ink). `coral` fails 4.5:1 with any text color, so it is
- * used only as a feedback fill/border, never as a text-bearing surface.
+ * used only as a feedback fill/border, never as a text-bearing surface. On the feedback
+ * tints only `ink` text is allowed (ink 9.8:1/9.4:1; `muted` fails at 4.4:1).
  */
 export const colors = {
   background: '#FFF8EC', // cream app background
@@ -17,6 +18,8 @@ export const colors = {
   coral: '#FF6B5B', // wrong / danger — soft, never harsh red
   grape: '#8E5CF6', // perfect badge
   border: '#E8E2D4', // hairlines, card borders
+  successTint: '#DCF4E1', // correct-answer tile wash — primary at 18% over white
+  dangerTint: '#FFE4E1', // wrong-answer tile wash — coral at 18% over white
 } as const;
 
 export type ColorToken = keyof typeof colors;

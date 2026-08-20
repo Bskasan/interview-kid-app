@@ -27,11 +27,15 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
    time bar with a seconds counter — green, turning **yellow at 10 s** and **coral at 5 s**.
 2. A short question ("Hangisi üçgen?") and a 2×2 grid of big square tiles. Each tile shows a
    visual — a drawn shape, an emoji with a word under it, a big digit, or (in one question) a
-   photo — sized so the whole screen fits a 360×640 phone without scrolling.
-3. Tapping a tile locks the quiz instantly (double-taps are ignored):
-   - Correct: the tile fills green with a ✓ corner badge, success haptic, mascot cheers "Harika! 🎉".
-   - Wrong: the tapped tile gets a coral border with an ✗ badge and a gentle shake, the correct
-     tile is revealed with a green outline ✓, mascot encourages "Olsun, devam! 💪".
+   photo — on a small white chip, sized so the whole screen fits a 360×640 phone without
+   scrolling.
+3. Tapping a tile locks the quiz instantly (double-taps are ignored). Feedback tints the tile
+   around the chip — the visual itself always stays on white, so a green shape can never
+   disappear into a green "correct" fill:
+   - Correct: light green wash + thick green border + ✓ corner badge, success haptic, mascot
+     cheers "Harika! 🎉".
+   - Wrong: light coral wash + thick coral border + ✗ badge and a gentle shake; the correct
+     tile is revealed with the green wash + ✓; mascot encourages "Olsun, devam! 💪".
    - Timeout: counts as wrong; mascot says "Süre doldu ⏰" and the correct answer is revealed.
 4. After ~1.4 s the next question appears with a fresh 15 s timer.
 5. After the third question the screen is **replaced** by the Result screen carrying
@@ -97,12 +101,16 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
   per-tile state (e.g. an image load failure) resets each question.
 - **Feedback visuals** — `src/components/AnswerTile.tsx`: five states (idle, correct,
   wrongChoice, revealCorrect, lockedOut) projected by the pure `feedbackForOption` in
-  `src/lib/quiz.ts`; meaning always carried by a ✓/✗ corner badge + border shape, never color
-  alone, and the badge mark is prefixed into the accessibility label. Gentle shake via
-  Reanimated `withSequence`, skipped under reduced motion. Shapes are drawn with
-  `react-native-svg`; images use `expo-image` and swap to the option's `fallbackEmoji` on
-  error. The inner visual scales to 60% of the tile's short side, so cramped screens shrink
-  artwork, never the tap target.
+  `src/lib/quiz.ts`. Feedback = light tint fill (`successTint`/`dangerTint` theme tokens, 18%
+  blends over white) + a uniform 4dp full-strength border + the ✓/✗ corner badge; meaning is
+  never color alone, and the badge mark is prefixed into the accessibility label. The option's
+  visual and caption render on a **constant white chip** (2dp beige border) that no feedback
+  state touches, so tint and artwork can never collide (ADR 0042); only `ink` text is allowed
+  on the tints (contrast rule in `src/theme/colors.ts`). Gentle shake via Reanimated
+  `withSequence`, skipped under reduced motion. Shapes are drawn with `react-native-svg`;
+  images use `expo-image` and swap to the option's `fallbackEmoji` on error. The inner visual
+  scales to 55% of the tile's short side (chip padding takes the rest), so cramped screens
+  shrink artwork, never the tap target.
 
 ## c) Edge cases handled
 
@@ -135,8 +143,14 @@ All copy is resolved from `src/locales/{tr,en}.json` at render time; Turkish is 
 1. Open a lesson → video autoplays; CTA is muted; mascot says watch first.
 2. Let the video end → CTA turns green; tap → quiz starts, timer counts from 15.
 3. Check the quiz layout: 2×2 tiles, no scrolling, progress/timer/prompt/mascot all visible.
-4. Answer correctly → tile fills green with ✓ badge + haptic + cheering mascot, auto-advance ~1.4 s.
-5. Answer wrong → coral border + ✗ badge + gentle shake + green outline ✓ on the right tile.
+4. Answer correctly → light green wash + green border + ✓ badge + haptic + cheering mascot,
+   auto-advance ~1.4 s; the tapped visual stays fully visible on its white chip.
+5. Answer wrong → light coral wash + coral border + ✗ badge + gentle shake + green wash ✓ on
+   the right tile.
+   5b. Tint worst cases: in the colors set answer "Yeşil olan hangisi?" correctly → the green
+   star must stay clearly visible (white chip) inside the green-washed tile; in the shapes
+   set tap the coral triangle when it's wrong → the triangle must not blend into the coral
+   wash/border; a counting question's digits stay ink-on-white in every state.
 6. Let the timer expire → "Süre doldu ⏰", correct answer revealed, counts as wrong.
 7. During a question, background the app 10 s → return: timer resumed where it stopped.
 8. Tap 🏠 (or press Android back) on either stage → the sheet slides up with the lesson

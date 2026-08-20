@@ -29,9 +29,16 @@ export type QuestionTextKey = DotPaths<QuestionsResource>;
 /** The t function bound to the `questions` namespace. */
 export type QuestionsT = TFunction<'questions'>;
 
+/**
+ * A shape may only use a palette color that also has a spoken name in the
+ * `questions.color` namespace — feedback-only tokens (tints) are excluded by
+ * construction, so "green tile wash" can never leak into an option's label.
+ */
+export type SpeakableColor = keyof typeof colors & keyof (typeof tr)['questions']['color'];
+
 export type OptionVisual =
   | { kind: 'emoji'; value: string }
-  | { kind: 'shape'; shape: ShapeName; color: keyof typeof colors }
+  | { kind: 'shape'; shape: ShapeName; color: SpeakableColor }
   // fallbackEmoji keeps an image option answerable offline or on load error.
   | { kind: 'image'; uri: string; fallbackEmoji: string };
 
@@ -82,7 +89,7 @@ export function optionA11yLabel(option: AnswerOptionData, t: QuestionsT): string
   });
 }
 
-const shapeOpt = (shape: ShapeName, color: keyof typeof colors): AnswerOptionData => ({
+const shapeOpt = (shape: ShapeName, color: SpeakableColor): AnswerOptionData => ({
   visual: { kind: 'shape', shape, color },
 });
 
