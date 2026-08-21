@@ -4,6 +4,16 @@
  * feedback, a wrong-answer shake, and tint + border + ✓/✗ feedback states
  * that never rely on color alone and never obscure the visual.
  */
+import {
+  optionA11yLabel,
+  optionLabel,
+  type AnswerOptionData,
+  type OptionVisual,
+} from '@/data/questions';
+import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { reportImageError } from '@/lib/errors/handleError';
+import { type AnswerFeedback } from '@/lib/quiz';
+import { colors, radius, spacing, typography } from '@/theme';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,16 +26,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Circle, Polygon, Rect } from 'react-native-svg';
-import {
-  optionA11yLabel,
-  optionLabel,
-  type AnswerOptionData,
-  type OptionVisual,
-} from '@/data/questions';
-import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { reportImageError } from '@/lib/errors/handleError';
-import { type AnswerFeedback } from '@/lib/quiz';
-import { colors, radius, spacing, typography } from '@/theme';
 
 // Feedback is never color-alone: the ✓/✗ badge + border shapes carry the meaning.
 // Feedback colors only the ring AROUND the white visual chip (light tint fill +
@@ -63,7 +63,7 @@ const TRIANGLE_POINTS = '50,8 92,88 8,88';
 // Visual share of the tile's short side; the rest is chip padding + borders.
 const VISUAL_RATIO = 0.55;
 
-type Props = {
+type AnswerTileProps = {
   option: AnswerOptionData;
   feedback: AnswerFeedback;
   onPress: () => void;
@@ -71,7 +71,7 @@ type Props = {
   height: number;
 };
 
-export function AnswerTile({ option, feedback, onPress, width, height }: Props) {
+export function AnswerTile({ option, feedback, onPress, width, height }: AnswerTileProps) {
   const { t } = useTranslation('questions');
   const locked = feedback !== 'idle';
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled: locked });

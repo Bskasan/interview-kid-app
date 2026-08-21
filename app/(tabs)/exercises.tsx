@@ -69,6 +69,7 @@ export default function ExercisesScreen() {
     () => (lessons ?? []).map((lesson) => lessonStars(results[lesson.id])),
     [lessons, results],
   );
+
   const nodeStates = useMemo(() => mapNodeStates(starsInOrder), [starsInOrder]);
 
   // One bubble at a time; its anchor is computed from index + scroll offset —
@@ -117,8 +118,6 @@ export default function ExercisesScreen() {
         width={mapWidth}
         isLast={index === lessonCount - 1 && !hasNextPage}
         onPress={() =>
-          // Anchor snapshotted here (event handler — the render itself never
-          // touches the scroll ref); a scroll closes the bubble anyway.
           setBubble({
             lesson: item,
             state: nodeStates[index] ?? 'locked',
@@ -204,8 +203,6 @@ export default function ExercisesScreen() {
       </View>
     );
   } else {
-    // No data at all: network error (offline gets a friendlier line) or a
-    // technically-successful-but-empty payload.
     content = (
       <FullScreenMessage
         speech={

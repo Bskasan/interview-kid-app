@@ -2,12 +2,12 @@
  * Settings tab: the app's only language toggle and the app version.
  * Deliberately tiny — nothing fake, no dead toggles.
  */
+import { LanguageSwitch } from '@/components/LanguageSwitch';
+import { colors, radius, spacing, typography } from '@/theme';
 import Constants from 'expo-constants';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LanguageSwitch } from '@/components/LanguageSwitch';
-import { colors, radius, spacing, typography } from '@/theme';
 
 export default function SettingsScreen() {
   const { t } = useTranslation('settings');
@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     gap: spacing.md,
   },
-  // The toggle beside it is a fixed 182dp; the label is what yields.
   rowLabel: {
     ...typography.bodyBold,
     color: colors.ink,

@@ -4,6 +4,10 @@
  * safe default: the primary tile, the backdrop tap and the system back all
  * continue the lesson; only the explicit second tile discards the attempt.
  */
+import { ChunkyButton } from '@/components/ChunkyButton';
+import { Mascot } from '@/components/Mascot';
+import { reportImageError } from '@/lib/errors/handleError';
+import { colors, motion, radius, spacing } from '@/theme';
 import { Image } from 'expo-image';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,15 +20,11 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ChunkyButton } from '@/components/ChunkyButton';
-import { Mascot } from '@/components/Mascot';
-import { reportImageError } from '@/lib/errors/handleError';
-import { colors, motion, radius, spacing } from '@/theme';
 
 const ENTER_OFFSET = 80;
 const THUMB_SIZE = 88;
 
-type Props = {
+type ExitConfirmSheetProps = {
   visible: boolean;
   /** Lesson thumbnail so the child sees what they would be leaving. */
   thumbnailUrl?: string;
@@ -32,7 +32,12 @@ type Props = {
   onLeave: () => void;
 };
 
-export function ExitConfirmSheet({ visible, thumbnailUrl, onStay, onLeave }: Props) {
+export function ExitConfirmSheet({
+  visible,
+  thumbnailUrl,
+  onStay,
+  onLeave,
+}: ExitConfirmSheetProps) {
   const { t } = useTranslation('exercise');
 
   return (

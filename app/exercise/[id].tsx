@@ -16,16 +16,10 @@ import { ExitConfirmSheet } from '@/components/ExitConfirmSheet';
 import { Mascot } from '@/components/Mascot';
 import { SegmentedProgress } from '@/components/SegmentedProgress';
 import { SpeakButton } from '@/components/SpeakButton';
-import { TimerBar } from '@/components/TimerBar';
 import { VideoUnavailableCard } from '@/components/VideoUnavailableCard';
 import { LESSON_VIDEO_URL } from '@/constants/media';
-import {
-  ANSWER_FEEDBACK_MS,
-  SECONDS_PER_QUESTION,
-  VIDEO_READY_TIMEOUT_MS,
-} from '@/constants/timing';
+import { ANSWER_FEEDBACK_MS, VIDEO_READY_TIMEOUT_MS } from '@/constants/timing';
 import { getQuestionSet } from '@/data/questions';
-import { useCountdown } from '@/hooks/useCountdown';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 import { handleError } from '@/lib/errors/handleError';
 import { hapticSuccess } from '@/lib/haptics';
@@ -44,30 +38,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-/**
- * The video step as an explicit machine. `error` is entered from the player's
- * error event, the ready watchdog, or being offline on entry — and leads to
- * the child's choice (retry / continue without video), never a silent skip.
- */
-type VideoState = 'loading' | 'ready' | 'ended' | 'error';
-
-// The intercepted navigation action, typed via the hook itself so no
-// standalone @react-navigation package needs importing (see comment above).
-type PreventRemoveEvent = Parameters<Parameters<typeof usePreventRemove>[1]>[0];
-type PendingAction = PreventRemoveEvent['data']['action'];
-
-// Remounted per question (key = quiz.index at the call site): one countdown
-// instance covers exactly one question, so a fresh 15 s can never race an
-// interval armed with the previous question's deadline — the same reset idiom
-// as the playerKey remount of the video stage.
-function QuestionTimer({ running, onExpire }: { running: boolean; onExpire: () => void }) {
-  const { remainingSeconds, progress } = useCountdown(SECONDS_PER_QUESTION, {
-    running,
-    onExpire,
-  });
-  return <TimerBar progress={progress} remainingSeconds={remainingSeconds} />;
-}
+import { PendingAction, VideoState } from '@/types/exercises';
+import { QuestionTimer } from '@/components/QuestionTimer';
 
 export default function ExerciseScreen() {
   const { t } = useTranslation('exercise');

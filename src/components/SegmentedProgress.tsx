@@ -4,22 +4,21 @@
  * current question, beige for upcoming — plus a "Soru 2/3" label. Meaning is
  * carried by the glyphs and the spoken per-question summary, never color alone.
  */
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 import { usePulse } from '@/hooks/usePulse';
 import { type QuestionOutcome } from '@/lib/quiz';
 import { colors, radius, spacing, typography } from '@/theme';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle } from 'react-native-reanimated';
 
-type Props = {
-  /** 1-based index of the question on screen. */
+type SegmentedProgressProps = {
   current: number;
   total: number;
   /** Outcome per answered question, in order (may include the current one). */
   outcomes: readonly QuestionOutcome[];
 };
 
-export function SegmentedProgress({ current, total, outcomes }: Props) {
+export function SegmentedProgress({ current, total, outcomes }: SegmentedProgressProps) {
   const { t } = useTranslation('exercise');
 
   // "You are here" breathes gently; a static outline under reduced motion.

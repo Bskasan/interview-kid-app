@@ -4,10 +4,6 @@
  * lesson node with its state visuals: 🔒 locked, number when open, pulse on
  * the current node, stars underneath once earned. Never color alone.
  */
-import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useReducedMotion } from 'react-native-reanimated';
-import Svg, { Path } from 'react-native-svg';
 import { StarRow } from '@/components/StarRow';
 import { MAP_CONNECTOR_WIDTH, MAP_NODE_SIZE, MAP_ROW_HEIGHT } from '@/constants/map';
 import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
@@ -17,6 +13,10 @@ import { entryPath, exitPath, NODE_CENTER_Y, nodeCenterX } from '@/lib/mapPath';
 import { type MapNodeState } from '@/lib/unlock';
 import { colors, radius, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useReducedMotion } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 
 const nodeStyles: Record<MapNodeState, { backgroundColor: string; borderColor: string }> = {
   locked: { backgroundColor: colors.border, borderColor: colors.border },
@@ -25,19 +25,25 @@ const nodeStyles: Record<MapNodeState, { backgroundColor: string; borderColor: s
   completed: { backgroundColor: colors.primary, borderColor: colors.primaryDark },
 };
 
-type Props = {
+type MapNodeRowProps = {
   lesson: Lesson;
   index: number;
   state: MapNodeState;
   stars: number;
-  /** Content width of the map (window minus list padding). */
   width: number;
-  /** True only for the very last node of the whole catalog. */
   isLast: boolean;
   onPress: () => void;
 };
 
-export function MapNodeRow({ lesson, index, state, stars, width, isLast, onPress }: Props) {
+export function MapNodeRow({
+  lesson,
+  index,
+  state,
+  stars,
+  width,
+  isLast,
+  onPress,
+}: MapNodeRowProps) {
   const { t } = useTranslation(['map', 'home']);
   const reduceMotion = useReducedMotion();
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback();

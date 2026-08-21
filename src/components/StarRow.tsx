@@ -3,17 +3,17 @@
  * meaning, a child can count stars. Decorative by default: parents fold the
  * count into their own accessibility label.
  */
-import { StyleSheet, Text } from 'react-native';
 import { EARNED_STAR, HOLLOW_STAR, starCounts } from '@/lib/stars';
 import { colors } from '@/theme';
+import { StyleSheet, Text } from 'react-native';
 
-type Props = {
+type StarRowProps = {
   earned: number;
   total: number;
   size?: number;
 };
 
-export function StarRow({ earned, total, size = 18 }: Props) {
+export function StarRow({ earned, total, size = 18 }: StarRowProps) {
   const safe = starCounts(earned, total);
   return (
     <Text style={[styles.stars, { fontSize: size }]} accessible={false} maxFontSizeMultiplier={1.2}>

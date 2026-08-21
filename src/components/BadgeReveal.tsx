@@ -3,7 +3,10 @@
  * one-shot glow ring and deterministic confetti — all hand-rolled Reanimated.
  * Reduced motion renders a static badge with no confetti.
  */
+import { colors, motion, spacing } from '@/theme';
+import type { Badge } from '@/types/progress';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -13,9 +16,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { useTranslation } from 'react-i18next';
-import { colors, motion, spacing } from '@/theme';
-import type { Badge } from '@/types/progress';
 
 const BADGE_SIZE = 148;
 const CONFETTI_COUNT = 10;
@@ -26,11 +26,11 @@ const badgeLook: Record<Exclude<Badge, 'none'>, { emoji: string; ring: string }>
   perfect: { emoji: '🌟', ring: colors.grape },
 };
 
-type Props = {
+type BadgeRevealProps = {
   badge: Exclude<Badge, 'none'>;
 };
 
-export function BadgeReveal({ badge }: Props) {
+export function BadgeReveal({ badge }: BadgeRevealProps) {
   const { t } = useTranslation('home');
   const reduceMotion = useReducedMotion();
   const scale = useSharedValue(reduceMotion ? 1 : 0);

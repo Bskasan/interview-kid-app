@@ -2,19 +2,18 @@
  * Centered mascot + speech bubble with one optional action button — the shared
  * layout for full-screen error/empty states.
  */
-import { StyleSheet, View } from 'react-native';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
 import { spacing } from '@/theme';
+import { StyleSheet, View } from 'react-native';
 
-type Props = {
-  /** What the mascot says (error, empty, encouragement…). */
+type FullScreenMessageProps = {
   speech: string;
   actionLabel?: string;
   onAction?: () => void;
 };
 
-export function FullScreenMessage({ speech, actionLabel, onAction }: Props) {
+export function FullScreenMessage({ speech, actionLabel, onAction }: FullScreenMessageProps) {
   return (
     <View style={styles.wrap}>
       <View style={styles.message}>

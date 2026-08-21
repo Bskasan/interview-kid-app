@@ -1,6 +1,7 @@
+import { computeTileSize, MIN_TILE_HEIGHT } from '@/utils/computeTileSize';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { useState } from 'react';
-import { AnswerGrid, computeTileSize, MIN_TILE_HEIGHT } from '../../src/components/AnswerGrid';
+import { AnswerGrid } from '../../src/components/AnswerGrid';
 import { type Question } from '../../src/data/questions';
 import i18n from '../../src/i18n';
 import { answerQuestion, createQuizState, feedbackForOption } from '../../src/lib/quiz';
