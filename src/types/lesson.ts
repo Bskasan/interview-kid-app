@@ -11,3 +11,10 @@ export type Lesson = {
   author: string;
   thumbnailUrl: string;
 };
+
+/** One fetched page plus what the pager needs to know about it. */
+export type LessonsPage = {
+  lessons: Lesson[];
+  page: number;
+  isLastPage: boolean;
+};

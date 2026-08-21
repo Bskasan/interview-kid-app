@@ -4,6 +4,13 @@
  * then fades out. Blocks all interaction while visible; reduced motion swaps
  * instantly without ever showing it.
  */
+import { Mascot } from '@/components/Mascot';
+import { BOUNCE_HALF_MS, BOUNCE_RISE } from '@/constants/languageSwitch';
+import { LANGUAGE_TRANSITION } from '@/constants/timing';
+import i18n, { type AppLanguage } from '@/i18n';
+import { useLanguageTransitionStore } from '@/store/languageTransitionStore';
+import { useSettingsStore } from '@/store/settingsStore';
+import { colors, motion, spacing, typography } from '@/theme';
 import { useEffect } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Animated, {
@@ -14,16 +21,6 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { LANGUAGE_TRANSITION } from '@/constants/timing';
-import i18n, { type AppLanguage } from '@/i18n';
-import { Mascot } from '@/components/Mascot';
-import { useLanguageTransitionStore } from '@/store/languageTransitionStore';
-import { useSettingsStore } from '@/store/settingsStore';
-import { colors, motion, spacing, typography } from '@/theme';
-
-// Gentle mascot bob while the child waits (~2.5 half-cycles over the overlay).
-const BOUNCE_RISE = -8;
-const BOUNCE_HALF_MS = 350;
 
 export function LanguageTransitionOverlay() {
   const pending = useLanguageTransitionStore((state) => state.pending);

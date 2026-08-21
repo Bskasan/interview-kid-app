@@ -4,6 +4,11 @@
  * wiggle on the icon and a haptic — while the audio itself is the speech
  * stub until TTS lands (src/lib/speech.ts).
  */
+import { TOUCH_TARGET } from '@/constants/layout';
+import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { isAppLanguage } from '@/i18n';
+import { speak } from '@/lib/speech';
+import { colors } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet } from 'react-native';
 import Animated, {
@@ -13,21 +18,16 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { TOUCH_TARGET } from '@/constants/layout';
-import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { isAppLanguage } from '@/i18n';
-import { speak } from '@/lib/speech';
-import { colors } from '@/theme';
 
 const SIZE = TOUCH_TARGET.compact;
 const SPEAKER_GLYPH = '🔊';
 
-type Props = {
+type SpeakButtonProps = {
   /** The already-translated sentence this button reads aloud. */
   text: string;
 };
 
-export function SpeakButton({ text }: Props) {
+export function SpeakButton({ text }: SpeakButtonProps) {
   const { t, i18n } = useTranslation();
   const reduceMotion = useReducedMotion();
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback();

@@ -3,20 +3,20 @@
  * offline on entry): the child decides — retry, or continue to the quiz
  * without the video — instead of the flow silently skipping ahead.
  */
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
 import { colors, radius, spacing } from '@/theme';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, View } from 'react-native';
 
-type Props = {
+type VideoUnavailableCardProps = {
   /** Recreates the player for another attempt. */
   onRetry: () => void;
   /** The child chooses to take the quiz without the video. */
   onContinue: () => void;
 };
 
-export function VideoUnavailableCard({ onRetry, onContinue }: Props) {
+export function VideoUnavailableCard({ onRetry, onContinue }: VideoUnavailableCardProps) {
   const { t } = useTranslation(['exercise', 'common']);
 
   return (

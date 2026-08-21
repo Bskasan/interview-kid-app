@@ -4,6 +4,20 @@
  * control toggles and starts the animated transition; the current side's label
  * is bold ink, and state is spoken via the label — never color alone.
  */
+import {
+  FLAG_SWAP_END,
+  FLAG_SWAP_START,
+  FLAGS,
+  KNOB_SIZE,
+  KNOB_TRAVEL,
+  TRACK_HEIGHT,
+  TRACK_WIDTH,
+} from '@/constants/languageSwitch';
+import { usePressFeedback } from '@/hooks/usePressFeedback';
+import { isAppLanguage, type AppLanguage } from '@/i18n';
+import { useLanguageTransitionStore } from '@/store/languageTransitionStore';
+import { useSettingsStore } from '@/store/settingsStore';
+import { colors, motion, radius, spacing, typography } from '@/theme';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -15,25 +29,6 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
-import { isAppLanguage, type AppLanguage } from '@/i18n';
-import { usePressFeedback } from '@/hooks/usePressFeedback';
-import { useLanguageTransitionStore } from '@/store/languageTransitionStore';
-import { useSettingsStore } from '@/store/settingsStore';
-import { colors, motion, radius, spacing, typography } from '@/theme';
-
-// Flag emoji denote countries, not languages — accepted for a two-language
-// kids' app because recognizability wins over precision at this age.
-const FLAGS: Record<AppLanguage, string> = { tr: '🇹🇷', en: '🇬🇧' };
-
-// The knob overhangs the track like a physical switch cap; the track area is
-// knob-sized so the overhang needs no overflow tricks.
-const TRACK_WIDTH = 110;
-const TRACK_HEIGHT = 52;
-const KNOB_SIZE = 60;
-const KNOB_TRAVEL = TRACK_WIDTH - KNOB_SIZE;
-// The knob's flag crossfades to the target language around mid-slide.
-const FLAG_SWAP_START = 0.42;
-const FLAG_SWAP_END = 0.58;
 
 export function LanguageSwitch() {
   const { t, i18n } = useTranslation();

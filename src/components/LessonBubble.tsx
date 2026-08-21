@@ -4,13 +4,10 @@
  * Rendered as an absolute overlay over the map (one at a time); tapping the
  * backdrop closes it. Anchor coordinates are computed, never measured.
  */
-import { Image } from 'expo-image';
-import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { SpeakButton } from '@/components/SpeakButton';
 import { StarRow } from '@/components/StarRow';
+import { BUBBLE_MAX_WIDTH, PLACEMENT_ESTIMATE, POINTER_SIZE } from '@/constants/lessons';
 import { MAP_NODE_SIZE } from '@/constants/map';
 import { QUESTIONS_PER_ATTEMPT } from '@/constants/quiz';
 import { reportImageError } from '@/lib/errors/handleError';
@@ -18,20 +15,12 @@ import { type MapNodeState } from '@/lib/unlock';
 import { colors, radius, spacing, typography } from '@/theme';
 import type { Lesson } from '@/types/lesson';
 import { clamp } from '@/utils/clamp';
+import { Image } from 'expo-image';
+import { useTranslation } from 'react-i18next';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeIn, ReduceMotion } from 'react-native-reanimated';
 
-const BUBBLE_MAX_WIDTH = 340;
-const POINTER_SIZE = 16;
-/**
- * Worst-case bubble height, used to decide above/below placement and to keep
- * the Start button inside the viewport: 2×16 padding + 52 header (thumbnail /
- * two-line title / stars) + 12 gap + 60 button, plus slack for the capped
- * font growth. Over-estimating only flips the bubble upwards a little sooner;
- * under-estimating puts the primary action off-screen with no way to scroll
- * to it (a scroll closes the bubble).
- */
-const PLACEMENT_ESTIMATE = 240;
-
-type Props = {
+type LessonBubbleProps = {
   lesson: Lesson;
   state: MapNodeState;
   stars: number;
@@ -52,7 +41,7 @@ export function LessonBubble({
   containerHeight,
   onStart,
   onClose,
-}: Props) {
+}: LessonBubbleProps) {
   const { t } = useTranslation(['map', 'home']);
   const locked = state === 'locked';
   const title = t('home:lessonTitle', { number: lesson.lessonNumber, author: lesson.author });

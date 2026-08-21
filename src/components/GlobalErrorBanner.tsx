@@ -4,6 +4,16 @@
  * the error carries a recovery action. Never shows codes, stacks, URLs or
  * library names. Mounted once in the root layout; a new error replaces the old.
  */
+import { TOUCH_TARGET } from '@/constants/layout';
+import { MASCOT_FACE } from '@/constants/mascot';
+import i18n from '@/i18n';
+import {
+  FALLBACK_ERROR_TEXT,
+  FALLBACK_OK_TEXT,
+  FALLBACK_RETRY_TEXT,
+} from '@/lib/errors/fallbackText';
+import { useErrorStore } from '@/store/errorStore';
+import { colors, motion, radius, spacing, typography } from '@/theme';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -14,18 +24,13 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import i18n from '@/i18n';
-import { MASCOT_FACE } from '@/components/Mascot';
-import {
-  FALLBACK_ERROR_TEXT,
-  FALLBACK_OK_TEXT,
-  FALLBACK_RETRY_TEXT,
-} from '@/lib/errors/fallbackText';
-import { TOUCH_TARGET } from '@/constants/layout';
-import { colors, motion, radius, spacing, typography } from '@/theme';
-import { useErrorStore } from '@/store/errorStore';
 
 const ENTER_OFFSET = -24;
+
+interface BannerShellProps {
+  topInset: number;
+  children: React.ReactNode;
+}
 
 export function GlobalErrorBanner() {
   const { t } = useTranslation(['errors', 'common']);
@@ -92,7 +97,7 @@ export function GlobalErrorBanner() {
 }
 
 /** Slide-and-settle entrance; instant under reduced motion. */
-function BannerShell({ topInset, children }: { topInset: number; children: React.ReactNode }) {
+function BannerShell({ topInset, children }: BannerShellProps) {
   const reduceMotion = useReducedMotion();
   const offset = useSharedValue(reduceMotion ? 0 : ENTER_OFFSET);
   const opacity = useSharedValue(reduceMotion ? 1 : 0);

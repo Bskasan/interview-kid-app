@@ -4,26 +4,19 @@
  * label is the speech line; `readAloud` adds a SpeakButton beside the bubble
  * (outside the image node, so it stays focusable) for pre-readers.
  */
+import { SpeakButton } from '@/components/SpeakButton';
+import { MASCOT_FACE } from '@/constants/mascot';
+import { colors, radius, spacing, typography } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
-import { SpeakButton } from '@/components/SpeakButton';
-import { colors, radius, spacing, typography } from '@/theme';
 
-// Original generic fox — deliberately not an owl or any existing app's character.
-// Exported so the one other face render (error banner) can't drift to a
-// different character.
-export const MASCOT_FACE = '🦊';
-
-type Props = {
-  /** Diameter of the face circle, dp. */
+type MascotProps = {
   size?: number;
-  /** Optional short line shown in a speech bubble next to the face. */
   speech?: string;
-  /** Adds a read-aloud button for lines a child must understand alone. */
   readAloud?: boolean;
 };
 
-export function Mascot({ size = 64, speech, readAloud = false }: Props) {
+export function Mascot({ size = 64, speech, readAloud = false }: MascotProps) {
   const { t } = useTranslation();
   const withButton = !!speech && readAloud;
   const figure = (

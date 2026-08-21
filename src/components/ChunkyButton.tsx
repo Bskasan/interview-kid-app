@@ -3,11 +3,11 @@
  * bottom edge that collapses on press, press-bounce feedback, an optional
  * emoji icon, and a ≥56dp target in every state.
  */
-import { Pressable, StyleSheet, Text } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { TOUCH_TARGET } from '@/constants/layout';
 import { usePressFeedback } from '@/hooks/usePressFeedback';
 import { colors, radius, spacing, typography } from '@/theme';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import Animated from 'react-native-reanimated';
 
 /** Height of the darker "3D" bottom edge that collapses while pressed. */
 const EDGE_HEIGHT = 4;
@@ -20,7 +20,7 @@ const variants = {
 
 type ChunkyButtonVariant = keyof typeof variants;
 
-type Props = {
+type ChunkyButtonProps = {
   label: string;
   onPress: () => void;
   variant?: ChunkyButtonVariant;
@@ -37,7 +37,7 @@ export function ChunkyButton({
   disabled = false,
   icon,
   accessibilityLabel,
-}: Props) {
+}: ChunkyButtonProps) {
   const { animatedStyle, onPressIn, onPressOut } = usePressFeedback({ disabled });
   const { fill, edge } = disabled ? { fill: colors.border, edge: colors.muted } : variants[variant];
 

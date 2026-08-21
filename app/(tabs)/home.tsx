@@ -3,12 +3,6 @@
  * cards, and one big CTA into the exercises tab. The star count animates up
  * each time the tab gains focus (static under reduced motion).
  */
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, Text, View } from 'react-native';
-import { useReducedMotion } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChunkyButton } from '@/components/ChunkyButton';
 import { Mascot } from '@/components/Mascot';
 import { useCountUp } from '@/hooks/useCountUp';
@@ -16,6 +10,12 @@ import { totalStars } from '@/lib/scoring';
 import { useHydratedResults } from '@/store/progressStore';
 import { useStreakStore } from '@/store/streakStore';
 import { colors, radius, spacing, typography } from '@/theme';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, Text, View } from 'react-native';
+import { useReducedMotion } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function DashboardScreen() {
   const { t } = useTranslation('dashboard');
@@ -33,6 +33,7 @@ export default function DashboardScreen() {
       setFocusKey((key) => key + 1);
     }, []),
   );
+
   const stars = useCountUp(starsTarget, { animate: !reduceMotion, restartKey: focusKey });
 
   return (

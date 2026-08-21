@@ -4,22 +4,13 @@
  * quiz. Labels re-render on language change; focus is icon opacity + label
  * weight + tint, never color alone.
  */
+import { TabIcon } from '@/components/TabIcon';
+import { colors, spacing } from '@/theme';
 import { Tabs } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, spacing } from '@/theme';
 
-// ≥56dp shell height before the bottom inset (design-language floor).
 const TAB_BAR_CONTENT_HEIGHT = 64;
-
-function TabIcon({ icon, focused }: { icon: string; focused: boolean }) {
-  return (
-    <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.45 }} maxFontSizeMultiplier={1}>
-      {icon}
-    </Text>
-  );
-}
 
 export default function TabsLayout() {
   const { t } = useTranslation('common');
@@ -41,8 +32,6 @@ export default function TabsLayout() {
           paddingBottom: insets.bottom + spacing.xs,
         },
         tabBarLabelStyle: { fontSize: 13, fontWeight: '800' },
-        // The bar is a fixed box and the label is single-line; on Android font
-        // scaling defaults to on, which clips it against the icon at 2×.
         tabBarAllowFontScaling: false,
       }}
     >

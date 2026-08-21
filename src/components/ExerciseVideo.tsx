@@ -2,14 +2,14 @@
  * Video-stage player: wraps expo-video's useVideoPlayer/VideoView and reports
  * ready/ended/error events up to the exercise screen's video state machine.
  */
+import { useAppActive } from '@/hooks/useAppActive';
+import { colors, radius } from '@/theme';
 import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
-import { useAppActive } from '@/hooks/useAppActive';
-import { colors, radius } from '@/theme';
 
-type Props = {
+type ExerciseVideoProps = {
   uri: string;
   /**
    * Pauses playback while true (e.g. the exit sheet is open) and resumes on
@@ -17,11 +17,8 @@ type Props = {
    * ended or user-paused video stays put.
    */
   suspended?: boolean;
-  /** Fired when the source becomes playable (clears the loading watchdog). */
   onReady: () => void;
-  /** Fired when playback reaches the end (unlocks the quiz CTA). */
   onEnded: () => void;
-  /** Fired when the source fails to load/play, with the player's error payload. */
   onError: (cause: unknown) => void;
 };
 
@@ -31,7 +28,13 @@ type Props = {
  * stage) stops playback via unmount. Backgrounding pauses explicitly on top of
  * expo-video's default staysActiveInBackground=false.
  */
-export function ExerciseVideo({ uri, suspended = false, onReady, onEnded, onError }: Props) {
+export function ExerciseVideo({
+  uri,
+  suspended = false,
+  onReady,
+  onEnded,
+  onError,
+}: ExerciseVideoProps) {
   const player = useVideoPlayer(uri, (instance) => {
     instance.loop = false;
     instance.play();

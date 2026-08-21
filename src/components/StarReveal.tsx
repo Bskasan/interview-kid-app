@@ -3,22 +3,22 @@
  * by one with a spring; unearned slots stay hollow. Static under reduced
  * motion. The row speaks its count as one sentence.
  */
+import { EARNED_STAR, HOLLOW_STAR, starCounts } from '@/lib/stars';
+import { colors } from '@/theme';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { ReduceMotion, ZoomIn } from 'react-native-reanimated';
-import { EARNED_STAR, HOLLOW_STAR, starCounts } from '@/lib/stars';
-import { colors } from '@/theme';
 
 const STAR_SIZE = 40;
 const FIRST_STAR_DELAY_MS = 250;
 const STAR_STAGGER_MS = 350;
 
-type Props = {
+type StarRevealProps = {
   earned: number;
   total: number;
 };
 
-export function StarReveal({ earned, total }: Props) {
+export function StarReveal({ earned, total }: StarRevealProps) {
   const { t } = useTranslation('result');
   const safe = starCounts(earned, total);
 

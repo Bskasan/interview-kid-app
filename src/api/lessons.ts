@@ -4,7 +4,6 @@
  * sequential numbering, and provides the pure pagination helpers (capped
  * next-page param, cross-page flatten + dedupe, load-more guard) for useLessons.
  */
-import type { InfiniteData } from '@tanstack/react-query';
 import {
   LESSON_THUMBNAIL_SIZE,
   LESSONS_PAGE_SIZE,
@@ -12,15 +11,8 @@ import {
   PICSUM_BASE_URL,
 } from '@/constants/api';
 import { REQUEST_TIMEOUT_MS } from '@/constants/timing';
-import type { Lesson } from '@/types/lesson';
-
-/** One fetched page plus what the pager needs to know about it. */
-export type LessonsPage = {
-  lessons: Lesson[];
-  page: number;
-  /** True when picsum returned fewer raw items than a full page — end of list. */
-  isLastPage: boolean;
-};
+import type { Lesson, LessonsPage } from '@/types/lesson';
+import type { InfiniteData } from '@tanstack/react-query';
 
 /**
  * Maps one raw picsum page to Lesson[]. Defensive by policy: unknown input

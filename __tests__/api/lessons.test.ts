@@ -5,10 +5,9 @@ import {
   flattenLessonPages,
   mapLessons,
   nextLessonsPageParam,
-  type LessonsPage,
 } from '../../src/api/lessons';
 import { LESSONS_PAGE_SIZE, LESSONS_TOTAL_LIMIT } from '../../src/constants/api';
-import type { Lesson } from '../../src/types/lesson';
+import type { Lesson, LessonsPage } from '../../src/types/lesson';
 
 const rawItems = (count: number, offset = 0) =>
   Array.from({ length: count }, (_, i) => ({ id: `${offset + i + 1}`, author: `Author ${i}` }));
